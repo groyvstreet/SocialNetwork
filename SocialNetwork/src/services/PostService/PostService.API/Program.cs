@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using PostService.Application.Interfaces;
+using PostService.Domain.Entities;
 using PostService.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,13 @@ var assemblyName = builder.Configuration.GetSection("MigrationsAssembly").Get<st
 builder.Services.AddDbContext<DataContext>(
     opt => opt.UseNpgsql(connectionString,
                          npgsqlOpt => npgsqlOpt.MigrationsAssembly(assemblyName)));
+
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+builder.Services.AddTransient<IRepository<UserProfile>, Repository<UserProfile>>();
+builder.Services.AddTransient<IRepository<Post>, Repository<Post>>();
+
+builder.Services.AddTransient<IPostService, PostService.Application.Services.PostService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
