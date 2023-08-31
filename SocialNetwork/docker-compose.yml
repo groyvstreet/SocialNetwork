@@ -11,7 +11,7 @@ services:
     container_name: post-service
     build:
       context: .
-      dockerfile: /src/services/PostService/PostService.API/Dockerfile
+      dockerfile: /src/services/PostService/PostService.Grpc/Dockerfile
     ports:
       - "80:80"
     networks:

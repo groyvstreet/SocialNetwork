@@ -9,8 +9,8 @@ package posts;
 service GrpcPost {
   rpc GetAll (Empty) returns (PostList);
   rpc Get (PostId) returns (Post);
-  rpc Add (Post) returns (Post);
-  rpc Update (Post) returns (Post);
+  rpc Add (Post) returns (Empty);
+  rpc Update (Post) returns (Empty);
   rpc Remove (PostId) returns (Empty);
 }
 
@@ -18,7 +18,7 @@ message Empty {}
 
 message Post {
 	string id = 1;
-	google.protobuf.Timestamp dateTime = 2;
+	string dateTime = 2;
 	string text = 3;
 	uint64 commentCount = 4;
 	uint64 likeCount = 5;
