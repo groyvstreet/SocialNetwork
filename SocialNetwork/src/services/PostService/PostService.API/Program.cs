@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using PostService.Application.Interfaces;
-using PostService.Domain.Entities;
+using PostService.API.Middlewares;
+using PostService.Application.Interfaces.PostInterfaces;
+using PostService.Application.Interfaces.UserProfileInterfaces;
 using PostService.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,8 +14,8 @@ builder.Services.AddDbContext<DataContext>(
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-builder.Services.AddTransient<IRepository<UserProfile>, Repository<UserProfile>>();
-builder.Services.AddTransient<IRepository<Post>, Repository<Post>>();
+builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddTransient<IPostRepository, PostRepository>();
 
 builder.Services.AddTransient<IPostService, PostService.Application.Services.PostService>();
 
@@ -29,6 +30,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 

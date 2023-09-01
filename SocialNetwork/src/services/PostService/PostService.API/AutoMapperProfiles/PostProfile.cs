@@ -10,6 +10,7 @@ namespace PostService.API.AutoMapperProfiles
         {
             CreateMap<Post, GetPostDTO>();
             CreateMap<AddPostDTO, Post>();
+            CreateMap<UpdatePostDTO, Post>();
         }
     }
 }

@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; }
 
-        public DateTime DateTime { get; set; }
+        public DateTimeOffset DateTime { get; set; }
 
         public string Text { get; set; } = string.Empty;
 

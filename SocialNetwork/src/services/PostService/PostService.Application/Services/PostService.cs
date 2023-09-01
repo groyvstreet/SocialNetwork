@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using PostService.Application.DTOs.PostDTOs;
-using PostService.Application.Interfaces;
+using PostService.Application.Exceptions;
+using PostService.Application.Interfaces.PostInterfaces;
+using PostService.Application.Interfaces.UserProfileInterfaces;
 using PostService.Domain.Entities;
 
 namespace PostService.Application.Services
@@ -8,64 +10,83 @@ namespace PostService.Application.Services
     public class PostService : IPostService
     {
         private readonly IMapper mapper;
-        private readonly IRepository<Post> postRepository;
+        private readonly IPostRepository postRepository;
+        private readonly IUserProfileRepository userProfileRepository;
 
         public PostService(IMapper mapper,
-                           IRepository<Post> postRepository)
+                           IPostRepository postRepository,
+                           IUserProfileRepository userProfileRepository)
         {
             this.mapper = mapper;
             this.postRepository = postRepository;
+            this.userProfileRepository = userProfileRepository;
         }
 
         public async Task<List<GetPostDTO>> GetPostsAsync()
         {
-            var posts = await postRepository.GetAsync();
-            var postDTOs = posts.Select(mapper.Map<GetPostDTO>).ToList();
+            var posts = await postRepository.GetPostsAsync();
+            var getPostDTOs = posts.Select(mapper.Map<GetPostDTO>).ToList();
 
-            return postDTOs;
+            return getPostDTOs;
         }
 
-        public async Task<GetPostDTO?> GetPostByIdAsync(Guid id)
+        public async Task<GetPostDTO> GetPostByIdAsync(Guid id)
         {
-            var post = await postRepository.GetFirstOrDefaultByAsync(p => p.Id == id);
-            var postDTO = mapper.Map<GetPostDTO>(post);
+            var post = await postRepository.GetPostByIdAsync(id);
 
-            return postDTO;
-        }
-
-        public async Task AddPostAsync(AddPostDTO addPostDTO)
-        {
-            var post = mapper.Map<Post>(addPostDTO);
-            await postRepository.AddAsync(post);
-        }
-
-        public async Task<bool> UpdatePostAsync(UpdatePostDTO updatePostDTO)
-        {
-            var post = await postRepository.GetFirstOrDefaultByAsync(p => p.Id == updatePostDTO.Id);
-            
-            if (post == null)
+            if (post is null)
             {
-                return false;
+                throw new NotFoundException($"no such post with id = {id}");
+            }
+
+            var getPostDTO = mapper.Map<GetPostDTO>(post);
+
+            return getPostDTO;
+        }
+
+        public async Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO)
+        {
+            var userProfile = await userProfileRepository.GetUserProfileByIdAsync(addPostDTO.UserProfileId);
+
+            if (userProfile is null)
+            {
+                throw new NotFoundException($"no such user profile with id = {addPostDTO.UserProfileId}");
+            }
+
+            var post = mapper.Map<Post>(addPostDTO);
+            post.DateTime = DateTimeOffset.Now;
+            await postRepository.AddPostAsync(post);
+            var getPostDTO = mapper.Map<GetPostDTO>(post);
+            
+            return getPostDTO;
+        }
+
+        public async Task<GetPostDTO> UpdatePostAsync(UpdatePostDTO updatePostDTO)
+        {
+            var post = await postRepository.GetPostByIdAsync(updatePostDTO.Id);
+            
+            if (post is null)
+            {
+                throw new NotFoundException($"no such post with id = {updatePostDTO.Id}");
             }
 
             post.Text = updatePostDTO.Text;
-            await postRepository.UpdateAsync(post);
+            await postRepository.UpdatePostAsync(post);
+            var getPostDTO = mapper.Map<GetPostDTO>(post);
 
-            return true;
+            return getPostDTO;
         }
 
-        public async Task<bool> RemovePostByIdAsync(Guid id)
+        public async Task RemovePostByIdAsync(Guid id)
         {
-            var post = await postRepository.GetFirstOrDefaultByAsync(p => p.Id == id);
+            var post = await postRepository.GetPostByIdAsync(id);
 
-            if (post == null)
+            if (post is null)
             {
-                return false;
+                throw new NotFoundException($"no such post with id = {id}");
             }
 
-            await postRepository.RemoveAsync(post);
-
-            return true;
+            await postRepository.RemovePostAsync(post);
         }
     }
 }

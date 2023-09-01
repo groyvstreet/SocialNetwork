@@ -83,7 +83,7 @@ namespace PostService.API.Migrations
                     b.Property<decimal>("CommentCount")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<DateTime>("DateTime")
+                    b.Property<DateTimeOffset>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("LikeCount")

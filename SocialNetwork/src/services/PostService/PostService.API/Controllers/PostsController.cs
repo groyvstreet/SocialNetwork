@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PostService.Application.DTOs.PostDTOs;
-using PostService.Application.Interfaces;
-using PostService.Domain.Entities;
+using PostService.Application.Interfaces.PostInterfaces;
 
 namespace PostService.API.Controllers
 {
@@ -10,13 +9,10 @@ namespace PostService.API.Controllers
     public class PostsController : ControllerBase
     {
         private readonly IPostService postService;
-        private readonly IRepository<UserProfile> rep;
 
-        public PostsController(IPostService postService,
-                               IRepository<UserProfile> rep)
+        public PostsController(IPostService postService)
         {
             this.postService = postService;
-            this.rep = rep;
         }
 
         [HttpGet]
@@ -25,7 +21,7 @@ namespace PostService.API.Controllers
 
             var posts = await postService.GetPostsAsync();
 
-            return Ok(await rep.GetAsync());
+            return Ok(posts);
         }
 
         [HttpGet]
@@ -40,36 +36,26 @@ namespace PostService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPostAsync(AddPostDTO addPostDTO)
         {
-            await postService.AddPostAsync(addPostDTO);
+            var post = await postService.AddPostAsync(addPostDTO);
 
-            return Ok();
+            return Ok(post);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAlbumAsync(UpdatePostDTO updatePostDTO)
+        public async Task<IActionResult> UpdatePostAsync(UpdatePostDTO updatePostDTO)
         {
-            var response = await postService.UpdatePostAsync(updatePostDTO);
+            var post = await postService.UpdatePostAsync(updatePostDTO);
 
-            if (response)
-            {
-                return Ok();
-            }
-
-            return NotFound();
+            return Ok(post);
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> RemoveAlbumByIdAsync(Guid id)
+        public async Task<IActionResult> RemovePostByIdAsync(Guid id)
         {
-            var response = await postService.RemovePostByIdAsync(id);
+            await postService.RemovePostByIdAsync(id);
 
-            if (response)
-            {
-                return Ok();
-            }
-
-            return NotFound();
+            return Ok();
         }
     }
 }

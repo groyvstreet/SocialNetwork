@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PostService.Infrastructure.Data;
 
 #nullable disable
 
-namespace PostService.Grpc.Migrations
+namespace PostService.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230901131002_PostEntityUpdated")]
+    partial class PostEntityUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,7 +86,7 @@ namespace PostService.Grpc.Migrations
                     b.Property<decimal>("CommentCount")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<DateTime>("DateTime")
+                    b.Property<DateTimeOffset>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("LikeCount")
