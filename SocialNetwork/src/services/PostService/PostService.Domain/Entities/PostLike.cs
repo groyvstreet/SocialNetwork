@@ -1,12 +1,12 @@
 ﻿namespace PostService.Domain.Entities
 {
-    public class CommentsUserProfile
+    public class PostLike
     {
         public Guid Id { get; set; }
 
-        public Comment Comment { get; set; }
+        public Post Post { get; set; }
 
-        public Guid CommentId { get; set; }
+        public Guid PostId { get; set; }
 
         public UserProfile UserProfile { get; set; }
 

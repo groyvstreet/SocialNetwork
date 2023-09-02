@@ -11,9 +11,9 @@ namespace PostService.Infrastructure.Data
 
         public DbSet<Comment> Comments { get; set; }
 
-        public DbSet<PostsUserProfile> PostsUserProfiles { get; set; }
+        public DbSet<PostLike> PostLikes { get; set; }
 
-        public DbSet<CommentsUserProfile> CommentsUserProfiles { get; set; }
+        public DbSet<CommentLike> CommentLikes { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 

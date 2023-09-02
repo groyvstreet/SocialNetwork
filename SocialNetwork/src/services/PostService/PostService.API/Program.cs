@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PostService.API.Middlewares;
 using PostService.Application.Interfaces.CommentInterfaces;
+using PostService.Application.Interfaces.CommentsUserProfileInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
 using PostService.Application.Interfaces.UserProfileInterfaces;
 using PostService.Application.Services;
@@ -19,9 +20,11 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddTransient<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddTransient<IPostRepository, PostRepository>();
 builder.Services.AddTransient<ICommentRepository, CommentRepository>();
+builder.Services.AddTransient<ICommentLikeRepository, CommentLikeRepository>();
 
 builder.Services.AddTransient<IPostService, PostService.Application.Services.PostService>();
 builder.Services.AddTransient<ICommentService, CommentService>();
+builder.Services.AddTransient<ICommentLikeService, CommentLikeService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
