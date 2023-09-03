@@ -24,6 +24,13 @@ namespace PostService.API.Middlewares
                 var response = new { ex.Message };
                 await context.Response.WriteAsJsonAsync(response);
             }
+            catch (AlreadyExistsException ex)
+            {
+                context.Response.Headers.ContentType = "text/json; charset=utf-8";
+                context.Response.StatusCode = 409;
+                var response = new { ex.Message };
+                await context.Response.WriteAsJsonAsync(response);
+            }
         }
     }
 }

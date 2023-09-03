@@ -22,6 +22,7 @@ builder.Services.AddTransient<IPostRepository, PostRepository>();
 builder.Services.AddTransient<ICommentRepository, CommentRepository>();
 builder.Services.AddTransient<ICommentLikeRepository, CommentLikeRepository>();
 
+builder.Services.AddTransient<IUserProfileService, UserProfileService>();
 builder.Services.AddTransient<IPostService, PostService.Application.Services.PostService>();
 builder.Services.AddTransient<ICommentService, CommentService>();
 builder.Services.AddTransient<ICommentLikeService, CommentLikeService>();

@@ -30,7 +30,7 @@ namespace PostService.Application.Services
         {
             var comment = await commentRepository.GetCommentByIdAsync(addCommentLikeDTO.CommentId);
 
-            if (comment is  null)
+            if (comment is null)
             {
                 throw new NotFoundException($"no such comment with id = {addCommentLikeDTO.CommentId}");
             }
@@ -42,9 +42,20 @@ namespace PostService.Application.Services
                 throw new NotFoundException($"no such user profile with id = {addCommentLikeDTO.UserProfileId}");
             }
 
-            var commentLike = mapper.Map<CommentLike>(addCommentLikeDTO);
+            var commentLike = await commentLikeRepository
+                .GetCommentLikeByCommentIdAndUserProfileIdAsync(addCommentLikeDTO.CommentId, addCommentLikeDTO.UserProfileId);
+
+            if (commentLike is not null)
+            {
+                throw new AlreadyExistsException($"comment like with commentId = {addCommentLikeDTO.CommentId} and userProfileId = {addCommentLikeDTO.UserProfileId} already exists");
+            }
+
+            commentLike = mapper.Map<CommentLike>(addCommentLikeDTO);
             await commentLikeRepository.AddCommentLikeAsync(commentLike);
             var getCommentsUserProfileDTO = mapper.Map<GetCommentLikeDTO>(commentLike);
+
+            comment.LikeCount++;
+            await commentRepository.UpdateCommentAsync(comment);
 
             return getCommentsUserProfileDTO;
         }
@@ -57,6 +68,12 @@ namespace PostService.Application.Services
             {
                 throw new NotFoundException($"no such comment like with id = {id}");
             }
+
+            await commentLikeRepository.RemoveCommentLikeAsync(commentLike);
+
+            var comment = await commentRepository.GetCommentByIdAsync(commentLike.CommentId);
+            comment!.LikeCount--;
+            await commentRepository.UpdateCommentAsync(comment);
         }
     }
 }

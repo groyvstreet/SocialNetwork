@@ -33,6 +33,24 @@ namespace PostService.API.Controllers
             return Ok(comment);
         }
 
+        [HttpGet]
+        [Route("/api/Posts/{id}/Comments")]
+        public async Task<IActionResult> GetCommentsByPostIdAsync(Guid id)
+        {
+            var comments = await commentService.GetCommentsByPostIdAsync(id);
+
+            return Ok(comments);
+        }
+
+        [HttpGet]
+        [Route("/api/UserProfiles/{id}/CommentLikes/Comments")]
+        public async Task<IActionResult> GetLikedCommentsByUserProfileIdAsync(Guid id)
+        {
+            var comments = await commentService.GetLikedCommentsByUserProfileIdAsync(id);
+
+            return Ok(comments);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddCommentAsync(AddCommentDTO addCommentDTO)
         {

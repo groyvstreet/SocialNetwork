@@ -33,6 +33,15 @@ namespace PostService.API.Controllers
             return Ok(post);
         }
 
+        [HttpGet]
+        [Route("/api/UserProfiles/{id}/Posts")]
+        public async Task<IActionResult> GetPostsByUserProfileIdAsync(Guid id)
+        {
+            var posts = await postService.GetPostsByUserProfileIdAsync(id);
+
+            return Ok(posts);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddPostAsync(AddPostDTO addPostDTO)
         {

@@ -44,6 +44,21 @@ namespace PostService.Application.Services
             return getPostDTO;
         }
 
+        public async Task<List<GetPostDTO>> GetPostsByUserProfileIdAsync(Guid userProfileId)
+        {
+            var userProfile = await userProfileRepository.GetUserProfileByIdAsync(userProfileId);
+
+            if (userProfile is null)
+            {
+                throw new NotFoundException($"no such user profile with id = {userProfileId}");
+            }
+
+            var posts = await postRepository.GetPostsByUserProfileIdAsync(userProfileId);
+            var getPostDTOs = posts.Select(mapper.Map<GetPostDTO>).ToList();
+
+            return getPostDTOs;
+        }
+
         public async Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO)
         {
             var userProfile = await userProfileRepository.GetUserProfileByIdAsync(addPostDTO.UserProfileId);

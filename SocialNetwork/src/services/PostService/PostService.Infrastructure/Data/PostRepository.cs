@@ -23,6 +23,11 @@ namespace PostService.Infrastructure.Data
             return await context.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<List<Post>> GetPostsByUserProfileIdAsync(Guid userProfileId)
+        {
+            return await context.Posts.AsNoTracking().Where(p => p.UserProfileId == userProfileId).ToListAsync();
+        }
+
         public async Task<Post> AddPostAsync(Post post)
         {
             context.Posts.Add(post);

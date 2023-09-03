@@ -12,7 +12,7 @@
 
         public ulong LikeCount { get; set; }
 
-        public UserProfile UserProfile { get; set; }
+        public User UserProfile { get; set; }
 
         public Guid UserProfileId { get; set; }
     }

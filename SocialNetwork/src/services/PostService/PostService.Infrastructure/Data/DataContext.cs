@@ -5,7 +5,7 @@ namespace PostService.Infrastructure.Data
 {
     public class DataContext : DbContext
     {
-        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<User> UserProfiles { get; set; }
 
         public DbSet<Post> Posts { get; set; }
 
@@ -19,10 +19,10 @@ namespace PostService.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserProfile>().HasData(
-                new UserProfile[]
+            modelBuilder.Entity<User>().HasData(
+                new User[]
                 {
-                    new UserProfile { 
+                    new User { 
                         Id = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6")
                     }
                 });

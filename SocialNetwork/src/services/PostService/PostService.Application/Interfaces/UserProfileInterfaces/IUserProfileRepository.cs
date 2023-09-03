@@ -4,6 +4,6 @@ namespace PostService.Application.Interfaces.UserProfileInterfaces
 {
     public interface IUserProfileRepository
     {
-        Task<UserProfile?> GetUserProfileByIdAsync(Guid id);
+        Task<User?> GetUserProfileByIdAsync(Guid id);
     }
 }

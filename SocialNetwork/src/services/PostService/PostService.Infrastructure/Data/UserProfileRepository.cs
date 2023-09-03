@@ -13,7 +13,7 @@ namespace PostService.Infrastructure.Data
             this.context = context;
         }
 
-        public async Task<UserProfile?> GetUserProfileByIdAsync(Guid id)
+        public async Task<User?> GetUserProfileByIdAsync(Guid id)
         {
             return await context.UserProfiles.AsNoTracking().FirstOrDefaultAsync(up => up.Id == id);
         }

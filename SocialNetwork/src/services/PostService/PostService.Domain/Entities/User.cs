@@ -1,6 +1,6 @@
 ﻿namespace PostService.Domain.Entities
 {
-    public class UserProfile
+    public class User
     {
         public Guid Id { get; set; }
 

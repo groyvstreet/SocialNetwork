@@ -23,6 +23,11 @@ namespace PostService.Infrastructure.Data
             return await context.Comments.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<List<Comment>> GetCommentsByPostIdAsync(Guid postId)
+        {
+            return await context.Comments.AsNoTracking().Where(c => c.PostId == postId).ToListAsync();
+        }
+
         public async Task<Comment> AddCommentAsync(Comment comment)
         {
             context.Comments.Add(comment);

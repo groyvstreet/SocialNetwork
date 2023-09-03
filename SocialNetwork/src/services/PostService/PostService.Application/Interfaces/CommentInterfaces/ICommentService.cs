@@ -8,6 +8,10 @@ namespace PostService.Application.Interfaces.CommentInterfaces
 
         Task<GetCommentDTO> GetCommentByIdAsync(Guid id);
 
+        Task<List<GetCommentDTO>> GetCommentsByPostIdAsync(Guid postId);
+
+        Task<List<GetCommentDTO>> GetLikedCommentsByUserProfileIdAsync(Guid userProfileId);
+
         Task<GetCommentDTO> AddCommentAsync(AddCommentDTO addCommentDTO);
 
         Task<GetCommentDTO> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO);
