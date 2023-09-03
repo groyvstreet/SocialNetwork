@@ -1,14 +1,12 @@
 ﻿using PostService.Domain.Entities;
 
-namespace PostService.Application.Interfaces.CommentsUserProfileInterfaces
+namespace PostService.Application.Interfaces.CommentLikeInterfaces
 {
     public interface ICommentLikeRepository
     {
-        Task<CommentLike?> GetCommentLikeByIdAsync(Guid id);
+        Task<CommentLike?> GetCommentLikeByCommentIdAndUserIdAsync(Guid commentId, Guid userId);
 
-        Task<CommentLike?> GetCommentLikeByCommentIdAndUserProfileIdAsync(Guid commentId, Guid userId);
-
-        Task<List<CommentLike>> GetCommentLikesByUserProfileIdAsync(Guid userProfileId);
+        Task<List<CommentLike>> GetCommentLikesByUserIdAsync(Guid userId);
 
         Task<List<CommentLike>> GetCommentLikesByCommentIdAsync(Guid commentId);
         

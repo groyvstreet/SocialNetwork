@@ -9,7 +9,7 @@ namespace PostService.API.AutoMapperProfiles
         public CommentLikeProfile()
         {
             CreateMap<CommentLike, GetCommentLikeDTO>();
-            CreateMap<AddCommentLikeDTO, CommentLike>();
+            CreateMap<AddRemoveCommentLikeDTO, CommentLike>();
         }
     }
 }

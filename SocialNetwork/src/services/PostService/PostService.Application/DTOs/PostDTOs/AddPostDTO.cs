@@ -4,6 +4,6 @@
     {
         public string Text { get; set; } = string.Empty;
 
-        public Guid UserProfileId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using PostService.Application.DTOs.CommentLikeDTOs;
 
-namespace PostService.Application.Interfaces.CommentsUserProfileInterfaces
+namespace PostService.Application.Interfaces.CommentLikeInterfaces
 {
     public interface ICommentLikeService
     {
-        Task<GetCommentLikeDTO> AddCommentLikeAsync(AddCommentLikeDTO addCommentLikeDTO);
+        Task<GetCommentLikeDTO> AddCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO);
         
-        Task RemoveCommentLikeByIdAsync(Guid id);
+        Task RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace PostService.Application.DTOs.UserProfileDTOs
+﻿namespace PostService.Application.DTOs.UserDTOs
 {
     public class GetUserDTO
     {

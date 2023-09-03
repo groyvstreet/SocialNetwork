@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PostService.Application.Interfaces.CommentsUserProfileInterfaces;
+using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Domain.Entities;
 
 namespace PostService.Infrastructure.Data
@@ -13,19 +13,14 @@ namespace PostService.Infrastructure.Data
             this.context = context;
         }
 
-        public async Task<CommentLike?> GetCommentLikeByIdAsync(Guid id)
+        public async Task<CommentLike?> GetCommentLikeByCommentIdAndUserIdAsync(Guid commentId, Guid userId)
         {
-            return await context.CommentLikes.AsNoTracking().FirstOrDefaultAsync(cl => cl.Id == id);
+            return await context.CommentLikes.AsNoTracking().FirstOrDefaultAsync(cl => cl.CommentId == commentId && cl.UserId == userId);
         }
 
-        public async Task<CommentLike?> GetCommentLikeByCommentIdAndUserProfileIdAsync(Guid commentId, Guid userProfileId)
+        public async Task<List<CommentLike>> GetCommentLikesByUserIdAsync(Guid userId)
         {
-            return await context.CommentLikes.AsNoTracking().FirstOrDefaultAsync(cl => cl.CommentId == commentId && cl.UserProfileId == userProfileId);
-        }
-
-        public async Task<List<CommentLike>> GetCommentLikesByUserProfileIdAsync(Guid userProfileId)
-        {
-            return await context.CommentLikes.AsNoTracking().Where(cl => cl.UserProfileId == userProfileId).ToListAsync();
+            return await context.CommentLikes.AsNoTracking().Where(cl => cl.UserId == userId).ToListAsync();
         }
 
         public async Task<List<CommentLike>> GetCommentLikesByCommentIdAsync(Guid commentId)

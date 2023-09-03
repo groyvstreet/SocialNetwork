@@ -2,8 +2,8 @@
 using PostService.Application.DTOs.CommentLikeDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces.CommentInterfaces;
-using PostService.Application.Interfaces.CommentsUserProfileInterfaces;
-using PostService.Application.Interfaces.UserProfileInterfaces;
+using PostService.Application.Interfaces.CommentLikeInterfaces;
+using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
 
 namespace PostService.Application.Services
@@ -13,20 +13,20 @@ namespace PostService.Application.Services
         private readonly IMapper mapper;
         private readonly ICommentLikeRepository commentLikeRepository;
         private readonly ICommentRepository commentRepository;
-        private readonly IUserProfileRepository userProfileRepository;
+        private readonly IUserRepository userRepository;
 
         public CommentLikeService(IMapper mapper,
                                           ICommentLikeRepository commentLikeRepository,
                                           ICommentRepository commentRepository,
-                                          IUserProfileRepository userProfileRepository)
+                                          IUserRepository userRepository)
         {
             this.mapper = mapper;
             this.commentLikeRepository = commentLikeRepository;
             this.commentRepository = commentRepository;
-            this.userProfileRepository = userProfileRepository;
+            this.userRepository = userRepository;
         }
 
-        public async Task<GetCommentLikeDTO> AddCommentLikeAsync(AddCommentLikeDTO addCommentLikeDTO)
+        public async Task<GetCommentLikeDTO> AddCommentLikeAsync(AddRemoveCommentLikeDTO addCommentLikeDTO)
         {
             var comment = await commentRepository.GetCommentByIdAsync(addCommentLikeDTO.CommentId);
 
@@ -35,38 +35,38 @@ namespace PostService.Application.Services
                 throw new NotFoundException($"no such comment with id = {addCommentLikeDTO.CommentId}");
             }
 
-            var userProfile = await userProfileRepository.GetUserProfileByIdAsync(addCommentLikeDTO.UserProfileId);
+            var user = await userRepository.GetUserByIdAsync(addCommentLikeDTO.UserId);
 
-            if (userProfile is null)
+            if (user is null)
             {
-                throw new NotFoundException($"no such user profile with id = {addCommentLikeDTO.UserProfileId}");
+                throw new NotFoundException($"no such user with id = {addCommentLikeDTO.UserId}");
             }
 
             var commentLike = await commentLikeRepository
-                .GetCommentLikeByCommentIdAndUserProfileIdAsync(addCommentLikeDTO.CommentId, addCommentLikeDTO.UserProfileId);
+                .GetCommentLikeByCommentIdAndUserIdAsync(addCommentLikeDTO.CommentId, addCommentLikeDTO.UserId);
 
             if (commentLike is not null)
             {
-                throw new AlreadyExistsException($"comment like with commentId = {addCommentLikeDTO.CommentId} and userProfileId = {addCommentLikeDTO.UserProfileId} already exists");
+                throw new AlreadyExistsException($"comment like with commentId = {addCommentLikeDTO.CommentId} and userId = {addCommentLikeDTO.UserId} already exists");
             }
 
             commentLike = mapper.Map<CommentLike>(addCommentLikeDTO);
             await commentLikeRepository.AddCommentLikeAsync(commentLike);
-            var getCommentsUserProfileDTO = mapper.Map<GetCommentLikeDTO>(commentLike);
+            var getCommentsUserDTO = mapper.Map<GetCommentLikeDTO>(commentLike);
 
             comment.LikeCount++;
             await commentRepository.UpdateCommentAsync(comment);
 
-            return getCommentsUserProfileDTO;
+            return getCommentsUserDTO;
         }
 
-        public async Task RemoveCommentLikeByIdAsync(Guid id)
+        public async Task RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
-            var commentLike = await commentLikeRepository.GetCommentLikeByIdAsync(id);
+            var commentLike = await commentLikeRepository.GetCommentLikeByCommentIdAndUserIdAsync(addRemoveCommentLikeDTO.CommentId, addRemoveCommentLikeDTO.UserId);
 
             if (commentLike is null)
             {
-                throw new NotFoundException($"no such comment like with id = {id}");
+                throw new NotFoundException($"no such comment like with commentId = {addRemoveCommentLikeDTO.CommentId} and userId = {addRemoveCommentLikeDTO.UserId}");
             }
 
             await commentLikeRepository.RemoveCommentLikeAsync(commentLike);

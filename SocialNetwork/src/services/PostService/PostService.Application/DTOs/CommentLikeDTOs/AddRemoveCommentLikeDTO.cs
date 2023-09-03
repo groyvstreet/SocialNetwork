@@ -1,9 +1,9 @@
 ﻿namespace PostService.Application.DTOs.CommentLikeDTOs
 {
-    public class AddCommentLikeDTO
+    public class AddRemoveCommentLikeDTO
     {
         public Guid CommentId { get; set; }
 
-        public Guid UserProfileId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace PostService.Application.Interfaces.PostInterfaces
 
         Task<Post?> GetPostByIdAsync(Guid id);
 
-        Task<List<Post>> GetPostsByUserProfileIdAsync(Guid userProfileId);
+        Task<List<Post>> GetPostsByUserIdAsync(Guid userProfileId);
 
         Task<Post> AddPostAsync(Post post);
 

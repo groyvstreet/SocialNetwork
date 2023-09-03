@@ -8,7 +8,9 @@ namespace PostService.Application.Interfaces.PostInterfaces
 
         Task<GetPostDTO> GetPostByIdAsync(Guid id);
 
-        Task<List<GetPostDTO>> GetPostsByUserProfileIdAsync(Guid userProfileId);
+        Task<List<GetPostDTO>> GetPostsByUserIdAsync(Guid userId);
+
+        Task<List<GetPostDTO>> GetLikedPostsByUserIdAsync(Guid userId);
 
         Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO);
 

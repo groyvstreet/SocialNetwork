@@ -43,10 +43,10 @@ namespace PostService.API.Controllers
         }
 
         [HttpGet]
-        [Route("/api/UserProfiles/{id}/CommentLikes/Comments")]
-        public async Task<IActionResult> GetLikedCommentsByUserProfileIdAsync(Guid id)
+        [Route("/api/Users/{id}/CommentLikes/Comments")]
+        public async Task<IActionResult> GetLikedCommentsByUserIdAsync(Guid id)
         {
-            var comments = await commentService.GetLikedCommentsByUserProfileIdAsync(id);
+            var comments = await commentService.GetLikedCommentsByUserIdAsync(id);
 
             return Ok(comments);
         }

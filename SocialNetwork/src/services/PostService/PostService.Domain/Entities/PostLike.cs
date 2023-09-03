@@ -8,8 +8,8 @@
 
         public Guid PostId { get; set; }
 
-        public User UserProfile { get; set; }
+        public User User { get; set; }
 
-        public Guid UserProfileId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

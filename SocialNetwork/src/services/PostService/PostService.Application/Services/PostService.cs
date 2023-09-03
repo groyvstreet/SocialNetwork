@@ -2,7 +2,8 @@
 using PostService.Application.DTOs.PostDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces.PostInterfaces;
-using PostService.Application.Interfaces.UserProfileInterfaces;
+using PostService.Application.Interfaces.PostLikeInterfaces;
+using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
 
 namespace PostService.Application.Services
@@ -11,15 +12,18 @@ namespace PostService.Application.Services
     {
         private readonly IMapper mapper;
         private readonly IPostRepository postRepository;
-        private readonly IUserProfileRepository userProfileRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IPostLikeRepository postLikeRepository;
 
         public PostService(IMapper mapper,
                            IPostRepository postRepository,
-                           IUserProfileRepository userProfileRepository)
+                           IUserRepository userRepository,
+                           IPostLikeRepository postLikeRepository)
         {
             this.mapper = mapper;
             this.postRepository = postRepository;
-            this.userProfileRepository = userProfileRepository;
+            this.userRepository = userRepository;
+            this.postLikeRepository = postLikeRepository;
         }
 
         public async Task<List<GetPostDTO>> GetPostsAsync()
@@ -44,16 +48,32 @@ namespace PostService.Application.Services
             return getPostDTO;
         }
 
-        public async Task<List<GetPostDTO>> GetPostsByUserProfileIdAsync(Guid userProfileId)
+        public async Task<List<GetPostDTO>> GetPostsByUserIdAsync(Guid userId)
         {
-            var userProfile = await userProfileRepository.GetUserProfileByIdAsync(userProfileId);
+            var user = await userRepository.GetUserByIdAsync(userId);
 
-            if (userProfile is null)
+            if (user is null)
             {
-                throw new NotFoundException($"no such user profile with id = {userProfileId}");
+                throw new NotFoundException($"no such user with id = {userId}");
             }
 
-            var posts = await postRepository.GetPostsByUserProfileIdAsync(userProfileId);
+            var posts = await postRepository.GetPostsByUserIdAsync(userId);
+            var getPostDTOs = posts.Select(mapper.Map<GetPostDTO>).ToList();
+
+            return getPostDTOs;
+        }
+
+        public async Task<List<GetPostDTO>> GetLikedPostsByUserIdAsync(Guid userId)
+        {
+            var user = await userRepository.GetUserByIdAsync(userId);
+
+            if (user is null)
+            {
+                throw new NotFoundException($"no such user with id = {userId}");
+            }
+
+            var postLikes = await postLikeRepository.GetPostLikesByUserIdAsync(userId);
+            var posts = postLikes.Select(pl => postRepository.GetPostByIdAsync(pl.PostId).Result);
             var getPostDTOs = posts.Select(mapper.Map<GetPostDTO>).ToList();
 
             return getPostDTOs;
@@ -61,11 +81,11 @@ namespace PostService.Application.Services
 
         public async Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO)
         {
-            var userProfile = await userProfileRepository.GetUserProfileByIdAsync(addPostDTO.UserProfileId);
+            var user = await userRepository.GetUserByIdAsync(addPostDTO.UserId);
 
-            if (userProfile is null)
+            if (user is null)
             {
-                throw new NotFoundException($"no such user profile with id = {addPostDTO.UserProfileId}");
+                throw new NotFoundException($"no such user with id = {addPostDTO.UserId}");
             }
 
             var post = mapper.Map<Post>(addPostDTO);

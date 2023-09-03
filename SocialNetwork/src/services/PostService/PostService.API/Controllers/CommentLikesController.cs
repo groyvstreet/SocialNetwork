@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PostService.Application.DTOs.CommentLikeDTOs;
-using PostService.Application.Interfaces.CommentsUserProfileInterfaces;
+using PostService.Application.Interfaces.CommentLikeInterfaces;
 
 namespace PostService.API.Controllers
 {
@@ -16,18 +16,17 @@ namespace PostService.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCommentLikeAsync(AddCommentLikeDTO addCommentLikeDTO)
+        public async Task<IActionResult> AddCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
-            var commentLike = await commentLikeService.AddCommentLikeAsync(addCommentLikeDTO);
+            var commentLike = await commentLikeService.AddCommentLikeAsync(addRemoveCommentLikeDTO);
 
             return Ok(commentLike);
         }
 
         [HttpDelete]
-        [Route("{id}")]
-        public async Task<IActionResult> RemoveCommentLikeByIdAsync(Guid id)
+        public async Task<IActionResult> RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
-            await commentLikeService.RemoveCommentLikeByIdAsync(id);
+            await commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO);
 
             return Ok();
         }

@@ -2,9 +2,9 @@
 using PostService.Application.DTOs.CommentDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces.CommentInterfaces;
-using PostService.Application.Interfaces.CommentsUserProfileInterfaces;
+using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
-using PostService.Application.Interfaces.UserProfileInterfaces;
+using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
 
 namespace PostService.Application.Services
@@ -14,19 +14,19 @@ namespace PostService.Application.Services
         private readonly IMapper mapper;
         private readonly ICommentRepository commentRepository;
         private readonly IPostRepository postRepository;
-        private readonly IUserProfileRepository userProfileRepository;
+        private readonly IUserRepository userRepository;
         private readonly ICommentLikeRepository commentLikeRepository;
 
         public CommentService(IMapper mapper,
                            ICommentRepository commentRepository,
                            IPostRepository postRepository,
-                           IUserProfileRepository userProfileRepository,
+                           IUserRepository userRepository,
                            ICommentLikeRepository commentLikeRepository)
         {
             this.mapper = mapper;
             this.commentRepository = commentRepository;
             this.postRepository = postRepository;
-            this.userProfileRepository = userProfileRepository;
+            this.userRepository = userRepository;
             this.commentLikeRepository = commentLikeRepository;
         }
 
@@ -67,16 +67,16 @@ namespace PostService.Application.Services
             return getCommentDTOs;
         }
 
-        public async Task<List<GetCommentDTO>> GetLikedCommentsByUserProfileIdAsync(Guid userProfileId)
+        public async Task<List<GetCommentDTO>> GetLikedCommentsByUserIdAsync(Guid userId)
         {
-            var userProfile = await userProfileRepository.GetUserProfileByIdAsync(userProfileId);
+            var user = await userRepository.GetUserByIdAsync(userId);
 
-            if (userProfile is null)
+            if (user is null)
             {
-                throw new NotFoundException($"no such user profile with id = {userProfileId}");
+                throw new NotFoundException($"no such user with id = {userId}");
             }
 
-            var commentLikes = await commentLikeRepository.GetCommentLikesByUserProfileIdAsync(userProfileId);
+            var commentLikes = await commentLikeRepository.GetCommentLikesByUserIdAsync(userId);
             var comments = commentLikes.Select(cl => commentRepository.GetCommentByIdAsync(cl.CommentId).Result);
             var getCommentDTOs = comments.Select(mapper.Map<GetCommentDTO>).ToList();
 
@@ -92,11 +92,11 @@ namespace PostService.Application.Services
                 throw new NotFoundException($"no such post with id = {addCommentDTO.PostId}");
             }
 
-            var userProfile = await userProfileRepository.GetUserProfileByIdAsync(addCommentDTO.UserProfileId);
+            var user = await userRepository.GetUserByIdAsync(addCommentDTO.UserId);
 
-            if (userProfile is null)
+            if (user is null)
             {
-                throw new NotFoundException($"no such user profile with id = {addCommentDTO.UserProfileId}");
+                throw new NotFoundException($"no such user with id = {addCommentDTO.UserId}");
             }
 
             var comment = mapper.Map<Comment>(addCommentDTO);
