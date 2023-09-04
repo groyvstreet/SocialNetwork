@@ -1,4 +1,9 @@
+using IdentityService.BLL.Interfaces;
+using IdentityService.BLL.Services;
 using IdentityService.DAL;
+using IdentityService.DAL.Interfaces;
+using IdentityService.DAL.Repositories;
+using IdentityService.PL.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +19,11 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
 
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+builder.Services.AddTransient<IRoleRepository, RoleRepository>();
+builder.Services.AddTransient<IRoleService, RoleService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,6 +35,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 

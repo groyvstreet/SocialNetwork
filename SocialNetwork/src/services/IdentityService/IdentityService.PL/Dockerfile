@@ -10,6 +10,7 @@ ENV ASPNETCORE_ENVIRONMENT Development
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["src/services/IdentityService/IdentityService.PL/IdentityService.PL.csproj", "src/services/IdentityService/IdentityService.PL/"]
+COPY ["src/services/IdentityService/IdentityService.BLL/IdentityService.BLL.csproj", "src/services/IdentityService/IdentityService.BLL/"]
 COPY ["src/services/IdentityService/IdentityService.DAL/IdentityService.DAL.csproj", "src/services/IdentityService/IdentityService.DAL/"]
 RUN dotnet restore "src/services/IdentityService/IdentityService.PL/IdentityService.PL.csproj"
 COPY . .
