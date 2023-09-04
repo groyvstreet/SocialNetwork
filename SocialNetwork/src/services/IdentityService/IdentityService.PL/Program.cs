@@ -1,4 +1,5 @@
 using IdentityService.DAL;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,10 @@ var assemblyName = builder.Configuration.GetSection("MigrationsAssembly").Get<st
 builder.Services.AddDbContext<DataContext>(
     opt => opt.UseSqlServer(connectionString,
                             sqlServerOpt => sqlServerOpt.MigrationsAssembly(assemblyName)));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<DataContext>()
+                .AddDefaultTokenProviders();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

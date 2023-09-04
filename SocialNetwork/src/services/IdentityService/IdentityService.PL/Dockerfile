@@ -11,7 +11,6 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["src/services/IdentityService/IdentityService.PL/IdentityService.PL.csproj", "src/services/IdentityService/IdentityService.PL/"]
 COPY ["src/services/IdentityService/IdentityService.DAL/IdentityService.DAL.csproj", "src/services/IdentityService/IdentityService.DAL/"]
-COPY ["src/services/IdentityService/IdentityService.BL/IdentityService.BL.csproj", "src/services/IdentityService/IdentityService.BL/"]
 RUN dotnet restore "src/services/IdentityService/IdentityService.PL/IdentityService.PL.csproj"
 COPY . .
 WORKDIR "/src/src/services/IdentityService/IdentityService.PL"
