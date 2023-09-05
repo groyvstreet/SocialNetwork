@@ -1,6 +1,7 @@
 using IdentityService.BLL.Interfaces;
 using IdentityService.BLL.Services;
 using IdentityService.DAL;
+using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
 using IdentityService.DAL.Repositories;
 using IdentityService.PL.Middlewares;
@@ -15,14 +16,20 @@ builder.Services.AddDbContext<DataContext>(
     opt => opt.UseSqlServer(connectionString,
                             sqlServerOpt => sqlServerOpt.MigrationsAssembly(assemblyName)));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<DataContext>()
-                .AddDefaultTokenProviders();
+builder.Services.AddIdentity<User, IdentityRole>(options => {
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireUppercase = false;
+}).AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IIdentityService, IdentityService.BLL.Services.IdentityService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
