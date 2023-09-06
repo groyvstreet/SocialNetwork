@@ -23,5 +23,14 @@ namespace IdentityService.PL.Controllers
 
             return Ok(user);
         }
+
+        [HttpPost]
+        [Route("Signin/Jwt")]
+        public async Task<IActionResult> SignInByJwt([FromQuery] string email, [FromQuery] string password)
+        {
+            var token = new { Token = await identityService.SignInByJwt(email, password) };
+
+            return Ok(token);
+        }
     }
 }

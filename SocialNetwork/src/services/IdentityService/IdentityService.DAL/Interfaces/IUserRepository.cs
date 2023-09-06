@@ -10,6 +10,10 @@ namespace IdentityService.DAL.Interfaces
 
         Task<User?> GetUserByEmailAsync(string email);
 
+        Task<User?> GetUserByEmailAndPasswordAsync(string emaill, string password);
+
+        Task<List<string>> GetUserRolesAsync(User user);
+
         Task AddUserAsync(User user, string password);
 
         Task UpdateUserAsync(User user);

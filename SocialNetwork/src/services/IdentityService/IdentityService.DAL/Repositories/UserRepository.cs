@@ -29,6 +29,32 @@ namespace IdentityService.DAL.Repositories
             return await userManager.FindByEmailAsync(email);
         }
 
+        public async Task<User?> GetUserByEmailAndPasswordAsync(string email, string password)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user is null)
+            {
+                return null;
+            }
+
+            var isPasswordValid = await userManager.CheckPasswordAsync(user, password);
+            
+            if (!isPasswordValid)
+            {
+                return null;
+            }
+
+            return user;
+        }
+
+        public async Task<List<string>> GetUserRolesAsync(User user)
+        {
+            var roles = await userManager.GetRolesAsync(user);
+
+            return roles.ToList();
+        }
+
         public async Task AddUserAsync(User user, string password)
         {
             await userManager.CreateAsync(user, password);

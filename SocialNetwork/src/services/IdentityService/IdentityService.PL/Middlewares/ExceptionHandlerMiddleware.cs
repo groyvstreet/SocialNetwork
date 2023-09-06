@@ -31,6 +31,13 @@ namespace IdentityService.PL.Middlewares
                 var response = new { ex.Message };
                 await context.Response.WriteAsJsonAsync(response);
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                context.Response.Headers.ContentType = "text/json; charset=utf-8";
+                context.Response.StatusCode = 401;
+                var response = new { ex.Message };
+                await context.Response.WriteAsJsonAsync(response);
+            }
         }
     }
 }
