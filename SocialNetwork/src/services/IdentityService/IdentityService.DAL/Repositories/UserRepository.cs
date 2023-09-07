@@ -55,9 +55,10 @@ namespace IdentityService.DAL.Repositories
             return roles.ToList();
         }
 
-        public async Task AddUserAsync(User user, string password)
+        public async Task AddUserAsync(User user, string password, string role)
         {
             await userManager.CreateAsync(user, password);
+            await userManager.AddToRoleAsync(user, role);
         }
 
         public async Task UpdateUserAsync(User user)

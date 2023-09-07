@@ -11,7 +11,9 @@ namespace IdentityService.BLL
 
         public string Key { get; set; } = string.Empty;
 
-        public ushort LifeTime { get; set; }
+        public ushort AccessTokenLifeTime { get; set; }
+
+        public ushort RefreshTokenLifeTime { get; set; }
 
         public SymmetricSecurityKey GetSymmetricSecurityKey()
         {

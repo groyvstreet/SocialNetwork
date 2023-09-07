@@ -5,8 +5,10 @@ using IdentityService.DAL;
 using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
 using IdentityService.DAL.Repositories;
+using IdentityService.PL.Authorization;
 using IdentityService.PL.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -54,10 +56,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
+
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddTransient<IRoleRepository, RoleRepository>();
 builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IUserService, UserService>();
@@ -117,6 +122,12 @@ using (var scope = app.Services.CreateScope())
     {
         context.Database.Migrate();
     }
+
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
+
+    await DbInitializer.SeedData(roleManager, new List<string> { Roles.Admin, Roles.User });
+    await DbInitializer.SeedData(userManager);
 }
 
 app.Run();

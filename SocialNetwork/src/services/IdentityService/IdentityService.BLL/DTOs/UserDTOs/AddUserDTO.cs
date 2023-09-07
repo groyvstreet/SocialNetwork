@@ -11,5 +11,7 @@
         public string LastName { get; set; } = string.Empty;
 
         public DateTime BirthDate { get; set; }
+
+        public string Role { get; set; } = string.Empty;
     }
 }

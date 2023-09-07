@@ -14,7 +14,7 @@ namespace IdentityService.DAL.Interfaces
 
         Task<List<string>> GetUserRolesAsync(User user);
 
-        Task AddUserAsync(User user, string password);
+        Task AddUserAsync(User user, string password, string role);
 
         Task UpdateUserAsync(User user);
 
