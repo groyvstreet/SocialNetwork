@@ -1,7 +1,5 @@
 ﻿using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Interfaces;
-using IdentityService.PL.Authorization;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.PL.Controllers
@@ -11,26 +9,19 @@ namespace IdentityService.PL.Controllers
     public class IdentityController : ControllerBase
     {
         private readonly IIdentityService identityService;
-        private readonly IAuthorizationService authorizationService;
+        private readonly ITokenService tokenService;
 
         public IdentityController(IIdentityService identityService,
-                                  IAuthorizationService authorizationService)
+                                  ITokenService tokenService)
         {
             this.identityService = identityService;
-            this.authorizationService = authorizationService;
+            this.tokenService = tokenService;
         }
 
         [HttpPost]
         [Route("Signup")]
         public async Task<IActionResult> SignUpAsync(AddUserDTO addUserDTO)
         {
-            var authorizationResult = await authorizationService.AuthorizeAsync(User, addUserDTO.Role, Operations.Create);
-
-            if (!authorizationResult.Succeeded)
-            {
-                return Forbid();
-            }
-
             var user = await identityService.SignUpAsync(addUserDTO);
 
             return Ok(user);
@@ -49,7 +40,7 @@ namespace IdentityService.PL.Controllers
         [Route("Refresh")]
         public async Task<IActionResult> RefreshAsync([FromQuery] string accsessToken, [FromQuery] string refreshToken)
         {
-            var tokens = await identityService.RefreshTokenAsync(accsessToken, refreshToken);
+            var tokens = await tokenService.RefreshTokenAsync(accsessToken, refreshToken);
 
             return Ok(tokens);
         }

@@ -16,6 +16,7 @@ namespace IdentityService.PL.Extensions
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ITokenService, TokenService>();
             services.AddTransient<IIdentityService, BLL.Services.IdentityService>();
         }
     }
