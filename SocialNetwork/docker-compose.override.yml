@@ -1,0 +1,64 @@
+version: "3.9"
+
+networks:
+  post-service-network:
+    driver: bridge
+
+  identity-service-network:
+    driver: bridge
+
+  chat-service-network:
+    driver: bridge
+
+services:
+  post-service-app: 
+    container_name: post-service
+    ports:
+      - "80:80"
+    networks:
+      - post-service-network
+
+  postgresql-db:
+    container_name: postgresql
+    environment:
+      POSTGRES_USER: postgresql
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: post-service
+    ports:
+      - "5432:5432"
+    networks:
+      - post-service-network
+
+  identity-service-app:
+    container_name: identity-service
+    ports:
+      - "81:80"
+    networks:
+      - identity-service-network
+
+  mssqlserver-db:
+    container_name: mssqlserver
+    environment:
+      SA_PASSWORD: S3cur3P@ssW0rd!
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    networks:
+      - identity-service-network
+
+  chat-service-app:
+    container_name: chat-service
+    ports:
+      - "82:80"
+    networks:
+      - chat-service-network
+
+  mongo-db:
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    networks:
+      - chat-service-network
