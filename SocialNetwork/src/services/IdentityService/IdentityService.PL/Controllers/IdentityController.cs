@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.PL.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/identity")]
     [ApiController]
     public class IdentityController : ControllerBase
     {
@@ -19,7 +19,7 @@ namespace IdentityService.PL.Controllers
         }
 
         [HttpPost]
-        [Route("Signup")]
+        [Route("signup")]
         public async Task<IActionResult> SignUpAsync(AddUserDTO addUserDTO)
         {
             var user = await identityService.SignUpAsync(addUserDTO);
@@ -28,7 +28,7 @@ namespace IdentityService.PL.Controllers
         }
 
         [HttpPost]
-        [Route("Signin")]
+        [Route("signin")]
         public async Task<IActionResult> SignInAsync([FromQuery] string email, [FromQuery] string password)
         {
             var tokens = await identityService.SignInAsync(email, password);
@@ -37,7 +37,7 @@ namespace IdentityService.PL.Controllers
         }
 
         [HttpPost]
-        [Route("Refresh")]
+        [Route("refresh")]
         public async Task<IActionResult> RefreshAsync([FromQuery] string accsessToken, [FromQuery] string refreshToken)
         {
             var tokens = await tokenService.RefreshTokenAsync(accsessToken, refreshToken);
