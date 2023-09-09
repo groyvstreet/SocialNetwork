@@ -1,8 +1,8 @@
 ﻿using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Interfaces;
-using IdentityService.PL.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace IdentityService.PL.Controllers
 {
@@ -11,13 +11,10 @@ namespace IdentityService.PL.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService userService;
-        private readonly IAuthorizationService authorizationService;
 
-        public UsersController(IUserService userService,
-                               IAuthorizationService authorizationService)
+        public UsersController(IUserService userService)
         {
             this.userService = userService;
-            this.authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -38,31 +35,25 @@ namespace IdentityService.PL.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> UpdateUserAsync(UpdateUserDTO updateUserDTO)
         {
-            var authorizationResult = await authorizationService.AuthorizeAsync(User, updateUserDTO.Id, Operations.Update);
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var authenticatedUserRole = User.FindFirstValue(ClaimTypes.Role)!;
 
-            if (!authorizationResult.Succeeded)
-            {
-                return Forbid();
-            }
-
-            var user = await userService.UpdateUserAsync(updateUserDTO);
+            var user = await userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
 
             return Ok(user);
         }
 
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> RemoveUserByIdAsync(string id)
         {
-            var authorizationResult = await authorizationService.AuthorizeAsync(User, id, Operations.Delete);
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var authenticatedUserRole = User.FindFirstValue(ClaimTypes.Role)!;
 
-            if (!authorizationResult.Succeeded)
-            {
-                return Forbid();
-            }
-
-            await userService.RemoveUserByIdAsync(id);
+            await userService.RemoveUserByIdAsync(id, authenticatedUserId, authenticatedUserRole);
 
             return Ok();
         }

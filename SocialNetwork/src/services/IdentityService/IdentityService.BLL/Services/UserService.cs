@@ -2,6 +2,7 @@
 using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Exceptions;
 using IdentityService.BLL.Interfaces;
+using IdentityService.DAL.Data;
 using IdentityService.DAL.Interfaces;
 
 namespace IdentityService.BLL.Services
@@ -40,8 +41,13 @@ namespace IdentityService.BLL.Services
             return getUserDTO;
         }
 
-        public async Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO updateUserDTO)
+        public async Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO updateUserDTO, string authenticatedUserId, string authenticatedUserRole)
         {
+            if (authenticatedUserRole != Roles.Admin && authenticatedUserId != updateUserDTO.Id)
+            {
+                throw new ForbiddenException();
+            }
+
             var user = await userRepository.GetUserByIdAsync(updateUserDTO.Id);
 
             if (user is null)
@@ -58,8 +64,13 @@ namespace IdentityService.BLL.Services
             return getUserDTO;
         }
 
-        public async Task RemoveUserByIdAsync(string id)
+        public async Task RemoveUserByIdAsync(string id, string authenticatedUserId, string authenticatedUserRole)
         {
+            if (authenticatedUserRole != Roles.Admin && authenticatedUserId != id)
+            {
+                throw new ForbiddenException();
+            }
+
             var user = await userRepository.GetUserByIdAsync(id);
 
             if (user is null)

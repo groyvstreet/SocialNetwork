@@ -21,7 +21,7 @@ namespace IdentityService.DAL.Data
                 LastName = "admin",
             };
             await userManager.CreateAsync(user, "string");
-            await userManager.AddToRoleAsync(user, "admin");
+            await userManager.AddToRoleAsync(user, Roles.Admin);
         }
     }
 }

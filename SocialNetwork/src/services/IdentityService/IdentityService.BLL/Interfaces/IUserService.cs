@@ -8,8 +8,8 @@ namespace IdentityService.BLL.Interfaces
 
         Task<GetUserDTO> GetUserByIdAsync(string id);
 
-        Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO updateUserDTO);
+        Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO updateUserDTO, string authenticatedUserId, string authenticatedUserRole);
 
-        Task RemoveUserByIdAsync(string id);
+        Task RemoveUserByIdAsync(string id, string authenticatedUserId, string authenticatedUserRole);
     }
 }
