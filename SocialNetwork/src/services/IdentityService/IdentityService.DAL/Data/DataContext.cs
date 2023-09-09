@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace IdentityService.DAL
+namespace IdentityService.DAL.Data
 {
     public class DataContext : IdentityDbContext<User>
     {

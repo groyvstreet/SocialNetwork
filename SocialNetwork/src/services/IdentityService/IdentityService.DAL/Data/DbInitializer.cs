@@ -1,16 +1,14 @@
 ﻿using IdentityService.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace IdentityService.DAL
+namespace IdentityService.DAL.Data
 {
     public static class DbInitializer
     {
-        public static async Task SeedData(RoleManager<IdentityRole> roleManager, List<string> roles)
+        public static async Task SeedData(RoleManager<IdentityRole> roleManager)
         {
-            foreach (var role in roles)
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
+            await roleManager.CreateAsync(new IdentityRole(Roles.Admin));
+            await roleManager.CreateAsync(new IdentityRole(Roles.User));
         }
 
         public static async Task SeedData(UserManager<User> userManager)

@@ -1,4 +1,5 @@
-﻿using IdentityService.DAL.Entities;
+﻿using IdentityService.DAL.Data;
+using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

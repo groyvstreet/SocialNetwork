@@ -1,4 +1,4 @@
-﻿namespace IdentityService.PL.Authorization
+﻿namespace IdentityService.DAL.Data
 {
     public static class Roles
     {
