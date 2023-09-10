@@ -7,38 +7,38 @@ namespace IdentityService.DAL.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly UserManager<User> userManager;
+        private readonly UserManager<User> _userManager;
 
         public UserRepository(UserManager<User> userManager)
         {
-            this.userManager = userManager;
+            _userManager = userManager;
         }
 
         public async Task<List<User>> GetUsersAsync()
         {
-            return await userManager.Users.AsNoTracking().ToListAsync();
+            return await _userManager.Users.AsNoTracking().ToListAsync();
         }
 
         public async Task<User?> GetUserByIdAsync(string id)
         {
-            return await userManager.FindByIdAsync(id);
+            return await _userManager.FindByIdAsync(id);
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await userManager.FindByEmailAsync(email);
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<User?> GetUserByEmailAndPasswordAsync(string email, string password)
         {
-            var user = await userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
 
             if (user is null)
             {
                 return null;
             }
 
-            var isPasswordValid = await userManager.CheckPasswordAsync(user, password);
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
             
             if (!isPasswordValid)
             {
@@ -50,25 +50,25 @@ namespace IdentityService.DAL.Repositories
 
         public async Task<List<string>> GetUserRolesAsync(User user)
         {
-            var roles = await userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
             return roles.ToList();
         }
 
         public async Task AddUserAsync(User user, string password, string role)
         {
-            await userManager.CreateAsync(user, password);
-            await userManager.AddToRoleAsync(user, role);
+            await _userManager.CreateAsync(user, password);
+            await _userManager.AddToRoleAsync(user, role);
         }
 
         public async Task UpdateUserAsync(User user)
         {
-            await userManager.UpdateAsync(user);
+            await _userManager.UpdateAsync(user);
         }
 
         public async Task RemoveUserAsync(User user)
         {
-            await userManager.DeleteAsync(user);
+            await _userManager.DeleteAsync(user);
         }
     }
 }

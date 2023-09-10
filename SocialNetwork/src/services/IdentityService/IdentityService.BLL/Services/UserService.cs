@@ -9,34 +9,34 @@ namespace IdentityService.BLL.Services
 {
     public class UserService : IUserService
     {
-        private readonly IMapper mapper;
-        private readonly IUserRepository userRepository;
+        private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
 
         public UserService(IMapper mapper,
                            IUserRepository userRepository)
         {
-            this.mapper = mapper;
-            this.userRepository = userRepository;
+            _mapper = mapper;
+            _userRepository = userRepository;
         }
 
         public async Task<List<GetUserDTO>> GetUsersAsync()
         {
-            var users = await userRepository.GetUsersAsync();
-            var getUserDTOs = users.Select(mapper.Map<GetUserDTO>).ToList();
+            var users = await _userRepository.GetUsersAsync();
+            var getUserDTOs = users.Select(_mapper.Map<GetUserDTO>).ToList();
 
             return getUserDTOs;
         }
 
         public async Task<GetUserDTO> GetUserByIdAsync(string id)
         {
-            var user = await userRepository.GetUserByIdAsync(id);
+            var user = await _userRepository.GetUserByIdAsync(id);
 
             if (user is null)
             {
                 throw new NotFoundException($"no such user with id = {id}");
             }
 
-            var getUserDTO = mapper.Map<GetUserDTO>(user);
+            var getUserDTO = _mapper.Map<GetUserDTO>(user);
 
             return getUserDTO;
         }
@@ -48,7 +48,7 @@ namespace IdentityService.BLL.Services
                 throw new ForbiddenException();
             }
 
-            var user = await userRepository.GetUserByIdAsync(updateUserDTO.Id);
+            var user = await _userRepository.GetUserByIdAsync(updateUserDTO.Id);
 
             if (user is null)
             {
@@ -58,8 +58,8 @@ namespace IdentityService.BLL.Services
             user.FirstName = updateUserDTO.FirstName;
             user.LastName = updateUserDTO.LastName;
             user.BirthDate = updateUserDTO.BirthDate;
-            await userRepository.UpdateUserAsync(user);
-            var getUserDTO = mapper.Map<GetUserDTO>(user);
+            await _userRepository.UpdateUserAsync(user);
+            var getUserDTO = _mapper.Map<GetUserDTO>(user);
 
             return getUserDTO;
         }
@@ -71,14 +71,14 @@ namespace IdentityService.BLL.Services
                 throw new ForbiddenException();
             }
 
-            var user = await userRepository.GetUserByIdAsync(id);
+            var user = await _userRepository.GetUserByIdAsync(id);
 
             if (user is null)
             {
                 throw new NotFoundException($"no such user with id = {id}");
             }
 
-            await userRepository.RemoveUserAsync(user);
+            await _userRepository.RemoveUserAsync(user);
         }
     }
 }

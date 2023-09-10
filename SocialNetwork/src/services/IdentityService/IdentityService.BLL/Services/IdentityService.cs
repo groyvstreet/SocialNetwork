@@ -12,39 +12,39 @@ namespace IdentityService.BLL.Services
 {
     public class IdentityService : IIdentityService
     {
-        private readonly IMapper mapper;
-        private readonly IUserRepository userRepository;
-        private readonly ITokenService tokenService;
+        private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
+        private readonly ITokenService _tokenService;
 
         public IdentityService(IMapper mapper,
                                IUserRepository userRepository,
                                ITokenService tokenService)
         {
-            this.mapper = mapper;
-            this.userRepository = userRepository;
-            this.tokenService = tokenService;
+            _mapper = mapper;
+            _userRepository = userRepository;
+            _tokenService = tokenService;
         }
 
         public async Task<GetUserDTO> SignUpAsync(AddUserDTO addUserDTO)
         {
-            var user = await userRepository.GetUserByEmailAsync(addUserDTO.Email);
+            var user = await _userRepository.GetUserByEmailAsync(addUserDTO.Email);
 
             if (user is not null)
             {
                 throw new AlreadyExistsException($"user with email = {addUserDTO.Email} already exists");
             }
 
-            user = mapper.Map<User>(addUserDTO);
+            user = _mapper.Map<User>(addUserDTO);
             user.UserName = user.Email;
-            await userRepository.AddUserAsync(user, addUserDTO.Password, Roles.User);
-            var getUserDTO = mapper.Map<GetUserDTO>(user);
+            await _userRepository.AddUserAsync(user, addUserDTO.Password, Roles.User);
+            var getUserDTO = _mapper.Map<GetUserDTO>(user);
 
             return getUserDTO;
         }
 
         public async Task<AuthenticatedResponseDTO> SignInAsync(string email, string password)
         {
-            var user = await userRepository.GetUserByEmailAndPasswordAsync(email, password);
+            var user = await _userRepository.GetUserByEmailAndPasswordAsync(email, password);
 
             if (user is null)
             {
@@ -56,7 +56,7 @@ namespace IdentityService.BLL.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
-            var roles = await userRepository.GetUserRolesAsync(user);
+            var roles = await _userRepository.GetUserRolesAsync(user);
 
             foreach (var role in roles)
             {
@@ -65,8 +65,8 @@ namespace IdentityService.BLL.Services
 
             var authenticatedResponseDTO = new AuthenticatedResponseDTO
             {
-                AccessToken = tokenService.GenerateAccessToken(claims),
-                RefreshToken = await tokenService.GenerateRefreshTokenAsync(user.Id)
+                AccessToken = _tokenService.GenerateAccessToken(claims),
+                RefreshToken = await _tokenService.GenerateRefreshTokenAsync(user.Id)
             };
 
             return authenticatedResponseDTO;

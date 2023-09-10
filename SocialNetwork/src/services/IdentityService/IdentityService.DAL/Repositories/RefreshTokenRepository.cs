@@ -7,28 +7,28 @@ namespace IdentityService.DAL.Repositories
 {
     public class RefreshTokenRepository : IRefreshTokenRepository
     {
-        private readonly DataContext context;
+        private readonly DataContext _context;
 
         public RefreshTokenRepository(DataContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public async Task<RefreshToken?> GetRefreshTokenByUserId(string userId)
         {
-            return await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
+            return await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
         }
 
         public async Task AddRefreshTokenAsync(RefreshToken refreshToken)
         {
-            context.RefreshTokens.Add(refreshToken);
-            await context.SaveChangesAsync();
+            _context.RefreshTokens.Add(refreshToken);
+            await _context.SaveChangesAsync();
         }
 
         public async Task RemoveRefreshTokenAsync(RefreshToken refreshToken)
         {
-            context.RefreshTokens.Remove(refreshToken);
-            await context.SaveChangesAsync();
+            _context.RefreshTokens.Remove(refreshToken);
+            await _context.SaveChangesAsync();
         }
     }
 }

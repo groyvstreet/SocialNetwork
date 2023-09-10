@@ -12,24 +12,24 @@ namespace IdentityService.BLL.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly IOptions<JwtOptions> jwtOptions;
-        private readonly IRefreshTokenRepository refreshTokenRepository;
+        private readonly IOptions<JwtOptions> _jwtOptions;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
         public TokenService(IOptions<JwtOptions> jwtOptions,
                             IRefreshTokenRepository refreshTokenRepository)
         {
-            this.jwtOptions = jwtOptions;
-            this.refreshTokenRepository = refreshTokenRepository;
+            _jwtOptions = jwtOptions;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
             var token = new JwtSecurityToken(
-                issuer: jwtOptions.Value.Issuer,
-                audience: jwtOptions.Value.Audience,
+                issuer: _jwtOptions.Value.Issuer,
+                audience: _jwtOptions.Value.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(jwtOptions.Value.AccessTokenLifeTime)),
-                signingCredentials: new SigningCredentials(jwtOptions.Value.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(_jwtOptions.Value.AccessTokenLifeTime)),
+                signingCredentials: new SigningCredentials(_jwtOptions.Value.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -40,21 +40,21 @@ namespace IdentityService.BLL.Services
             using var randomNumberGenerator = RandomNumberGenerator.Create();
             randomNumberGenerator.GetBytes(randomBytes);
 
-            var refreshToken = await refreshTokenRepository.GetRefreshTokenByUserId(userId);
+            var refreshToken = await _refreshTokenRepository.GetRefreshTokenByUserId(userId);
 
             if (refreshToken is not null)
             {
-                await refreshTokenRepository.RemoveRefreshTokenAsync(refreshToken);
+                await _refreshTokenRepository.RemoveRefreshTokenAsync(refreshToken);
             }
 
             refreshToken = new RefreshToken
             {
                 Token = Convert.ToBase64String(randomBytes),
-                ExpirationTime = DateTime.UtcNow.Add(TimeSpan.FromMinutes(jwtOptions.Value.RefreshTokenLifeTime)),
+                ExpirationTime = DateTime.UtcNow.Add(TimeSpan.FromMinutes(_jwtOptions.Value.RefreshTokenLifeTime)),
                 UserId = userId
             };
 
-            await refreshTokenRepository.AddRefreshTokenAsync(refreshToken);
+            await _refreshTokenRepository.AddRefreshTokenAsync(refreshToken);
 
             return refreshToken.Token;
         }
@@ -64,12 +64,12 @@ namespace IdentityService.BLL.Services
             var tokenValidationParameters = new TokenValidationParameters()
             {
                 ValidateIssuer = true,
-                ValidIssuer = jwtOptions.Value.Issuer,
+                ValidIssuer = _jwtOptions.Value.Issuer,
                 ValidateAudience = true,
-                ValidAudience = jwtOptions.Value.Audience,
+                ValidAudience = _jwtOptions.Value.Audience,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = jwtOptions.Value.GetSymmetricSecurityKey()
+                IssuerSigningKey = _jwtOptions.Value.GetSymmetricSecurityKey()
             };
 
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
@@ -94,7 +94,7 @@ namespace IdentityService.BLL.Services
                 throw new SecurityTokenException("invalid access token");
             }
 
-            var refreshTokenObj = await refreshTokenRepository.GetRefreshTokenByUserId(userId);
+            var refreshTokenObj = await _refreshTokenRepository.GetRefreshTokenByUserId(userId);
 
             if (refreshTokenObj is null)
             {
@@ -111,7 +111,7 @@ namespace IdentityService.BLL.Services
                 throw new SecurityTokenExpiredException("refresh token is expired");
             }
 
-            await refreshTokenRepository.RemoveRefreshTokenAsync(refreshTokenObj);
+            await _refreshTokenRepository.RemoveRefreshTokenAsync(refreshTokenObj);
 
             var authenticatedResponseDTO = new AuthenticatedResponseDTO
             {

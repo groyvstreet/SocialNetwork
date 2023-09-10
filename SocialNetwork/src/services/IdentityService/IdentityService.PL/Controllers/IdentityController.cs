@@ -8,21 +8,21 @@ namespace IdentityService.PL.Controllers
     [ApiController]
     public class IdentityController : ControllerBase
     {
-        private readonly IIdentityService identityService;
-        private readonly ITokenService tokenService;
+        private readonly IIdentityService _identityService;
+        private readonly ITokenService _tokenService;
 
         public IdentityController(IIdentityService identityService,
                                   ITokenService tokenService)
         {
-            this.identityService = identityService;
-            this.tokenService = tokenService;
+            _identityService = identityService;
+            _tokenService = tokenService;
         }
 
         [HttpPost]
         [Route("signup")]
         public async Task<IActionResult> SignUpAsync(AddUserDTO addUserDTO)
         {
-            var user = await identityService.SignUpAsync(addUserDTO);
+            var user = await _identityService.SignUpAsync(addUserDTO);
 
             return Ok(user);
         }
@@ -31,7 +31,7 @@ namespace IdentityService.PL.Controllers
         [Route("signin")]
         public async Task<IActionResult> SignInAsync([FromQuery] string email, [FromQuery] string password)
         {
-            var tokens = await identityService.SignInAsync(email, password);
+            var tokens = await _identityService.SignInAsync(email, password);
 
             return Ok(tokens);
         }
@@ -40,7 +40,7 @@ namespace IdentityService.PL.Controllers
         [Route("refresh")]
         public async Task<IActionResult> RefreshAsync([FromQuery] string accsessToken, [FromQuery] string refreshToken)
         {
-            var tokens = await tokenService.RefreshTokenAsync(accsessToken, refreshToken);
+            var tokens = await _tokenService.RefreshTokenAsync(accsessToken, refreshToken);
 
             return Ok(tokens);
         }

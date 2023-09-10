@@ -10,17 +10,17 @@ namespace IdentityService.PL.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserService userService;
+        private readonly IUserService _userService;
 
         public UsersController(IUserService userService)
         {
-            this.userService = userService;
+            _userService = userService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetUsersAsync()
         {
-            var users = await userService.GetUsersAsync();
+            var users = await _userService.GetUsersAsync();
 
             return Ok(users);
         }
@@ -29,7 +29,7 @@ namespace IdentityService.PL.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetUserByIdAsync(string id)
         {
-            var user = await userService.GetUserByIdAsync(id);
+            var user = await _userService.GetUserByIdAsync(id);
 
             return Ok(user);
         }
@@ -41,7 +41,7 @@ namespace IdentityService.PL.Controllers
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var authenticatedUserRole = User.FindFirstValue(ClaimTypes.Role)!;
 
-            var user = await userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
+            var user = await _userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
 
             return Ok(user);
         }
@@ -53,7 +53,7 @@ namespace IdentityService.PL.Controllers
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var authenticatedUserRole = User.FindFirstValue(ClaimTypes.Role)!;
 
-            await userService.RemoveUserByIdAsync(id, authenticatedUserId, authenticatedUserRole);
+            await _userService.RemoveUserByIdAsync(id, authenticatedUserId, authenticatedUserRole);
 
             return Ok();
         }

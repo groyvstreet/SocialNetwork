@@ -6,41 +6,41 @@ namespace IdentityService.DAL.Repositories
 {
     public class RoleRepository : IRoleRepository
     {
-        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RoleRepository(RoleManager<IdentityRole> roleManager)
         {
-            this.roleManager = roleManager;
+            _roleManager = roleManager;
         }
 
         public async Task<List<IdentityRole>> GetRolesAsync()
         {
-            return await roleManager.Roles.AsNoTracking().ToListAsync();
+            return await _roleManager.Roles.AsNoTracking().ToListAsync();
         }
 
         public async Task<IdentityRole?> GetRoleByIdAsync(string id)
         {
-            return await roleManager.FindByIdAsync(id);
+            return await _roleManager.FindByIdAsync(id);
         }
 
         public async Task<IdentityRole?> GetRoleByNameAsync(string name)
         {
-            return await roleManager.FindByNameAsync(name);
+            return await _roleManager.FindByNameAsync(name);
         }
 
         public async Task AddRoleAsync(IdentityRole role)
         {
-            await roleManager.CreateAsync(role);
+            await _roleManager.CreateAsync(role);
         }
 
         public async Task UpdateRoleAsync(IdentityRole role)
         {
-            await roleManager.UpdateAsync(role);
+            await _roleManager.UpdateAsync(role);
         }
 
         public async Task RemoveRoleAsync(IdentityRole role)
         {
-            await roleManager.DeleteAsync(role);
+            await _roleManager.DeleteAsync(role);
         }
     }
 }
