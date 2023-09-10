@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Domain.Entities;
+using PostService.Infrastructure.Data;
 
-namespace PostService.Infrastructure.Data
+namespace PostService.Infrastructure.Repositories
 {
     public class CommentLikeRepository : ICommentLikeRepository
     {

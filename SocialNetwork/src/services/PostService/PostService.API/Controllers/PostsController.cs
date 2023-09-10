@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PostService.Application.DTOs.PostDTOs;
 using PostService.Application.Interfaces.PostInterfaces;
-using PostService.Application.Services;
 
 namespace PostService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/posts")]
     [ApiController]
     public class PostsController : ControllerBase
     {
@@ -35,7 +34,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Users/{id}/Posts")]
+        [Route("/api/users/{id}/posts")]
         public async Task<IActionResult> GetPostsByUserIdAsync(Guid id)
         {
             var posts = await postService.GetPostsByUserIdAsync(id);
@@ -44,7 +43,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Users/{id}/PostLikes/Posts")]
+        [Route("/api/users/{id}/post-likes/posts")]
         public async Task<IActionResult> GetLikedPostsByUserIdAsync(Guid id)
         {
             var posts = await postService.GetLikedPostsByUserIdAsync(id);

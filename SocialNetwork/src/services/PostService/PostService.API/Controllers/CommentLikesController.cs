@@ -4,7 +4,7 @@ using PostService.Application.Interfaces.CommentLikeInterfaces;
 
 namespace PostService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/comment-likes")]
     [ApiController]
     public class CommentLikesController : ControllerBase
     {

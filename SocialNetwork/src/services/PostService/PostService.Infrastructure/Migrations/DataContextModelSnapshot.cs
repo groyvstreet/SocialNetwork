@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PostService.Infrastructure.Data;
 
 #nullable disable
 
-namespace PostService.API.Migrations
+namespace PostService.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230901152450_CommentEntityUpdated")]
-    partial class CommentEntityUpdated
+    partial class DataContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,19 +41,19 @@ namespace PostService.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserProfileId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
 
-                    b.HasIndex("UserProfileId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("PostService.Domain.Entities.CommentsUserProfile", b =>
+            modelBuilder.Entity("PostService.Domain.Entities.CommentLike", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,16 +62,16 @@ namespace PostService.API.Migrations
                     b.Property<Guid>("CommentId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UserProfileId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CommentId");
 
-                    b.HasIndex("UserProfileId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("CommentsUserProfiles");
+                    b.ToTable("CommentLikes");
                 });
 
             modelBuilder.Entity("PostService.Domain.Entities.Post", b =>
@@ -96,17 +93,17 @@ namespace PostService.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserProfileId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserProfileId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("PostService.Domain.Entities.PostsUserProfile", b =>
+            modelBuilder.Entity("PostService.Domain.Entities.PostLike", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -115,19 +112,19 @@ namespace PostService.API.Migrations
                     b.Property<Guid>("PostId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UserProfileId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PostId");
 
-                    b.HasIndex("UserProfileId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("PostsUserProfiles");
+                    b.ToTable("PostLikes");
                 });
 
-            modelBuilder.Entity("PostService.Domain.Entities.UserProfile", b =>
+            modelBuilder.Entity("PostService.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -150,17 +147,7 @@ namespace PostService.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserProfiles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                            BirthDate = new DateOnly(1, 1, 1),
-                            FirstName = "",
-                            Image = "",
-                            LastName = ""
-                        });
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("PostService.Domain.Entities.Comment", b =>
@@ -171,18 +158,18 @@ namespace PostService.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PostService.Domain.Entities.UserProfile", "UserProfile")
+                    b.HasOne("PostService.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserProfileId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Post");
 
-                    b.Navigation("UserProfile");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PostService.Domain.Entities.CommentsUserProfile", b =>
+            modelBuilder.Entity("PostService.Domain.Entities.CommentLike", b =>
                 {
                     b.HasOne("PostService.Domain.Entities.Comment", "Comment")
                         .WithMany()
@@ -190,29 +177,29 @@ namespace PostService.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PostService.Domain.Entities.UserProfile", "UserProfile")
+                    b.HasOne("PostService.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserProfileId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Comment");
 
-                    b.Navigation("UserProfile");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PostService.Domain.Entities.Post", b =>
                 {
-                    b.HasOne("PostService.Domain.Entities.UserProfile", "UserProfile")
+                    b.HasOne("PostService.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserProfileId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UserProfile");
+                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PostService.Domain.Entities.PostsUserProfile", b =>
+            modelBuilder.Entity("PostService.Domain.Entities.PostLike", b =>
                 {
                     b.HasOne("PostService.Domain.Entities.Post", "Post")
                         .WithMany()
@@ -220,15 +207,15 @@ namespace PostService.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PostService.Domain.Entities.UserProfile", "UserProfile")
+                    b.HasOne("PostService.Domain.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserProfileId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Post");
 
-                    b.Navigation("UserProfile");
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PostService.Application.Interfaces.PostInterfaces;
 using PostService.Domain.Entities;
+using PostService.Infrastructure.Data;
 
-namespace PostService.Infrastructure.Data
+namespace PostService.Infrastructure.Repositories
 {
     public class PostRepository : IPostRepository
     {

@@ -4,7 +4,7 @@ using PostService.Application.Interfaces.CommentInterfaces;
 
 namespace PostService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/comments")]
     [ApiController]
     public class CommentsController : ControllerBase
     {
@@ -34,7 +34,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Posts/{id}/Comments")]
+        [Route("/api/posts/{id}/comments")]
         public async Task<IActionResult> GetCommentsByPostIdAsync(Guid id)
         {
             var comments = await commentService.GetCommentsByPostIdAsync(id);
@@ -43,7 +43,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Users/{id}/CommentLikes/Comments")]
+        [Route("/api/users/{id}/comment-likes/comments")]
         public async Task<IActionResult> GetLikedCommentsByUserIdAsync(Guid id)
         {
             var comments = await commentService.GetLikedCommentsByUserIdAsync(id);

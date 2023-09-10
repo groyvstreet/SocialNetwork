@@ -3,7 +3,7 @@ using PostService.Application.Interfaces.UserInterfaces;
 
 namespace PostService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -15,7 +15,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Comments/{id}/Likes/Users")]
+        [Route("/api/comments/{id}/likes/users")]
         public async Task<IActionResult> GetUsersLikedByCommentIdIdAsync(Guid id)
         {
             var users = await userService.GetUsersLikedByCommentIdAsync(id);
@@ -24,7 +24,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpGet]
-        [Route("/api/Posts/{id}/Likes/Users")]
+        [Route("/api/posts/{id}/likes/users")]
         public async Task<IActionResult> GetUsersLikedByPostIdIdAsync(Guid id)
         {
             var users = await userService.GetUsersLikedByPostIdAsync(id);

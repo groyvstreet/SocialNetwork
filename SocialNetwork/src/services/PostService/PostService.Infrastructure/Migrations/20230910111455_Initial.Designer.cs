@@ -9,11 +9,11 @@ using PostService.Infrastructure.Data;
 
 #nullable disable
 
-namespace PostService.API.Migrations
+namespace PostService.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230903193333_RenamedEntityUserProfileToUser")]
-    partial class RenamedEntityUserProfileToUser
+    [Migration("20230910111455_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -151,16 +151,6 @@ namespace PostService.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa6"),
-                            BirthDate = new DateOnly(1, 1, 1),
-                            FirstName = "",
-                            Image = "",
-                            LastName = ""
-                        });
                 });
 
             modelBuilder.Entity("PostService.Domain.Entities.Comment", b =>
