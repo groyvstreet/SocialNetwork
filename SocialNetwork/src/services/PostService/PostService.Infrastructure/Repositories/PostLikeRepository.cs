@@ -7,40 +7,40 @@ namespace PostService.Infrastructure.Repositories
 {
     public class PostLikeRepository : IPostLikeRepository
     {
-        private readonly DataContext context;
+        private readonly DataContext _context;
 
         public PostLikeRepository(DataContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public async Task<PostLike?> GetPostLikeByPostIdAndUserIdAsync(Guid postId, Guid userId)
         {
-            return await context.PostLikes.AsNoTracking().FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
+            return await _context.PostLikes.AsNoTracking().FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
         }
 
         public async Task<List<PostLike>> GetPostLikesByUserIdAsync(Guid userId)
         {
-            return await context.PostLikes.AsNoTracking().Where(pl => pl.UserId == userId).ToListAsync();
+            return await _context.PostLikes.AsNoTracking().Where(pl => pl.UserId == userId).ToListAsync();
         }
 
         public async Task<List<PostLike>> GetPostLikesByPostIdAsync(Guid postId)
         {
-            return await context.PostLikes.AsNoTracking().Where(pl => pl.PostId == postId).ToListAsync();
+            return await _context.PostLikes.AsNoTracking().Where(pl => pl.PostId == postId).ToListAsync();
         }
 
         public async Task<PostLike> AddPostLikeAsync(PostLike postLike)
         {
-            context.PostLikes.Add(postLike);
-            await context.SaveChangesAsync();
+            _context.PostLikes.Add(postLike);
+            await _context.SaveChangesAsync();
 
             return postLike;
         }
 
         public async Task RemovePostLikeAsync(PostLike postLike)
         {
-            context.PostLikes.Remove(postLike);
-            await context.SaveChangesAsync();
+            _context.PostLikes.Remove(postLike);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -7,48 +7,48 @@ namespace PostService.Infrastructure.Repositories
 {
     public class CommentRepository : ICommentRepository
     {
-        private readonly DataContext context;
+        private readonly DataContext _context;
 
         public CommentRepository(DataContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public async Task<List<Comment>> GetCommentsAsync()
         {
-            return await context.Comments.AsNoTracking().ToListAsync();
+            return await _context.Comments.AsNoTracking().ToListAsync();
         }
 
         public async Task<Comment?> GetCommentByIdAsync(Guid id)
         {
-            return await context.Comments.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Comments.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<List<Comment>> GetCommentsByPostIdAsync(Guid postId)
         {
-            return await context.Comments.AsNoTracking().Where(c => c.PostId == postId).ToListAsync();
+            return await _context.Comments.AsNoTracking().Where(c => c.PostId == postId).ToListAsync();
         }
 
         public async Task<Comment> AddCommentAsync(Comment comment)
         {
-            context.Comments.Add(comment);
-            await context.SaveChangesAsync();
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
 
             return comment;
         }
 
         public async Task<Comment> UpdateCommentAsync(Comment comment)
         {
-            context.Comments.Update(comment);
-            await context.SaveChangesAsync();
+            _context.Comments.Update(comment);
+            await _context.SaveChangesAsync();
 
             return comment;
         }
 
         public async Task RemoveCommentAsync(Comment comment)
         {
-            context.Comments.Remove(comment);
-            await context.SaveChangesAsync();
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
         }
     }
 }

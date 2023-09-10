@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using PostService.Application.DTOs.CommentLikeDTOs;
 using PostService.Application.DTOs.PostLikeDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces.PostInterfaces;
@@ -11,39 +10,39 @@ namespace PostService.Application.Services
 {
     public class PostLikeService : IPostLikeService
     {
-        private readonly IMapper mapper;
-        private readonly IPostLikeRepository postLikeRepository;
-        private readonly IPostRepository postRepository;
-        private readonly IUserRepository userRepository;
+        private readonly IMapper _mapper;
+        private readonly IPostLikeRepository _postLikeRepository;
+        private readonly IPostRepository _postRepository;
+        private readonly IUserRepository _userRepository;
 
         public PostLikeService(IMapper mapper,
                                IPostLikeRepository postLikeRepository,
                                IPostRepository postRepository,
                                IUserRepository userRepository)
         {
-            this.mapper = mapper;
-            this.postLikeRepository = postLikeRepository;
-            this.postRepository = postRepository;
-            this.userRepository = userRepository;
+            _mapper = mapper;
+            _postLikeRepository = postLikeRepository;
+            _postRepository = postRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<GetPostLikeDTO> AddPostLikeAsync(AddRemovePostLikeDTO addPostLikeDTO)
         {
-            var post = await postRepository.GetPostByIdAsync(addPostLikeDTO.PostId);
+            var post = await _postRepository.GetPostByIdAsync(addPostLikeDTO.PostId);
 
             if (post is null)
             {
                 throw new NotFoundException($"no such post with id = {addPostLikeDTO.PostId}");
             }
 
-            var user = await userRepository.GetUserByIdAsync(addPostLikeDTO.UserId);
+            var user = await _userRepository.GetUserByIdAsync(addPostLikeDTO.UserId);
 
             if (user is null)
             {
                 throw new NotFoundException($"no such user with id = {addPostLikeDTO.UserId}");
             }
 
-            var postLike = await postLikeRepository
+            var postLike = await _postLikeRepository
                 .GetPostLikeByPostIdAndUserIdAsync(addPostLikeDTO.PostId, addPostLikeDTO.UserId);
 
             if (postLike is not null)
@@ -51,30 +50,30 @@ namespace PostService.Application.Services
                 throw new AlreadyExistsException($"post like with postId = {addPostLikeDTO.PostId} and userId = {addPostLikeDTO.UserId} already exists");
             }
 
-            postLike = mapper.Map<PostLike>(addPostLikeDTO);
-            await postLikeRepository.AddPostLikeAsync(postLike);
-            var getPostLikeDTO = mapper.Map<GetPostLikeDTO>(postLike);
+            postLike = _mapper.Map<PostLike>(addPostLikeDTO);
+            await _postLikeRepository.AddPostLikeAsync(postLike);
+            var getPostLikeDTO = _mapper.Map<GetPostLikeDTO>(postLike);
 
             post.LikeCount++;
-            await postRepository.UpdatePostAsync(post);
+            await _postRepository.UpdatePostAsync(post);
 
             return getPostLikeDTO;
         }
 
         public async Task RemovePostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO)
         {
-            var postLike = await postLikeRepository.GetPostLikeByPostIdAndUserIdAsync(addRemovePostLikeDTO.PostId, addRemovePostLikeDTO.UserId);
+            var postLike = await _postLikeRepository.GetPostLikeByPostIdAndUserIdAsync(addRemovePostLikeDTO.PostId, addRemovePostLikeDTO.UserId);
 
             if (postLike is null)
             {
                 throw new NotFoundException($"no such post like with postId = {addRemovePostLikeDTO.PostId} and userId = {addRemovePostLikeDTO.UserId}");
             }
 
-            await postLikeRepository.RemovePostLikeAsync(postLike);
+            await _postLikeRepository.RemovePostLikeAsync(postLike);
 
-            var post = await postRepository.GetPostByIdAsync(postLike.PostId);
+            var post = await _postRepository.GetPostByIdAsync(postLike.PostId);
             post!.LikeCount--;
-            await postRepository.UpdatePostAsync(post);
+            await _postRepository.UpdatePostAsync(post);
         }
     }
 }

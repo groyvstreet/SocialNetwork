@@ -8,17 +8,17 @@ namespace PostService.API.Controllers
     [ApiController]
     public class PostLikesController : ControllerBase
     {
-        private readonly IPostLikeService postLikeService;
+        private readonly IPostLikeService _postLikeService;
 
         public PostLikesController(IPostLikeService postLikeService)
         {
-            this.postLikeService = postLikeService;
+            _postLikeService = postLikeService;
         }
 
         [HttpPost]
         public async Task<IActionResult> AddPostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO)
         {
-            var postLike = await postLikeService.AddPostLikeAsync(addRemovePostLikeDTO);
+            var postLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO);
 
             return Ok(postLike);
         }
@@ -26,7 +26,7 @@ namespace PostService.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> RemovePostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO)
         {
-            await postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO);
+            await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO);
 
             return Ok();
         }

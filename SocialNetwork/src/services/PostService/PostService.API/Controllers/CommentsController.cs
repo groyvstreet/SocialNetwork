@@ -8,18 +8,18 @@ namespace PostService.API.Controllers
     [ApiController]
     public class CommentsController : ControllerBase
     {
-        private readonly ICommentService commentService;
+        private readonly ICommentService _commentService;
 
         public CommentsController(ICommentService commentService)
         {
-            this.commentService = commentService;
+            _commentService = commentService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCommentsAsync()
         {
 
-            var comments = await commentService.GetCommentsAsync();
+            var comments = await _commentService.GetCommentsAsync();
 
             return Ok(comments);
         }
@@ -28,7 +28,7 @@ namespace PostService.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetCommentByIdAsync(Guid id)
         {
-            var comment = await commentService.GetCommentByIdAsync(id);
+            var comment = await _commentService.GetCommentByIdAsync(id);
 
             return Ok(comment);
         }
@@ -37,7 +37,7 @@ namespace PostService.API.Controllers
         [Route("/api/posts/{id}/comments")]
         public async Task<IActionResult> GetCommentsByPostIdAsync(Guid id)
         {
-            var comments = await commentService.GetCommentsByPostIdAsync(id);
+            var comments = await _commentService.GetCommentsByPostIdAsync(id);
 
             return Ok(comments);
         }
@@ -46,7 +46,7 @@ namespace PostService.API.Controllers
         [Route("/api/users/{id}/comment-likes/comments")]
         public async Task<IActionResult> GetLikedCommentsByUserIdAsync(Guid id)
         {
-            var comments = await commentService.GetLikedCommentsByUserIdAsync(id);
+            var comments = await _commentService.GetLikedCommentsByUserIdAsync(id);
 
             return Ok(comments);
         }
@@ -54,7 +54,7 @@ namespace PostService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCommentAsync(AddCommentDTO addCommentDTO)
         {
-            var comment = await commentService.AddCommentAsync(addCommentDTO);
+            var comment = await _commentService.AddCommentAsync(addCommentDTO);
 
             return Ok(comment);
         }
@@ -62,7 +62,7 @@ namespace PostService.API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO)
         {
-            var comment = await commentService.UpdateCommentAsync(updateCommentDTO);
+            var comment = await _commentService.UpdateCommentAsync(updateCommentDTO);
 
             return Ok(comment);
         }
@@ -71,7 +71,7 @@ namespace PostService.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> RemoveCommentByIdAsync(Guid id)
         {
-            await commentService.RemoveCommentByIdAsync(id);
+            await _commentService.RemoveCommentByIdAsync(id);
 
             return Ok();
         }

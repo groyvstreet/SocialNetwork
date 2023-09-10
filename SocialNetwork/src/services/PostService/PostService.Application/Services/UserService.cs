@@ -11,12 +11,12 @@ namespace PostService.Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IMapper mapper;
-        private readonly IUserRepository userRepository;
-        private readonly ICommentRepository commentRepository;
-        private readonly ICommentLikeRepository commentLikeRepository;
-        private readonly IPostRepository postRepository;
-        private readonly IPostLikeRepository postLikeRepository;
+        private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
+        private readonly ICommentRepository _commentRepository;
+        private readonly ICommentLikeRepository _commentLikeRepository;
+        private readonly IPostRepository _postRepository;
+        private readonly IPostLikeRepository _postLikeRepository;
 
         public UserService(IMapper mapper,
                                   IUserRepository userRepository,
@@ -25,42 +25,42 @@ namespace PostService.Application.Services
                                   IPostRepository postRepository,
                                   IPostLikeRepository postLikeRepository)
         {
-            this.mapper = mapper;
-            this.userRepository = userRepository;
-            this.commentRepository = commentRepository;
-            this.commentLikeRepository = commentLikeRepository;
-            this.postRepository = postRepository;
-            this.postLikeRepository = postLikeRepository;
+            _mapper = mapper;
+            _userRepository = userRepository;
+            _commentRepository = commentRepository;
+            _commentLikeRepository = commentLikeRepository;
+            _postRepository = postRepository;
+            _postLikeRepository = postLikeRepository;
         }
 
         public async Task<List<GetUserDTO>> GetUsersLikedByCommentIdAsync(Guid commentId)
         {
-            var comment = await commentRepository.GetCommentByIdAsync(commentId);
+            var comment = await _commentRepository.GetCommentByIdAsync(commentId);
 
             if (comment is null)
             {
                 throw new NotFoundException($"no such comment with id = {commentId}");
             }
 
-            var commentLikes = await commentLikeRepository.GetCommentLikesByCommentIdAsync(commentId);
-            var users = commentLikes.Select(up => userRepository.GetUserByIdAsync(up.UserId).Result);
-            var getUserDTOs = users.Select(mapper.Map<GetUserDTO>).ToList();
+            var commentLikes = await _commentLikeRepository.GetCommentLikesByCommentIdAsync(commentId);
+            var users = commentLikes.Select(up => _userRepository.GetUserByIdAsync(up.UserId).Result);
+            var getUserDTOs = users.Select(_mapper.Map<GetUserDTO>).ToList();
 
             return getUserDTOs;
         }
 
         public async Task<List<GetUserDTO>> GetUsersLikedByPostIdAsync(Guid postId)
         {
-            var post = await postRepository.GetPostByIdAsync(postId);
+            var post = await _postRepository.GetPostByIdAsync(postId);
 
             if (post is null)
             {
                 throw new NotFoundException($"no such post with id = {postId}");
             }
 
-            var postLikes = await postLikeRepository.GetPostLikesByPostIdAsync(postId);
-            var users = postLikes.Select(up => userRepository.GetUserByIdAsync(up.UserId).Result);
-            var getUserDTOs = users.Select(mapper.Map<GetUserDTO>).ToList();
+            var postLikes = await _postLikeRepository.GetPostLikesByPostIdAsync(postId);
+            var users = postLikes.Select(up => _userRepository.GetUserByIdAsync(up.UserId).Result);
+            var getUserDTOs = users.Select(_mapper.Map<GetUserDTO>).ToList();
 
             return getUserDTOs;
         }

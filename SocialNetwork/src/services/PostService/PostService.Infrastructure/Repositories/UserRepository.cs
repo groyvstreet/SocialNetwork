@@ -7,16 +7,16 @@ namespace PostService.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly DataContext context;
+        private readonly DataContext _context;
 
         public UserRepository(DataContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            return await context.Users.AsNoTracking().FirstOrDefaultAsync(up => up.Id == id);
+            return await _context.Users.AsNoTracking().FirstOrDefaultAsync(up => up.Id == id);
         }
     }
 }

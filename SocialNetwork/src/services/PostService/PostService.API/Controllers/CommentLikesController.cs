@@ -8,17 +8,17 @@ namespace PostService.API.Controllers
     [ApiController]
     public class CommentLikesController : ControllerBase
     {
-        private readonly ICommentLikeService commentLikeService;
+        private readonly ICommentLikeService _commentLikeService;
 
         public CommentLikesController(ICommentLikeService commentLikeService)
         {
-            this.commentLikeService = commentLikeService;
+            _commentLikeService = commentLikeService;
         }
 
         [HttpPost]
         public async Task<IActionResult> AddCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
-            var commentLike = await commentLikeService.AddCommentLikeAsync(addRemoveCommentLikeDTO);
+            var commentLike = await _commentLikeService.AddCommentLikeAsync(addRemoveCommentLikeDTO);
 
             return Ok(commentLike);
         }
@@ -26,7 +26,7 @@ namespace PostService.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
-            await commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO);
+            await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO);
 
             return Ok();
         }

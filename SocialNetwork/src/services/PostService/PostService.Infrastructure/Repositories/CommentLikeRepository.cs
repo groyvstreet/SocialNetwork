@@ -7,40 +7,40 @@ namespace PostService.Infrastructure.Repositories
 {
     public class CommentLikeRepository : ICommentLikeRepository
     {
-        private readonly DataContext context;
+        private readonly DataContext _context;
 
         public CommentLikeRepository(DataContext context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public async Task<CommentLike?> GetCommentLikeByCommentIdAndUserIdAsync(Guid commentId, Guid userId)
         {
-            return await context.CommentLikes.AsNoTracking().FirstOrDefaultAsync(cl => cl.CommentId == commentId && cl.UserId == userId);
+            return await _context.CommentLikes.AsNoTracking().FirstOrDefaultAsync(cl => cl.CommentId == commentId && cl.UserId == userId);
         }
 
         public async Task<List<CommentLike>> GetCommentLikesByUserIdAsync(Guid userId)
         {
-            return await context.CommentLikes.AsNoTracking().Where(cl => cl.UserId == userId).ToListAsync();
+            return await _context.CommentLikes.AsNoTracking().Where(cl => cl.UserId == userId).ToListAsync();
         }
 
         public async Task<List<CommentLike>> GetCommentLikesByCommentIdAsync(Guid commentId)
         {
-            return await context.CommentLikes.AsNoTracking().Where(cl => cl.CommentId == commentId).ToListAsync();
+            return await _context.CommentLikes.AsNoTracking().Where(cl => cl.CommentId == commentId).ToListAsync();
         }
 
         public async Task<CommentLike> AddCommentLikeAsync(CommentLike commentLike)
         {
-            context.CommentLikes.Add(commentLike);
-            await context.SaveChangesAsync();
+            _context.CommentLikes.Add(commentLike);
+            await _context.SaveChangesAsync();
 
             return commentLike;
         }
 
         public async Task RemoveCommentLikeAsync(CommentLike commentLike)
         {
-            context.CommentLikes.Remove(commentLike);
-            await context.SaveChangesAsync();
+            _context.CommentLikes.Remove(commentLike);
+            await _context.SaveChangesAsync();
         }
     }
 }

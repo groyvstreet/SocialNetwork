@@ -7,18 +7,18 @@ namespace PostService.API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserService userService;
+        private readonly IUserService _userService;
 
         public UsersController(IUserService userService)
         {
-            this.userService = userService;
+            _userService = userService;
         }
 
         [HttpGet]
         [Route("/api/comments/{id}/likes/users")]
         public async Task<IActionResult> GetUsersLikedByCommentIdIdAsync(Guid id)
         {
-            var users = await userService.GetUsersLikedByCommentIdAsync(id);
+            var users = await _userService.GetUsersLikedByCommentIdAsync(id);
 
             return Ok(users);
         }
@@ -27,7 +27,7 @@ namespace PostService.API.Controllers
         [Route("/api/posts/{id}/likes/users")]
         public async Task<IActionResult> GetUsersLikedByPostIdIdAsync(Guid id)
         {
-            var users = await userService.GetUsersLikedByPostIdAsync(id);
+            var users = await _userService.GetUsersLikedByPostIdAsync(id);
 
             return Ok(users);
         }
