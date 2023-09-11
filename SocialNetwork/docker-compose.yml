@@ -1,0 +1,73 @@
+version: "3.9"
+networks:
+  post-service-network:
+    driver: bridge
+  identity-service-network:
+    driver: bridge
+  chat-service-network:
+    driver: bridge
+services:
+  post-service-app: 
+    container_name: post-service
+    build:
+      context: .
+      dockerfile: /src/services/PostService/PostService.API/Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - post-service-network
+    depends_on:
+      - postgresql-db
+  postgresql-db:
+    container_name: postgresql
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgresql
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: post-service
+    ports:
+      - "5432:5432"
+    networks:
+      - post-service-network
+  identity-service-app:
+    container_name: identity-service
+    build:
+      context: .
+      dockerfile: /src/services/IdentityService/IdentityService.PL/Dockerfile
+    ports:
+      - "81:80"
+    networks:
+      - identity-service-network
+    depends_on:
+      - mssqlserver-db
+  mssqlserver-db:
+    container_name: mssqlserver
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: S3cur3P@ssW0rd!
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    networks:
+      - identity-service-network
+  chat-service-app:
+    container_name: chat-service
+    build:
+      context: .
+      dockerfile: /src/services/ChatService/ChatService.API/Dockerfile
+    ports:
+      - "82:80"
+    networks:
+      - chat-service-network
+    depends_on:
+      - mongo-db
+  mongo-db:
+    container_name: mongo
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    networks:
+      - chat-service-network
