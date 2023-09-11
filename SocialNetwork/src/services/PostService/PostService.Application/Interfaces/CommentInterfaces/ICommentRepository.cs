@@ -10,9 +10,9 @@ namespace PostService.Application.Interfaces.CommentInterfaces
 
         Task<List<Comment>> GetCommentsByPostIdAsync(Guid postId);
 
-        Task<Comment> AddCommentAsync(Comment comment);
+        Task AddCommentAsync(Comment comment);
 
-        Task<Comment> UpdateCommentAsync(Comment comment);
+        Task UpdateCommentAsync(Comment comment);
 
         Task RemoveCommentAsync(Comment comment);
     }

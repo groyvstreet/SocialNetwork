@@ -29,20 +29,16 @@ namespace PostService.Infrastructure.Repositories
             return await _context.Posts.AsNoTracking().Where(p => p.UserId == userId).ToListAsync();
         }
 
-        public async Task<Post> AddPostAsync(Post post)
+        public async Task AddPostAsync(Post post)
         {
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
-
-            return post;
         }
 
-        public async Task<Post> UpdatePostAsync(Post post)
+        public async Task UpdatePostAsync(Post post)
         {
             _context.Posts.Update(post);
             await _context.SaveChangesAsync();
-
-            return post;
         }
 
         public async Task RemovePostAsync(Post post)

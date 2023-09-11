@@ -29,20 +29,16 @@ namespace PostService.Infrastructure.Repositories
             return await _context.Comments.AsNoTracking().Where(c => c.PostId == postId).ToListAsync();
         }
 
-        public async Task<Comment> AddCommentAsync(Comment comment)
+        public async Task AddCommentAsync(Comment comment)
         {
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
-
-            return comment;
         }
 
-        public async Task<Comment> UpdateCommentAsync(Comment comment)
+        public async Task UpdateCommentAsync(Comment comment)
         {
             _context.Comments.Update(comment);
             await _context.SaveChangesAsync();
-
-            return comment;
         }
 
         public async Task RemoveCommentAsync(Comment comment)

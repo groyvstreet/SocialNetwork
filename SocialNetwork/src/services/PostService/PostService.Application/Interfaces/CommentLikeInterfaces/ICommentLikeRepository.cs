@@ -10,7 +10,7 @@ namespace PostService.Application.Interfaces.CommentLikeInterfaces
 
         Task<List<CommentLike>> GetCommentLikesByCommentIdAsync(Guid commentId);
         
-        Task<CommentLike> AddCommentLikeAsync(CommentLike commentLike);
+        Task AddCommentLikeAsync(CommentLike commentLike);
 
         Task RemoveCommentLikeAsync(CommentLike commentLike);
     }

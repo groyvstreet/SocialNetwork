@@ -10,7 +10,7 @@ namespace PostService.Application.Interfaces.PostLikeInterfaces
 
         Task<List<PostLike>> GetPostLikesByPostIdAsync(Guid postId);
 
-        Task<PostLike> AddPostLikeAsync(PostLike postLike);
+        Task AddPostLikeAsync(PostLike postLike);
 
         Task RemovePostLikeAsync(PostLike postLike);
     }
