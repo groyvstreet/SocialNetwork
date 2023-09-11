@@ -44,7 +44,7 @@ namespace IdentityService.BLL.Services
 
             if (refreshToken is not null)
             {
-                await _refreshTokenRepository.RemoveRefreshTokenAsync(refreshToken);
+                _refreshTokenRepository.Remove(refreshToken);
             }
 
             refreshToken = new RefreshToken
@@ -54,7 +54,8 @@ namespace IdentityService.BLL.Services
                 UserId = userId
             };
 
-            await _refreshTokenRepository.AddRefreshTokenAsync(refreshToken);
+            await _refreshTokenRepository.AddAsync(refreshToken);
+            await _refreshTokenRepository.SaveChangesAsync();
 
             return refreshToken.Token;
         }
@@ -111,7 +112,8 @@ namespace IdentityService.BLL.Services
                 throw new SecurityTokenExpiredException("refresh token is expired");
             }
 
-            await _refreshTokenRepository.RemoveRefreshTokenAsync(refreshTokenObj);
+            _refreshTokenRepository.Remove(refreshTokenObj);
+            await _refreshTokenRepository.SaveChangesAsync();
 
             var authenticatedResponseDTO = new AuthenticatedResponseDTO
             {

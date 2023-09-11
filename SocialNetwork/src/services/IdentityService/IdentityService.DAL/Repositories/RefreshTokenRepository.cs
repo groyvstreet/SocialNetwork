@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.DAL.Repositories
 {
-    public class RefreshTokenRepository : IRefreshTokenRepository
+    public class RefreshTokenRepository : BaseRepository<RefreshToken>, IRefreshTokenRepository
     {
         private readonly DataContext _context;
 
-        public RefreshTokenRepository(DataContext context)
+        public RefreshTokenRepository(DataContext context) : base(context)
         {
             _context = context;
         }
@@ -17,18 +17,6 @@ namespace IdentityService.DAL.Repositories
         public async Task<RefreshToken?> GetRefreshTokenByUserId(string userId)
         {
             return await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
-        }
-
-        public async Task AddRefreshTokenAsync(RefreshToken refreshToken)
-        {
-            _context.RefreshTokens.Add(refreshToken);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task RemoveRefreshTokenAsync(RefreshToken refreshToken)
-        {
-            _context.RefreshTokens.Remove(refreshToken);
-            await _context.SaveChangesAsync();
         }
     }
 }

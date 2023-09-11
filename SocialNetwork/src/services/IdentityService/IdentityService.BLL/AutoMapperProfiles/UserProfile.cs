@@ -2,7 +2,7 @@
 using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.DAL.Entities;
 
-namespace IdentityService.PL.AutoMapperProfiles
+namespace IdentityService.BLL.AutoMapperProfiles
 {
     public class UserProfile : Profile
     {

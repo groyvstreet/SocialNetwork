@@ -8,7 +8,9 @@ builder.Services.AddIdentity();
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddFluentValidation();
+
+builder.Services.AddAutoMapper();
 
 builder.Services.AddServices();
 
