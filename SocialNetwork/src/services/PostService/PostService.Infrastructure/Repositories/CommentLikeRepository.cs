@@ -5,11 +5,11 @@ using PostService.Infrastructure.Data;
 
 namespace PostService.Infrastructure.Repositories
 {
-    public class CommentLikeRepository : ICommentLikeRepository
+    public class CommentLikeRepository : BaseRepository<CommentLike>, ICommentLikeRepository
     {
         private readonly DataContext _context;
 
-        public CommentLikeRepository(DataContext context)
+        public CommentLikeRepository(DataContext context) : base(context)
         {
             _context = context;
         }
@@ -29,16 +29,16 @@ namespace PostService.Infrastructure.Repositories
             return await _context.CommentLikes.AsNoTracking().Where(cl => cl.CommentId == commentId).ToListAsync();
         }
 
-        public async Task AddCommentLikeAsync(CommentLike commentLike)
+        /*public async Task AddCommentLikeAsync(CommentLike commentLike)
         {
             _context.CommentLikes.Add(commentLike);
             await _context.SaveChangesAsync();
-        }
+        }*/
 
-        public async Task RemoveCommentLikeAsync(CommentLike commentLike)
+        /*public async Task RemoveCommentLikeAsync(CommentLike commentLike)
         {
             _context.CommentLikes.Remove(commentLike);
             await _context.SaveChangesAsync();
-        }
+        }*/
     }
 }

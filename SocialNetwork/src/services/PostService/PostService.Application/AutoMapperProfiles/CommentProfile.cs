@@ -2,7 +2,7 @@
 using PostService.Application.DTOs.CommentDTOs;
 using PostService.Domain.Entities;
 
-namespace PostService.API.AutoMapperProfiles
+namespace PostService.Application.AutoMapperProfiles
 {
     public class CommentProfile : Profile
     {

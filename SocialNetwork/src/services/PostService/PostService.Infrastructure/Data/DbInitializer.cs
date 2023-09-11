@@ -4,7 +4,7 @@ namespace PostService.Infrastructure.Data
 {
     public static class DbInitializer
     {
-        public static async Task SeedData(DataContext context)
+        public static async Task SeedDataAsync(DataContext context)
         {
             if (!context.Users.Any())
             {

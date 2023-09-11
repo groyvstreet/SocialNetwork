@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PostService.Domain.Entities;
+using PostService.Infrastructure.Configurations;
 
 namespace PostService.Infrastructure.Data
 {
@@ -16,5 +17,13 @@ namespace PostService.Infrastructure.Data
         public DbSet<CommentLike> CommentLikes { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new PostLikeConfiguration());
+            modelBuilder.ApplyConfiguration(new CommentLikeConfiguration());
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

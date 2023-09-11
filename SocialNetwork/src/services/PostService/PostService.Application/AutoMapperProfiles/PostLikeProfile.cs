@@ -2,7 +2,7 @@
 using PostService.Application.DTOs.PostLikeDTOs;
 using PostService.Domain.Entities;
 
-namespace PostService.API.AutoMapperProfiles
+namespace PostService.Application.AutoMapperProfiles
 {
     public class PostLikeProfile : Profile
     {

@@ -16,7 +16,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
+        public async Task<IActionResult> AddCommentLikeAsync([FromBody] AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
             var commentLike = await _commentLikeService.AddCommentLikeAsync(addRemoveCommentLikeDTO);
 
@@ -24,11 +24,11 @@ namespace PostService.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
+        public async Task<IActionResult> RemoveCommentLikeAsync([FromBody] AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
             await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

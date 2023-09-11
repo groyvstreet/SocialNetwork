@@ -18,7 +18,6 @@ namespace PostService.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCommentsAsync()
         {
-
             var comments = await _commentService.GetCommentsAsync();
 
             return Ok(comments);
@@ -52,7 +51,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCommentAsync(AddCommentDTO addCommentDTO)
+        public async Task<IActionResult> AddCommentAsync([FromBody] AddCommentDTO addCommentDTO)
         {
             var comment = await _commentService.AddCommentAsync(addCommentDTO);
 
@@ -60,7 +59,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO)
+        public async Task<IActionResult> UpdateCommentAsync([FromBody] UpdateCommentDTO updateCommentDTO)
         {
             var comment = await _commentService.UpdateCommentAsync(updateCommentDTO);
 
@@ -73,7 +72,7 @@ namespace PostService.API.Controllers
         {
             await _commentService.RemoveCommentByIdAsync(id);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

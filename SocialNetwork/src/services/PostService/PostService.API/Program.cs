@@ -4,7 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
 
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddFluentValidation();
+
+builder.Services.AddAutoMapper();
 
 builder.Services.AddServices();
 
@@ -29,6 +31,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.ApplyMigrations();
-await app.InitializeDatabase();
+await app.InitializeDatabaseAsync();
 
 app.Run();

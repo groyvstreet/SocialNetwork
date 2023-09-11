@@ -2,7 +2,7 @@
 
 namespace PostService.Application.Interfaces.PostLikeInterfaces
 {
-    public interface IPostLikeRepository
+    public interface IPostLikeRepository : IBaseRepository<PostLike>
     {
         Task<PostLike?> GetPostLikeByPostIdAndUserIdAsync(Guid postId, Guid userId);
 
@@ -10,8 +10,8 @@ namespace PostService.Application.Interfaces.PostLikeInterfaces
 
         Task<List<PostLike>> GetPostLikesByPostIdAsync(Guid postId);
 
-        Task AddPostLikeAsync(PostLike postLike);
+        //Task AddPostLikeAsync(PostLike postLike);
 
-        Task RemovePostLikeAsync(PostLike postLike);
+        //Task RemovePostLikeAsync(PostLike postLike);
     }
 }

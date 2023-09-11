@@ -2,7 +2,7 @@
 
 namespace PostService.Application.Interfaces.CommentLikeInterfaces
 {
-    public interface ICommentLikeRepository
+    public interface ICommentLikeRepository : IBaseRepository<CommentLike>
     {
         Task<CommentLike?> GetCommentLikeByCommentIdAndUserIdAsync(Guid commentId, Guid userId);
 
@@ -10,8 +10,8 @@ namespace PostService.Application.Interfaces.CommentLikeInterfaces
 
         Task<List<CommentLike>> GetCommentLikesByCommentIdAsync(Guid commentId);
         
-        Task AddCommentLikeAsync(CommentLike commentLike);
+        //Task AddCommentLikeAsync(CommentLike commentLike);
 
-        Task RemoveCommentLikeAsync(CommentLike commentLike);
+        //Task RemoveCommentLikeAsync(CommentLike commentLike);
     }
 }

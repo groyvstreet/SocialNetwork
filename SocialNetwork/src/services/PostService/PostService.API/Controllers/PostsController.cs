@@ -52,7 +52,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddPostAsync(AddPostDTO addPostDTO)
+        public async Task<IActionResult> AddPostAsync([FromBody] AddPostDTO addPostDTO)
         {
             var post = await _postService.AddPostAsync(addPostDTO);
 
@@ -60,7 +60,7 @@ namespace PostService.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdatePostAsync(UpdatePostDTO updatePostDTO)
+        public async Task<IActionResult> UpdatePostAsync([FromBody] UpdatePostDTO updatePostDTO)
         {
             var post = await _postService.UpdatePostAsync(updatePostDTO);
 
@@ -73,7 +73,7 @@ namespace PostService.API.Controllers
         {
             await _postService.RemovePostByIdAsync(id);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

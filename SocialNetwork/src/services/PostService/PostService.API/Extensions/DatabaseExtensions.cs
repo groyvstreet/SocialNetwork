@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PostService.Infrastructure.Data;
 
 namespace PostService.API.Extensions
@@ -29,7 +28,7 @@ namespace PostService.API.Extensions
             }
         }
 
-        public static async Task InitializeDatabase(this IHost host)
+        public static async Task InitializeDatabaseAsync(this IHost host)
         {
             using var scope = host.Services.CreateScope();
 
@@ -37,7 +36,7 @@ namespace PostService.API.Extensions
 
             var context = services.GetRequiredService<DataContext>();
 
-            await DbInitializer.SeedData(context);
+            await DbInitializer.SeedDataAsync(context);
         }
     }
 }

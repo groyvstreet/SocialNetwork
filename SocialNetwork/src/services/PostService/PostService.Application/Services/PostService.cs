@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using PostService.Application.DTOs.PostDTOs;
 using PostService.Application.Exceptions;
+using PostService.Application.Interfaces;
 using PostService.Application.Interfaces.PostInterfaces;
 using PostService.Application.Interfaces.PostLikeInterfaces;
-using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
 
 namespace PostService.Application.Services
@@ -12,12 +12,12 @@ namespace PostService.Application.Services
     {
         private readonly IMapper _mapper;
         private readonly IPostRepository _postRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IPostLikeRepository _postLikeRepository;
 
         public PostService(IMapper mapper,
                            IPostRepository postRepository,
-                           IUserRepository userRepository,
+                           IBaseRepository<User> userRepository,
                            IPostLikeRepository postLikeRepository)
         {
             _mapper = mapper;
@@ -28,7 +28,7 @@ namespace PostService.Application.Services
 
         public async Task<List<GetPostDTO>> GetPostsAsync()
         {
-            var posts = await _postRepository.GetPostsAsync();
+            var posts = await _postRepository.GetAllAsync();
             var getPostDTOs = posts.Select(_mapper.Map<GetPostDTO>).ToList();
 
             return getPostDTOs;
@@ -36,7 +36,7 @@ namespace PostService.Application.Services
 
         public async Task<GetPostDTO> GetPostByIdAsync(Guid id)
         {
-            var post = await _postRepository.GetPostByIdAsync(id);
+            var post = await _postRepository.GetFirstOrDefaultByIdAsync(id);
 
             if (post is null)
             {
@@ -50,7 +50,7 @@ namespace PostService.Application.Services
 
         public async Task<List<GetPostDTO>> GetPostsByUserIdAsync(Guid userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetFirstOrDefaultByIdAsync(userId);
 
             if (user is null)
             {
@@ -65,7 +65,7 @@ namespace PostService.Application.Services
 
         public async Task<List<GetPostDTO>> GetLikedPostsByUserIdAsync(Guid userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetFirstOrDefaultByIdAsync(userId);
 
             if (user is null)
             {
@@ -73,7 +73,7 @@ namespace PostService.Application.Services
             }
 
             var postLikes = await _postLikeRepository.GetPostLikesByUserIdAsync(userId);
-            var posts = postLikes.Select(pl => _postRepository.GetPostByIdAsync(pl.PostId).Result);
+            var posts = postLikes.Select(pl => _postRepository.GetFirstOrDefaultByIdAsync(pl.PostId).Result);
             var getPostDTOs = posts.Select(_mapper.Map<GetPostDTO>).ToList();
 
             return getPostDTOs;
@@ -81,7 +81,7 @@ namespace PostService.Application.Services
 
         public async Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO)
         {
-            var user = await _userRepository.GetUserByIdAsync(addPostDTO.UserId);
+            var user = await _userRepository.GetFirstOrDefaultByIdAsync(addPostDTO.UserId);
 
             if (user is null)
             {
@@ -90,7 +90,8 @@ namespace PostService.Application.Services
 
             var post = _mapper.Map<Post>(addPostDTO);
             post.DateTime = DateTimeOffset.Now;
-            await _postRepository.AddPostAsync(post);
+            await _postRepository.AddAsync(post);
+            await _postRepository.SaveChangesAsync();
             var getPostDTO = _mapper.Map<GetPostDTO>(post);
             
             return getPostDTO;
@@ -98,7 +99,7 @@ namespace PostService.Application.Services
 
         public async Task<GetPostDTO> UpdatePostAsync(UpdatePostDTO updatePostDTO)
         {
-            var post = await _postRepository.GetPostByIdAsync(updatePostDTO.Id);
+            var post = await _postRepository.GetFirstOrDefaultByIdAsync(updatePostDTO.Id);
             
             if (post is null)
             {
@@ -106,7 +107,7 @@ namespace PostService.Application.Services
             }
 
             post.Text = updatePostDTO.Text;
-            await _postRepository.UpdatePostAsync(post);
+            await _postRepository.SaveChangesAsync();
             var getPostDTO = _mapper.Map<GetPostDTO>(post);
 
             return getPostDTO;
@@ -114,14 +115,15 @@ namespace PostService.Application.Services
 
         public async Task RemovePostByIdAsync(Guid id)
         {
-            var post = await _postRepository.GetPostByIdAsync(id);
+            var post = await _postRepository.GetFirstOrDefaultByIdAsync(id);
 
             if (post is null)
             {
                 throw new NotFoundException($"no such post with id = {id}");
             }
 
-            await _postRepository.RemovePostAsync(post);
+            _postRepository.Remove(post);
+            await _postRepository.SaveChangesAsync();
         }
     }
 }
