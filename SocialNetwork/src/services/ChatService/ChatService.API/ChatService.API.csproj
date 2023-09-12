@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AutoMapperProfiles\" />
     <Folder Include="Controllers\" />
   </ItemGroup>
 
