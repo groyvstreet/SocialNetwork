@@ -10,6 +10,9 @@ ENV ASPNETCORE_ENVIRONMENT Development
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["src/services/ChatService/ChatService.API/ChatService.API.csproj", "src/services/ChatService/ChatService.API/"]
+COPY ["src/services/ChatService/ChatService.Application/ChatService.Application.csproj", "src/services/ChatService/ChatService.Application/"]
+COPY ["src/services/ChatService/ChatService.Domain/ChatService.Domain.csproj", "src/services/ChatService/ChatService.Domain/"]
+COPY ["src/services/ChatService/ChatService.Infrastructure/ChatService.Infrastructure.csproj", "src/services/ChatService/ChatService.Infrastructure/"]
 RUN dotnet restore "src/services/ChatService/ChatService.API/ChatService.API.csproj"
 COPY . .
 WORKDIR "/src/src/services/ChatService/ChatService.API"
