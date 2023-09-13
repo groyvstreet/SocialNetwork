@@ -19,7 +19,13 @@ namespace ChatService.API.Extensions
 
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddRepository<Dialog>("dialogs");
+            services.AddScoped<IDialogRepository>(provider =>
+            {
+                var mongoDatabase = provider.GetService<IMongoDatabase>()!;
+
+                return new DialogRepository(mongoDatabase, "dialogs");
+            });
+            services.AddRepository<User>("users");
         }
     }
 }

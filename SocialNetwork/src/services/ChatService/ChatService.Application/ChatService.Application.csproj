@@ -8,9 +8,12 @@
 
   <ItemGroup>
     <Folder Include="AutoMapperProfiles\" />
-    <Folder Include="Commands\Handlers\" />
     <Folder Include="DTOs\" />
     <Folder Include="Queries\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
   </ItemGroup>
 
   <ItemGroup>
