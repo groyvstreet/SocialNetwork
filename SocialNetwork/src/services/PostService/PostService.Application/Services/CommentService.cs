@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using PostService.Application.DTOs.CommentDTOs;
 using PostService.Application.Exceptions;
-using PostService.Application.Interfaces;
 using PostService.Application.Interfaces.CommentInterfaces;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
+using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
 
 namespace PostService.Application.Services
@@ -14,14 +14,14 @@ namespace PostService.Application.Services
         private readonly IMapper _mapper;
         private readonly ICommentRepository _commentRepository;
         private readonly IPostRepository _postRepository;
-        private readonly IBaseRepository<User> _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ICommentLikeRepository _commentLikeRepository;
 
         public CommentService(IMapper mapper,
-                           ICommentRepository commentRepository,
-                           IPostRepository postRepository,
-                           IBaseRepository<User> userRepository,
-                           ICommentLikeRepository commentLikeRepository)
+                              ICommentRepository commentRepository,
+                              IPostRepository postRepository,
+                              IUserRepository userRepository,
+                              ICommentLikeRepository commentLikeRepository)
         {
             _mapper = mapper;
             _commentRepository = commentRepository;
@@ -40,7 +40,7 @@ namespace PostService.Application.Services
 
         public async Task<GetCommentDTO> GetCommentByIdAsync(Guid id)
         {
-            var comment = await _commentRepository.GetFirstOrDefaultByIdAsync(id);
+            var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
 
             if (comment is null)
             {
@@ -54,30 +54,29 @@ namespace PostService.Application.Services
 
         public async Task<List<GetCommentDTO>> GetCommentsByPostIdAsync(Guid postId)
         {
-            var post = await _postRepository.GetFirstOrDefaultByIdAsync(postId);
+            var post = await _postRepository.GetPostWithCommentsByIdAsync(postId);
 
             if (post is null)
             {
                 throw new NotFoundException($"no such post with id = {postId}");
             }
 
-            var comments = await _commentRepository.GetCommentsByPostIdAsync(postId);
-            var getCommentDTOs = comments.Select(_mapper.Map<GetCommentDTO>).ToList();
+            var getCommentDTOs = post.Comments.Select(_mapper.Map<GetCommentDTO>).ToList();
 
             return getCommentDTOs;
         }
 
         public async Task<List<GetCommentDTO>> GetLikedCommentsByUserIdAsync(Guid userId)
         {
-            var user = await _userRepository.GetFirstOrDefaultByIdAsync(userId);
+            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == userId);
 
             if (user is null)
             {
                 throw new NotFoundException($"no such user with id = {userId}");
             }
 
-            var commentLikes = await _commentLikeRepository.GetCommentLikesByUserIdAsync(userId);
-            var comments = commentLikes.Select(cl => _commentRepository.GetFirstOrDefaultByIdAsync(cl.CommentId).Result);
+            var commentLikes = await _commentLikeRepository.GetCommentLikesWithCommentByUserIdAsync(userId);
+            var comments = commentLikes.Select(cl => cl.Comment);
             var getCommentDTOs = comments.Select(_mapper.Map<GetCommentDTO>).ToList();
 
             return getCommentDTOs;
@@ -85,14 +84,14 @@ namespace PostService.Application.Services
 
         public async Task<GetCommentDTO> AddCommentAsync(AddCommentDTO addCommentDTO)
         {
-            var post = await _postRepository.GetFirstOrDefaultByIdAsync(addCommentDTO.PostId);
+            var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == addCommentDTO.PostId);
 
             if (post is null)
             {
                 throw new NotFoundException($"no such post with id = {addCommentDTO.PostId}");
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByIdAsync(addCommentDTO.UserId);
+            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addCommentDTO.UserId);
 
             if (user is null)
             {
@@ -113,7 +112,7 @@ namespace PostService.Application.Services
 
         public async Task<GetCommentDTO> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO)
         {
-            var comment = await _commentRepository.GetFirstOrDefaultByIdAsync(updateCommentDTO.Id);
+            var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == updateCommentDTO.Id);
 
             if (comment is null)
             {
@@ -129,7 +128,7 @@ namespace PostService.Application.Services
 
         public async Task RemoveCommentByIdAsync(Guid id)
         {
-            var comment = await _commentRepository.GetFirstOrDefaultByIdAsync(id);
+            var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
 
             if (comment is null)
             {
@@ -139,7 +138,7 @@ namespace PostService.Application.Services
             _commentRepository.Remove(comment);
             await _commentRepository.SaveChangesAsync();
 
-            var post = await _postRepository.GetFirstOrDefaultByIdAsync(comment.PostId);
+            var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == comment.PostId);
             post!.CommentCount--;
             await _postRepository.SaveChangesAsync();
         }

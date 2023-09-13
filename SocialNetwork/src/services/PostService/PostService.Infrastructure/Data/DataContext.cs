@@ -20,8 +20,7 @@ namespace PostService.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new PostLikeConfiguration());
-            modelBuilder.ApplyConfiguration(new CommentLikeConfiguration());
+            modelBuilder.ApplyConfiguration(new PostLikeConfiguration()).ApplyConfiguration(new CommentLikeConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

@@ -1,10 +1,14 @@
-﻿namespace PostService.Application.Interfaces
+﻿using System.Linq.Expressions;
+
+namespace PostService.Application.Interfaces
 {
     public interface IBaseRepository<T> where T : class
     {
         Task<List<T>> GetAllAsync();
 
-        Task<T?> GetFirstOrDefaultByIdAsync(Guid id);
+        Task<List<T>> GetAllByAsync(Expression<Func<T, bool>> predicate);
+
+        Task<T?> GetFirstOrDefaultByAsync(Expression<Func<T, bool>> predicate);
 
         Task AddAsync(T entity);
 

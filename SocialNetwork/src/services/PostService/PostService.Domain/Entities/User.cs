@@ -11,5 +11,13 @@
         public DateOnly BirthDate { get; set; }
 
         public string Image { get; set; } = string.Empty;
+
+        public List<Post> Posts { get; set; }
+
+        public List<Comment> Comments { get; set; }
+
+        public List<PostLike> PostLikes { get; set; }
+
+        public List<CommentLike> CommentLikes { get; set; }
     }
 }
