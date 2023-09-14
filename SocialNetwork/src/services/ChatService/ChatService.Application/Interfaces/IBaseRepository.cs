@@ -1,4 +1,5 @@
 ﻿using ChatService.Domain.Entities;
+using System.Linq.Expressions;
 
 namespace ChatService.Application.Interfaces
 {
@@ -6,12 +7,14 @@ namespace ChatService.Application.Interfaces
     {
         Task<List<T>> GetAllAsync();
 
-        Task<T?> GetFirstOrDefaultByIdAsync(Guid id);
+        Task<List<T>> GetAllByAsync(Expression<Func<T, bool>> predicate);
+
+        Task<T?> GetFirstOrDefaultByAsync(Expression<Func<T, bool>> predicate);
 
         Task AddAsync(T entity);
 
-        Task UpdateAsync(T entity);
+        Task UpdateFieldAsync<K>(T entity, Expression<Func<T, K>> field, K value);
 
-        Task RemoveByIdAsync(Guid id);
+        Task RemoveAsync(T entity);
     }
 }

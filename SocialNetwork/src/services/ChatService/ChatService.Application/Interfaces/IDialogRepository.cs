@@ -4,8 +4,14 @@ namespace ChatService.Application.Interfaces
 {
     public interface IDialogRepository : IBaseRepository<Dialog>
     {
-        Task<Dialog?> GetDialogByUsers(Guid senderId, Guid receiverId);
+        Task<List<Dialog>> GetDialogsByUserIdAsync(Guid userId);
 
-        Task AddMessageToDialogAsync(Guid dialogId, Message message);
+        Task AddDialogMessageAsync(Guid dialogId, Message message);
+
+        Task UpdateDialogMessageAsync(Guid dialogId, Guid messageId, string text);
+
+        Task RemoveDialogMessageAsync(Guid dialogId, Guid messageId);
+
+        Task RemoveDialogMessageFromUserAsync(Guid dialogId, Guid messageId, Guid userId);
     }
 }

@@ -1,54 +1,54 @@
 ﻿using ChatService.Application.Interfaces;
 using ChatService.Domain.Entities;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ChatService.Infrastructure.Repositories
 {
     public class DialogRepository : BaseRepository<Dialog>, IDialogRepository
     {
-        private readonly IMongoCollection<Dialog> _collection;
-        private readonly FilterDefinitionBuilder<Dialog> _filterBuilder;
+        public DialogRepository(IMongoDatabase mongoDatabase, string collectionName) : base(mongoDatabase, collectionName) { }
 
-        public DialogRepository(IMongoDatabase mongoDatabase, string collectionName) : base(mongoDatabase, collectionName)
+        public async Task<List<Dialog>> GetDialogsByUserIdAsync(Guid userId)
         {
-            _collection = mongoDatabase.GetCollection<Dialog>(collectionName);
-            _filterBuilder = Builders<Dialog>.Filter;
-        }
-
-        public async Task<Dialog?> GetDialogByUsers(Guid senderId, Guid receiverId)
-        {
-            if (_collection.CountDocuments(_filterBuilder.Empty) == 0)
-            {
-                return null;
-            }
-
-            var filter = new BsonDocument("users",
-                new BsonDocument
+            var aggregation = _collection.Aggregate()
+                .Match(d => d.Users.Any(u => u.Id == userId))
+                .Project(d => new Dialog
                 {
-                    {
-                        "$elemMatch",
-                        new BsonDocument
-                        {
-                            {
-                                "$or",
-                                new BsonArray
-                                {
-                                    new BsonDocument("Id", new BsonDocument("$eq", senderId.ToString())),
-                                    new BsonDocument("Id", new BsonDocument("$eq", receiverId.ToString()))
-                                }
-                            }
-                        }
-                    }
+                    Id = d.Id,
+                    MessageCount = d.MessageCount,
+                    Users = d.Users,
+                    Messages = d.Messages.Where(m => m.UsersRemoved.All(s => s != userId.ToString())).ToList()
                 });
 
-            return await _collection.Find(filter).FirstOrDefaultAsync();
+            return await aggregation.ToListAsync();
         }
 
-        public async Task AddMessageToDialogAsync(Guid dialogId, Message message)
+        public async Task AddDialogMessageAsync(Guid dialogId, Message message)
         {
-            var updateSettings = new BsonDocument("$push", new BsonDocument("Messages", message.ToBsonDocument()));
-            await _collection.UpdateOneAsync(_filterBuilder.Eq(d => d.Id, dialogId), updateSettings);
+            var update = _updateDefinitionBuilder.Push(d => d.Messages, message);
+            await _collection.UpdateOneAsync(d => d.Id == dialogId, update);
+        }
+
+        public async Task UpdateDialogMessageAsync(Guid dialogId, Guid messageId, string text)
+        {
+            var dialog = await _collection.Find(d => d.Id == dialogId).FirstOrDefaultAsync();
+            var messageIndex = dialog.Messages.FindIndex(m => m.Id == messageId);
+            var update = _updateDefinitionBuilder.Set(d => d.Messages[messageIndex].Text, text);
+            await _collection.UpdateOneAsync(d => d.Id == dialogId, update);
+        }
+
+        public async Task RemoveDialogMessageAsync(Guid dialogId, Guid messageId)
+        {
+            var update = _updateDefinitionBuilder.PullFilter(d => d.Messages, m => m.Id == messageId);
+            await _collection.UpdateOneAsync(d => d.Id == dialogId, update);
+        }
+
+        public async Task RemoveDialogMessageFromUserAsync(Guid dialogId, Guid messageId, Guid userId)
+        {
+            var dialog = await _collection.Find(d => d.Id == dialogId).FirstOrDefaultAsync();
+            var messageIndex = dialog.Messages.FindIndex(m => m.Id == messageId);
+            var update = _updateDefinitionBuilder.AddToSet(d => d.Messages[messageIndex].UsersRemoved, userId.ToString());
+            await _collection.UpdateOneAsync(d => d.Id == dialogId, update);
         }
     }
 }

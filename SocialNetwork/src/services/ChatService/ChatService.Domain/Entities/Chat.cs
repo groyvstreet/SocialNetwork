@@ -1,8 +1,8 @@
 ﻿namespace ChatService.Domain.Entities
 {
-    public class Chat
+    public class Chat : IEntity
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public string Name { get; set; } = string.Empty;
 
@@ -10,8 +10,8 @@
 
         public ulong MessageCount { get; set; }
 
-        public List<ChatUser> Users { get; set; }
+        public List<ChatUser> Users { get; set; } = new List<ChatUser>();
 
-        public List<Message> Messages { get; set; }
+        public List<Message> Messages { get; set; } = new List<Message>();
     }
 }

@@ -1,28 +1,36 @@
 ﻿using ChatService.Application.Interfaces;
 using ChatService.Domain.Entities;
 using MongoDB.Driver;
+using System.Linq.Expressions;
 
 namespace ChatService.Infrastructure.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : IEntity
     {
-        private readonly IMongoCollection<T> _collection;
-        private readonly FilterDefinitionBuilder<T> _filterBuilder;
+        protected readonly IMongoCollection<T> _collection;
+        protected readonly FilterDefinitionBuilder<T> _filterDefinitionBuilder;
+        protected readonly UpdateDefinitionBuilder<T> _updateDefinitionBuilder;
 
         public BaseRepository(IMongoDatabase mongoDatabase, string collectionName)
         {
             _collection = mongoDatabase.GetCollection<T>(collectionName);
-            _filterBuilder = Builders<T>.Filter;
+            _filterDefinitionBuilder = Builders<T>.Filter;
+            _updateDefinitionBuilder = Builders<T>.Update;
         }
 
         public async Task<List<T>> GetAllAsync()
         {
-            return await _collection.Find(_filterBuilder.Empty).ToListAsync();
+            return await _collection.Find(_filterDefinitionBuilder.Empty).ToListAsync();
         }
 
-        public async Task<T?> GetFirstOrDefaultByIdAsync(Guid id)
+        public async Task<List<T>> GetAllByAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _collection.Find(_filterBuilder.Eq(e => e.Id, id)).FirstOrDefaultAsync();
+            return await _collection.Find(predicate).ToListAsync();
+        }
+
+        public async Task<T?> GetFirstOrDefaultByAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _collection.Find(predicate).FirstOrDefaultAsync();
         }
 
         public async Task AddAsync(T entity)
@@ -30,14 +38,15 @@ namespace ChatService.Infrastructure.Repositories
             await _collection.InsertOneAsync(entity);
         }
 
-        public async Task UpdateAsync(T entity)
+        public async Task UpdateFieldAsync<K>(T entity, Expression<Func<T, K>> field, K value)
         {
-            await _collection.ReplaceOneAsync(_filterBuilder.Eq(e => e.Id, entity.Id), entity);
+            var update = _updateDefinitionBuilder.Set(field, value);
+            await _collection.UpdateOneAsync(e => e.Id == entity.Id, update);
         }
 
-        public async Task RemoveByIdAsync(Guid id)
+        public async Task RemoveAsync(T entity)
         {
-            await _collection.DeleteOneAsync(_filterBuilder.Eq(e => e.Id, id));
+            await _collection.DeleteOneAsync(e => e.Id == entity.Id);
         }
     }
 }
