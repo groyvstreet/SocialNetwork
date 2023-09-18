@@ -1,12 +1,11 @@
 using ChatService.API.Extensions;
-using ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand;
-using MediatR;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
 
-builder.Services.AddMediatR(typeof(AddDialogMessageCommandHandler).Assembly);
+builder.Services.AddAutoMapper();
+builder.Services.AddMediatR();
 builder.Services.AddServices();
 
 builder.Services.AddControllers();
@@ -20,6 +19,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseGlobalExceptionHandler();
 
 app.UseHttpsRedirection();
 

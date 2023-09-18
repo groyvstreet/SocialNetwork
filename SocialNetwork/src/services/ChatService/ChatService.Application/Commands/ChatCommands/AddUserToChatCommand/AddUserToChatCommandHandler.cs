@@ -33,12 +33,24 @@ namespace ChatService.Application.Commands.ChatCommands.AddUserToChatCommand
                 throw new NotFoundException($"no such user with id = {request.UserId}");
             }
 
+            if (!chat.Users.Any(u => u.Id == request.UserId))
+            {
+                throw new ForbiddenException($"no such user with id = {request.UserId} in chat with id = {request.ChatId}");
+            }
+
+            var invitedUser = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == request.InvitedUserId);
+
+            if (invitedUser is null)
+            {
+                throw new NotFoundException($"no such user with id = {request.InvitedUserId}");
+            }
+
             var chatUser = new ChatUser
             {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Image = user.Image,
+                Id = invitedUser.Id,
+                FirstName = invitedUser.FirstName,
+                LastName = invitedUser.LastName,
+                Image = invitedUser.Image,
                 IsAdmin = false
             };
 

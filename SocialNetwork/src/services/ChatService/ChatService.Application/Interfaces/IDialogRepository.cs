@@ -6,6 +6,8 @@ namespace ChatService.Application.Interfaces
     {
         Task<List<Dialog>> GetDialogsByUserIdAsync(Guid userId);
 
+        Task<Dialog?> GetDialogWithSingleMessage(Guid dialogId, Guid messageId);
+
         Task AddDialogMessageAsync(Guid dialogId, Message message);
 
         Task UpdateDialogMessageAsync(Guid dialogId, Guid messageId, string text);

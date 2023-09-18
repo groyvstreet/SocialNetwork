@@ -33,6 +33,11 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
                 throw new NotFoundException($"no such user with id = {request.UserId}");
             }
 
+            if (!chat.Users.Any(u => u.Id == request.UserId))
+            {
+                throw new ForbiddenException($"no such user with id = {request.UserId} in chat with id = {request.ChatId}");
+            }
+
             var message = new Message
             {
                 DateTime = DateTimeOffset.Now,

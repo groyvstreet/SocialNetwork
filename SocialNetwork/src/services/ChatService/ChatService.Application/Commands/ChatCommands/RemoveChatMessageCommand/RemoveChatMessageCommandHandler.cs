@@ -25,12 +25,10 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveChatMessageCommand
                 throw new NotFoundException($"no such chat with id = {request.ChatId}");
             }
 
-            /*var message = await _chatRepository.GetChatMessageAsync(request.ChatId, request.MessageId);
-
-            if (message is null)
+            if (!chat.Messages.Any(m => m.Id == request.MessageId))
             {
                 throw new NotFoundException($"no such message with id = {request.MessageId}");
-            }*/
+            }
 
             await _chatRepository.RemoveChatMessageAsync(request.ChatId, request.MessageId);
             await _chatRepository.UpdateFieldAsync(chat, c => c.MessageCount, chat.MessageCount - 1);

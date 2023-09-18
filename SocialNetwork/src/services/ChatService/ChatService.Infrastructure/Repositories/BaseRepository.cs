@@ -10,12 +10,14 @@ namespace ChatService.Infrastructure.Repositories
         protected readonly IMongoCollection<T> _collection;
         protected readonly FilterDefinitionBuilder<T> _filterDefinitionBuilder;
         protected readonly UpdateDefinitionBuilder<T> _updateDefinitionBuilder;
+        protected readonly ProjectionDefinitionBuilder<T> _projectionDefinitionBuilder;
 
         public BaseRepository(IMongoDatabase mongoDatabase, string collectionName)
         {
             _collection = mongoDatabase.GetCollection<T>(collectionName);
             _filterDefinitionBuilder = Builders<T>.Filter;
             _updateDefinitionBuilder = Builders<T>.Update;
+            _projectionDefinitionBuilder = Builders<T>.Projection;
         }
 
         public async Task<List<T>> GetAllAsync()

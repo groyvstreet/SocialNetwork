@@ -30,7 +30,6 @@ namespace ChatService.Infrastructure.Repositories
 
         public async Task<List<Chat>> GetChatsByUserIdAsync(Guid userId)
         {
-            //var proj = Builders<Chat>.Projection.Include(c => c.Messages.Where(m => m.UsersRemoved.All(s => s != userId.ToString())));
             var aggregation = _collection.Aggregate()
                 .Match(c => c.Users.Any(u => u.Id == userId))
                 .Project(c => new Chat

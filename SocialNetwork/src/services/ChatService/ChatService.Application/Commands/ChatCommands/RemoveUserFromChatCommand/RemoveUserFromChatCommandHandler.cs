@@ -25,7 +25,10 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveUserFromChatComman
                 throw new NotFoundException($"no such chat with id = {request.ChatId}");
             }
 
-            // check user
+            if (!chat.Users.Any(u => u.Id == request.UserId))
+            {
+                throw new NotFoundException($"no such user with id = {request.UserId} in chat with id = {request.ChatId}");
+            }
 
             await _chatRepository.RemoveUserFromChatAsync(request.ChatId, request.UserId);
             await _chatRepository.UpdateFieldAsync(chat, c => c.UserCount, chat.UserCount - 1);

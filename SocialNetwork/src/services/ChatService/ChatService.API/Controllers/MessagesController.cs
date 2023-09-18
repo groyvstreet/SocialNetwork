@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ChatService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/messages")]
     [ApiController]
     public class MessagesController : ControllerBase
     {

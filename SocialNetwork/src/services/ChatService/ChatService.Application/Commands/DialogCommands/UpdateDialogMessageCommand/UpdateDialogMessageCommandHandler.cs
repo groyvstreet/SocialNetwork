@@ -22,7 +22,10 @@ namespace ChatService.Application.Commands.DialogCommands.UpdateDialogMessageCom
                 throw new NotFoundException($"no such dialog with id = {request.DialogId}");
             }
 
-            // check message
+            if (!dialog.Messages.Any(m => m.Id == request.MessageId))
+            {
+                throw new NotFoundException($"no such message with id = {request.MessageId}");
+            }
 
             await _dialogRepository.UpdateDialogMessageAsync(request.DialogId, request.MessageId, request.Text);
 

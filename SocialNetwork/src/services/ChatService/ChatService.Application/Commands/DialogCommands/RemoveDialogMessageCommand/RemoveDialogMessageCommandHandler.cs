@@ -22,13 +22,20 @@ namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageCom
                 throw new NotFoundException($"no such dialog with id = {request.DialogId}");
             }
 
-            // check message
-
-            await _dialogRepository.RemoveDialogMessageAsync(request.DialogId, request.MessageId);
+            if (!dialog.Messages.Any(m => m.Id == request.MessageId))
+            {
+                throw new NotFoundException($"no such message with id = {request.MessageId}");
+            }
             
-            // check for removing of dialog
-            
-            await _dialogRepository.UpdateFieldAsync(dialog, d => d.MessageCount, dialog.MessageCount - 1);
+            if (dialog.MessageCount == 1)
+            {
+                await _dialogRepository.RemoveAsync(dialog);
+            }
+            else
+            {
+                await _dialogRepository.RemoveDialogMessageAsync(request.DialogId, request.MessageId);
+                await _dialogRepository.UpdateFieldAsync(dialog, d => d.MessageCount, dialog.MessageCount - 1);
+            }
             
             return new Unit();
         }

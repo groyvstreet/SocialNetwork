@@ -50,6 +50,7 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
                 User = sender
             };
             await _dialogRepository.AddDialogMessageAsync(dialog.Id, message);
+            await _dialogRepository.UpdateFieldAsync(dialog, d => d.MessageCount, dialog.MessageCount + 1);
 
             return new Unit();
         }

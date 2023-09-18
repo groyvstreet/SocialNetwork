@@ -1,23 +1,27 @@
-﻿using ChatService.Application.Exceptions;
+﻿using AutoMapper;
+using ChatService.Application.DTOs.ChatDTOs;
+using ChatService.Application.Exceptions;
 using ChatService.Application.Interfaces;
-using ChatService.Domain.Entities;
 using MediatR;
 
 namespace ChatService.Application.Queries.ChatQueries.GetChatsQuery
 {
-    public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, List<Chat>>
+    public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, List<GetChatDTO>>
     {
+        private readonly IMapper _mapper;
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
 
-        public GetChatsQueryHandler(IChatRepository chatRepository,
+        public GetChatsQueryHandler(IMapper mapper,
+                                    IChatRepository chatRepository,
                                     IUserRepository userRepository)
         {
+            _mapper = mapper;
             _chatRepository = chatRepository;
             _userRepository = userRepository;
         }
 
-        public async Task<List<Chat>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetChatDTO>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == request.UserId);
 
@@ -26,7 +30,10 @@ namespace ChatService.Application.Queries.ChatQueries.GetChatsQuery
                 throw new NotFoundException($"no such user with id = {request.UserId}");
             }
 
-            return await _chatRepository.GetChatsByUserIdAsync(request.UserId);
+            var chats = await _chatRepository.GetChatsByUserIdAsync(request.UserId);
+            var chatDTOs = chats.Select(_mapper.Map<GetChatDTO>).ToList();
+
+            return chatDTOs;
         }
     }
 }

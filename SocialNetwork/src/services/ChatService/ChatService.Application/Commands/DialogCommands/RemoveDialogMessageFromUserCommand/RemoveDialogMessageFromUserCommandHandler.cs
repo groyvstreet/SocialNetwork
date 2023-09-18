@@ -22,11 +22,33 @@ namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageFro
                 throw new NotFoundException($"no such dialog with id = {request.DialogId}");
             }
 
-            // check message
+            if (!dialog.Messages.Any(m => m.Id == request.MessageId))
+            {
+                throw new NotFoundException($"no such message with id = {request.MessageId}");
+            }
 
-            await _dialogRepository.RemoveDialogMessageFromUserAsync(request.DialogId, request.MessageId, request.UserId);
-            
-            // check for removing of dialog
+            if (dialog.Messages.First(m => m.Id == request.MessageId).UsersRemoved.Any(u => u == request.UserId.ToString()))
+            {
+                throw new AlreadyExistsException($"message with id = {request.MessageId} is already removed from user with id = {request.UserId}");
+            }
+
+            if (dialog.Messages.First(m => m.Id == request.MessageId).UsersRemoved.Count ==
+                dialog.Users.Count - 1)
+            {
+                if (dialog.MessageCount == 1)
+                {
+                    await _dialogRepository.RemoveAsync(dialog);
+                }
+                else
+                {
+                    await _dialogRepository.RemoveDialogMessageAsync(request.DialogId, request.MessageId);
+                    await _dialogRepository.UpdateFieldAsync(dialog, d => d.MessageCount, dialog.MessageCount - 1);
+                }
+            }
+            else
+            {
+                await _dialogRepository.RemoveDialogMessageFromUserAsync(request.DialogId, request.MessageId, request.UserId);
+            }
             
             return new Unit();
         }

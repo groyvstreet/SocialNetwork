@@ -1,12 +1,25 @@
 ﻿using ChatService.Application.Interfaces;
 using ChatService.Domain.Entities;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace ChatService.Infrastructure.Repositories
 {
     public class DialogRepository : BaseRepository<Dialog>, IDialogRepository
     {
         public DialogRepository(IMongoDatabase mongoDatabase, string collectionName) : base(mongoDatabase, collectionName) { }
+
+        public async Task<Dialog?> GetDialogWithSingleMessage(Guid dialogId, Guid messageId)
+        {
+            var dialog = await _collection.Find(c => c.Id == dialogId).Project(d => new Dialog
+            {
+                Id = d.Id,
+                MessageCount = d.MessageCount,
+                Messages = d.Messages.Where(m => m.Id == messageId).ToList()
+            }).FirstOrDefaultAsync();
+
+            return dialog;
+        }
 
         public async Task<List<Dialog>> GetDialogsByUserIdAsync(Guid userId)
         {

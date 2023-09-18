@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ChatService.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/chats")]
     [ApiController]
     public class ChatsController : ControllerBase
     {
