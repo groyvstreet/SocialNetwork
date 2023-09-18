@@ -20,7 +20,7 @@ namespace IdentityService.PL.Controllers
 
         [HttpPost]
         [Route("signup")]
-        public async Task<IActionResult> SignUpAsync(AddUserDTO addUserDTO)
+        public async Task<IActionResult> SignUpAsync([FromBody] AddUserDTO addUserDTO)
         {
             var user = await _identityService.SignUpAsync(addUserDTO);
 

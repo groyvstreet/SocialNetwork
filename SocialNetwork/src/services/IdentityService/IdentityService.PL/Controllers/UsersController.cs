@@ -36,7 +36,7 @@ namespace IdentityService.PL.Controllers
 
         [HttpPut]
         [Authorize]
-        public async Task<IActionResult> UpdateUserAsync(UpdateUserDTO updateUserDTO)
+        public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserDTO updateUserDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var authenticatedUserRole = User.FindFirstValue(ClaimTypes.Role)!;
@@ -47,6 +47,7 @@ namespace IdentityService.PL.Controllers
         }
 
         [HttpDelete]
+        [Route("{id}")]
         [Authorize]
         public async Task<IActionResult> RemoveUserByIdAsync(string id)
         {

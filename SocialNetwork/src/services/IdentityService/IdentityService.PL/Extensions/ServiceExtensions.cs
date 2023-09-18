@@ -5,7 +5,6 @@ using IdentityService.BLL.Services;
 using IdentityService.BLL.AutoMapperProfiles;
 using IdentityService.BLL.Validators.UserValidators;
 using FluentValidation;
-using IdentityService.BLL.DTOs.UserDTOs;
 using FluentValidation.AspNetCore;
 
 namespace IdentityService.PL.Extensions
@@ -14,9 +13,7 @@ namespace IdentityService.PL.Extensions
     {
         public static void AddFluentValidation(this IServiceCollection services)
         {
-            services.AddScoped<IValidator<AddUserDTO>, AddUserValidator>();
-            services.AddScoped<IValidator<UpdateUserDTO>, UpdateUserValidator>();
-
+            services.AddValidatorsFromAssemblyContaining<AddUserValidator>();
             services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
         }
 
@@ -27,12 +24,13 @@ namespace IdentityService.PL.Extensions
 
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddTransient<IRoleRepository, RoleRepository>();
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<ITokenService, TokenService>();
-            services.AddTransient<IIdentityService, BLL.Services.IdentityService>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IIdentityService, BLL.Services.IdentityService>();
         }
     }
 }
