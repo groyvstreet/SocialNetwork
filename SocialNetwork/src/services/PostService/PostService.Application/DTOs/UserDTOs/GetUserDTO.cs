@@ -1,6 +1,6 @@
-﻿namespace PostService.Domain.Entities
+﻿namespace PostService.Application.DTOs.UserDTOs
 {
-    public class UserProfile
+    public class GetUserDTO
     {
         public Guid Id { get; set; }
 

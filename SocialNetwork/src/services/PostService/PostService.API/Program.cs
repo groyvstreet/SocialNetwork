@@ -1,13 +1,14 @@
-using Microsoft.EntityFrameworkCore;
-using PostService.Infrastructure.Data;
+using PostService.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var assemblyName = builder.Configuration.GetSection("MigrationsAssembly").Get<string>();
-builder.Services.AddDbContext<DataContext>(
-    opt => opt.UseNpgsql(connectionString,
-                         npgsqlOpt => npgsqlOpt.MigrationsAssembly(assemblyName)));
+builder.Services.AddDatabaseConnection(builder.Configuration);
+
+builder.Services.AddFluentValidation();
+
+builder.Services.AddAutoMapper();
+
+builder.Services.AddServices();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -21,21 +22,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseGlobalExceptionHandler();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<DataContext>();
-
-    if (context.Database.GetPendingMigrations().Any())
-    {
-        context.Database.Migrate();
-    }
-}
+app.ApplyMigrations();
+await app.InitializeDatabaseAsync();
 
 app.Run();

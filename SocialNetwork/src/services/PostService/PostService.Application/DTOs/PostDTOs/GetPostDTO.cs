@@ -1,6 +1,6 @@
-﻿namespace PostService.Domain.Entities
+﻿namespace PostService.Application.DTOs.PostDTOs
 {
-    public class Post
+    public class GetPostDTO
     {
         public Guid Id { get; set; }
 
@@ -12,12 +12,6 @@
 
         public ulong LikeCount { get; set; }
 
-        public User User { get; set; }
-
         public Guid UserId { get; set; }
-
-        public List<Comment> Comments { get; set; }
-
-        public List<PostLike> Likes { get; set; }
     }
 }
