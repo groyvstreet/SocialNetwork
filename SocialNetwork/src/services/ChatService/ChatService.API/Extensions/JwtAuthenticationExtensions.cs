@@ -37,15 +37,14 @@ namespace ChatService.API.Extensions
                     OnMessageReceived = context =>
                     {
                         var accessToken = context.Request.Query["access_token"];
-
-                        // если запрос направлен хабу
                         var path = context.HttpContext.Request.Path;
+
                         if (!string.IsNullOrEmpty(accessToken) &&
                             (path.StartsWithSegments("/dialogs")))
                         {
-                            // получаем токен из строки запроса
                             context.Token = accessToken;
                         }
+
                         return Task.CompletedTask;
                     }
                 };

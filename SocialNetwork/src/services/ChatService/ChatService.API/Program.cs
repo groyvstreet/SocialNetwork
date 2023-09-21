@@ -1,5 +1,5 @@
 using ChatService.API.Extensions;
-using ChatService.Infrastructure.Hubs;
+using ChatService.Application.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +35,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseGlobalExceptionHandler();
+//app.UseGlobalExceptionHandler();
 
 app.UseCors("CORSPolicy");
 

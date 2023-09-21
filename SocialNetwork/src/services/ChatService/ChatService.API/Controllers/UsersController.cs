@@ -5,7 +5,6 @@ using ChatService.Application.Commands.ChatCommands.SetUserAsChatAdminCommand;
 using ChatService.Application.Commands.ChatCommands.SetUserAsDefaultCommand;
 using ChatService.Application.Interfaces;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -60,7 +59,6 @@ namespace ChatService.API.Controllers
 
         [HttpDelete]
         [Route("/api/chats/admins")]
-        [Authorize]
         public async Task<IActionResult> SetUserAsDefaultAsync([FromBody] SetUserAsDefaultCommand command)
         {
             await _mediator.Send(command);
