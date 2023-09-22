@@ -32,6 +32,13 @@ namespace ChatService.Application.Commands.ChatCommands.SetUserAsChatAdminComman
                 throw new NotFoundException($"no such chat with id = {request.ChatId}");
             }
 
+            var user = chat.Users.FirstOrDefault(u => u.Id == request.AuthenticatedUserId);
+
+            if (user is null || !user.IsAdmin)
+            {
+                throw new ForbiddenException("forbidden");
+            }
+
             if (!chat.Users.Any(u => u.Id == request.UserId))
             {
                 throw new NotFoundException($"no such user with id = {request.UserId} in chat with id = {request.ChatId}");

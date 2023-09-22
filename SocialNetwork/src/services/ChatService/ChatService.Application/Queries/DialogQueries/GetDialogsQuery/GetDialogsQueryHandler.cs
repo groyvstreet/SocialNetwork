@@ -23,6 +23,11 @@ namespace ChatService.Application.Queries.DialogQueries.GetDialogsQuery
 
         public async Task<List<GetDialogDTO>> Handle(GetDialogsQuery request, CancellationToken cancellationToken)
         {
+            if (request.UserId != request.AuthenticatedUserId)
+            {
+                throw new ForbiddenException("forbidden");
+            }
+
             var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == request.UserId);
 
             if (user is null)

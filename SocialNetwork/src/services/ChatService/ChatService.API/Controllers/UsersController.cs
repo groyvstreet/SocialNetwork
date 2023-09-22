@@ -3,8 +3,10 @@ using ChatService.Application.Commands.ChatCommands.AddUserToChatCommand;
 using ChatService.Application.Commands.ChatCommands.RemoveUserFromChatCommand;
 using ChatService.Application.Commands.ChatCommands.SetUserAsChatAdminCommand;
 using ChatService.Application.Commands.ChatCommands.SetUserAsDefaultCommand;
+using ChatService.Application.DTOs.ChatDTOs;
 using ChatService.Application.Interfaces.Repositories;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -19,21 +21,21 @@ namespace ChatService.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IOptions<JwtOptions> _jwtOptions;
-        private readonly IUserRepository _userRepository;
 
         public UsersController(IMediator mediator,
-                               IOptions<JwtOptions> jwtOptions,
-                               IUserRepository userRepository)
+                               IOptions<JwtOptions> jwtOptions)
         {
             _mediator = mediator;
             _jwtOptions = jwtOptions;
-            _userRepository = userRepository;
         }
 
         [HttpPost]
         [Route("/api/chats/users")]
-        public async Task<IActionResult> AddUserToChatAsync([FromBody] AddUserToChatCommand command)
+        [Authorize]
+        public async Task<IActionResult> AddUserToChatAsync([FromBody] AddUserToChatDTO addUserToChatDTO)
         {
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var command = new AddUserToChatCommand(addUserToChatDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
             return Ok();
@@ -41,8 +43,11 @@ namespace ChatService.API.Controllers
 
         [HttpDelete]
         [Route("/api/chats/users")]
-        public async Task<IActionResult> RemoveUserFromChatAsync([FromBody] RemoveUserFromChatCommand command)
+        [Authorize]
+        public async Task<IActionResult> RemoveUserFromChatAsync([FromBody] RemoveUserFromChatDTO removeUserFromChatDTO)
         {
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var command = new RemoveUserFromChatCommand(removeUserFromChatDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
             return NoContent();
@@ -50,8 +55,11 @@ namespace ChatService.API.Controllers
 
         [HttpPost]
         [Route("/api/chats/admins")]
-        public async Task<IActionResult> SetUserAsChatAdminAsync([FromBody] SetUserAsChatAdminCommand command)
+        [Authorize]
+        public async Task<IActionResult> SetUserAsChatAdminAsync([FromBody] SetUserAsChatAdminDTO setUserAsChatAdminDTO)
         {
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var command = new SetUserAsChatAdminCommand(setUserAsChatAdminDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
             return Ok();
@@ -59,19 +67,14 @@ namespace ChatService.API.Controllers
 
         [HttpDelete]
         [Route("/api/chats/admins")]
-        public async Task<IActionResult> SetUserAsDefaultAsync([FromBody] SetUserAsDefaultCommand command)
+        [Authorize]
+        public async Task<IActionResult> SetUserAsDefaultAsync([FromBody] SetUserAsDefaultDTO setUserAsDefaultDTO)
         {
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var command = new SetUserAsDefaultCommand(setUserAsDefaultDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
             return Ok();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetUsers()
-        {
-            var users = await _userRepository.GetAllAsync();
-
-            return Ok(users);
         }
 
         [HttpPost]

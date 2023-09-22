@@ -18,6 +18,11 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveChatMessageFromUse
 
         public async Task<Unit> Handle(RemoveChatMessageFromUserCommand request, CancellationToken cancellationToken)
         {
+            if (request.UserId != request.AuthenticatedUserId)
+            {
+                throw new ForbiddenException("forbidden");
+            }
+
             var chat = await _chatRepository.GetFirstOrDefaultByAsync(c => c.Id == request.ChatId);
 
             if (chat is null)

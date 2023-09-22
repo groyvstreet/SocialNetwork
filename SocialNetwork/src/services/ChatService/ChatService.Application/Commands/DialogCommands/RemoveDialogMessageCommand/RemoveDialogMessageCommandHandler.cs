@@ -29,9 +29,16 @@ namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageCom
                 throw new NotFoundException($"no such dialog with id = {request.DialogId}");
             }
 
-            if (!dialog.Messages.Any(m => m.Id == request.MessageId))
+            var message = dialog.Messages.FirstOrDefault(m => m.Id == request.MessageId);
+
+            if (message is null)
             {
                 throw new NotFoundException($"no such message with id = {request.MessageId}");
+            }
+
+            if (message.User.Id != request.AuthenticatedUserId)
+            {
+                throw new ForbiddenException("forbidden");
             }
 
             dialog.Messages = new List<Message> { dialog.Messages.First(m => m.Id == request.MessageId) };

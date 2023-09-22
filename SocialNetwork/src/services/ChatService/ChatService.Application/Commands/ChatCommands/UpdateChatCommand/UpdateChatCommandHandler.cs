@@ -31,6 +31,18 @@ namespace ChatService.Application.Commands.ChatCommands.UpdateChatCommand
                 throw new NotFoundException($"no such chat with id = {request.Id}");
             }
 
+            var user = chat.Users.FirstOrDefault(u => u.Id == request.AuthenticatedUserId);
+
+            if (user is null)
+            {
+                throw new ForbiddenException("forbidden");
+            }
+
+            if (!user.IsAdmin)
+            {
+                throw new ForbiddenException("forbidden");
+            }
+
             await _chatRepository.UpdateFieldAsync(chat, c => c.Name, request.Name);
 
             var userIds = chat.Users.Select(u => u.Id.ToString()).ToList();

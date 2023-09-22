@@ -15,6 +15,11 @@ namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageFro
 
         public async Task<Unit> Handle(RemoveDialogMessageFromUserCommand request, CancellationToken cancellationToken)
         {
+            if (request.UserId != request.AuthenticatedUserId)
+            {
+                throw new ForbiddenException("forbidden");
+            }
+
             var dialog = await _dialogRepository.GetFirstOrDefaultByAsync(d => d.Id == request.DialogId);
 
             if (dialog is null)

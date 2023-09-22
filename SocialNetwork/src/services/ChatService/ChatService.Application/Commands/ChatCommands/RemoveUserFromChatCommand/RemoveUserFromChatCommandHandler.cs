@@ -32,6 +32,18 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveUserFromChatComman
                 throw new NotFoundException($"no such chat with id = {request.ChatId}");
             }
 
+            var user = chat.Users.FirstOrDefault(u => u.Id == request.AuthenticatedUserId);
+
+            if (user is null)
+            {
+                throw new NotFoundException($"no such user with id = {request.AuthenticatedUserId} in chat with id = {request.ChatId}");
+            }
+
+            if (!user.InvitedUsers.Any(u => u == request.UserId.ToString()))
+            {
+                throw new ForbiddenException("forbidden");
+            }
+
             if (!chat.Users.Any(u => u.Id == request.UserId))
             {
                 throw new NotFoundException($"no such user with id = {request.UserId} in chat with id = {request.ChatId}");

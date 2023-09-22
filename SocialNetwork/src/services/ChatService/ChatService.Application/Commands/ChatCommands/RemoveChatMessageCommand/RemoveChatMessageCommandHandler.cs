@@ -32,9 +32,16 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveChatMessageCommand
                 throw new NotFoundException($"no such chat with id = {request.ChatId}");
             }
 
-            if (!chat.Messages.Any(m => m.Id == request.MessageId))
+            var message = chat.Messages.FirstOrDefault(m => m.Id == request.MessageId);
+
+            if (message is null)
             {
                 throw new NotFoundException($"no such message with id = {request.MessageId}");
+            }
+
+            if (message.User.Id != request.AuthenticatedUserId)
+            {
+                throw new ForbiddenException("forbidden");
             }
 
             await _chatRepository.RemoveChatMessageAsync(request.ChatId, request.MessageId);

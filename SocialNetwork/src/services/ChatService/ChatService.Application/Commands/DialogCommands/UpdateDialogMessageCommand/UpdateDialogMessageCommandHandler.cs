@@ -29,9 +29,16 @@ namespace ChatService.Application.Commands.DialogCommands.UpdateDialogMessageCom
                 throw new NotFoundException($"no such dialog with id = {request.DialogId}");
             }
 
-            if (!dialog.Messages.Any(m => m.Id == request.MessageId))
+            var message = dialog.Messages.FirstOrDefault(m => m.Id == request.MessageId);
+
+            if (message is null)
             {
                 throw new NotFoundException($"no such message with id = {request.MessageId}");
+            }
+
+            if (message.User.Id != request.AuthenticatedUserId)
+            {
+                throw new ForbiddenException("forbidden");
             }
 
             await _dialogRepository.UpdateDialogMessageAsync(request.DialogId, request.MessageId, request.Text);

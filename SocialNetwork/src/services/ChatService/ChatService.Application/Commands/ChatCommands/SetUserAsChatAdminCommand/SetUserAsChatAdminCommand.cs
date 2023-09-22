@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ChatService.Application.DTOs.ChatDTOs;
+using MediatR;
 
 namespace ChatService.Application.Commands.ChatCommands.SetUserAsChatAdminCommand
 {
@@ -7,5 +8,14 @@ namespace ChatService.Application.Commands.ChatCommands.SetUserAsChatAdminComman
         public Guid ChatId { get; set; }
 
         public Guid UserId { get; set; }
+
+        public Guid AuthenticatedUserId { get; set; }
+
+        public SetUserAsChatAdminCommand(SetUserAsChatAdminDTO setUserAsChatAdminDTO, Guid authenticatedUserId)
+        {
+            ChatId = setUserAsChatAdminDTO.ChatId;
+            UserId = setUserAsChatAdminDTO.UserId;
+            AuthenticatedUserId = authenticatedUserId;
+        }
     }
 }

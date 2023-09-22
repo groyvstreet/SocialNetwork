@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ChatService.Application.DTOs.MessageDTOs;
+using MediatR;
 
 namespace ChatService.Application.Commands.DialogCommands.UpdateDialogMessageCommand
 {
@@ -9,5 +10,15 @@ namespace ChatService.Application.Commands.DialogCommands.UpdateDialogMessageCom
         public Guid MessageId { get; set; }
 
         public string Text { get; set; } = string.Empty;
+
+        public Guid AuthenticatedUserId { get; set; }
+
+        public UpdateDialogMessageCommand(UpdateDialogMessageDTO updateDialogMessageDTO, Guid authenticatedUserId)
+        {
+            DialogId = updateDialogMessageDTO.DialogId;
+            MessageId = updateDialogMessageDTO.MessageId;
+            Text = updateDialogMessageDTO.Text;
+            AuthenticatedUserId = authenticatedUserId;
+        }
     }
 }
