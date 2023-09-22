@@ -1,20 +1,20 @@
 ﻿using ChatService.Application.Exceptions;
 using ChatService.Application.Hubs;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Interfaces.Hubs;
+using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
-using System.Reflection;
 
 namespace ChatService.Application.Commands.DialogCommands.UpdateDialogMessageCommand
 {
     public class UpdateDialogMessageCommandHandler : IRequestHandler<UpdateDialogMessageCommand>
     {
         private readonly IDialogRepository _dialogRepository;
-        private readonly IHubContext<ChatHub, IChatHub> _hubContext;
+        private readonly IHubContext<DialogHub, IDialogHub> _hubContext;
 
         public UpdateDialogMessageCommandHandler(IDialogRepository dialogRepository,
-                                                 IHubContext<ChatHub, IChatHub> hubContext)
+                                                 IHubContext<DialogHub, IDialogHub> hubContext)
         {
             _dialogRepository = dialogRepository;
             _hubContext = hubContext;
@@ -40,8 +40,8 @@ namespace ChatService.Application.Commands.DialogCommands.UpdateDialogMessageCom
             dialog.Messages.First().Text = request.Text;
             var sender = dialog.Messages.First().User;
             var receiver = dialog.Users.First(u => u.Id != sender.Id);
-            await _hubContext.Clients.User(sender.Id.ToString()).UpdateMessage(receiver.Id.ToString(), dialog);
-            await _hubContext.Clients.User(receiver.Id.ToString()).UpdateMessage(receiver.Id.ToString(), dialog);
+            await _hubContext.Clients.User(sender.Id.ToString()).UpdateMessage(dialog);
+            await _hubContext.Clients.User(receiver.Id.ToString()).UpdateMessage(dialog);
 
             return new Unit();
         }

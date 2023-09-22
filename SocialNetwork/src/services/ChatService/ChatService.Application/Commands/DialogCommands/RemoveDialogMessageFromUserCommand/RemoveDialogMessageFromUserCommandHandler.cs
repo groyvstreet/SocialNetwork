@@ -1,5 +1,5 @@
 ﻿using ChatService.Application.Exceptions;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageFromUserCommand

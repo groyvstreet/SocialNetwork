@@ -1,6 +1,7 @@
 ﻿using ChatService.Application.Exceptions;
 using ChatService.Application.Hubs;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Interfaces.Hubs;
+using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -10,10 +11,10 @@ namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageCom
     public class RemoveDialogMessageCommandHandler : IRequestHandler<RemoveDialogMessageCommand>
     {
         private readonly IDialogRepository _dialogRepository;
-        private readonly IHubContext<ChatHub, IChatHub> _hubContext;
+        private readonly IHubContext<DialogHub, IDialogHub> _hubContext;
 
         public RemoveDialogMessageCommandHandler(IDialogRepository dialogRepository,
-                                                 IHubContext<ChatHub, IChatHub> hubContext)
+                                                 IHubContext<DialogHub, IDialogHub> hubContext)
         {
             _dialogRepository = dialogRepository;
             _hubContext = hubContext;
@@ -42,16 +43,18 @@ namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageCom
                 await _dialogRepository.RemoveAsync(dialog);
 
                 dialog.Messages = new List<Message>();
-                await _hubContext.Clients.User(sender.Id.ToString()).RemoveDialog(receiver.Id.ToString(), dialog);
-                await _hubContext.Clients.User(receiver.Id.ToString()).RemoveDialog(receiver.Id.ToString(), dialog);
+                dialog.MessageCount = 0;
+                await _hubContext.Clients.User(sender.Id.ToString()).RemoveDialog(dialog);
+                await _hubContext.Clients.User(receiver.Id.ToString()).RemoveDialog(dialog);
             }
             else
             {
                 await _dialogRepository.RemoveDialogMessageAsync(request.DialogId, request.MessageId);
                 await _dialogRepository.UpdateFieldAsync(dialog, d => d.MessageCount, dialog.MessageCount - 1);
 
-                await _hubContext.Clients.User(sender.Id.ToString()).RemoveMessage(receiver.Id.ToString(), dialog);
-                await _hubContext.Clients.User(receiver.Id.ToString()).RemoveMessage(receiver.Id.ToString(), dialog);
+                dialog.MessageCount--;
+                await _hubContext.Clients.User(sender.Id.ToString()).RemoveMessage(dialog);
+                await _hubContext.Clients.User(receiver.Id.ToString()).RemoveMessage(dialog);
             }
             
             return new Unit();

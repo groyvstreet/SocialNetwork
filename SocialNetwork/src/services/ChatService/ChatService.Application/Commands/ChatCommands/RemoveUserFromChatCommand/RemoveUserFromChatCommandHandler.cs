@@ -1,6 +1,10 @@
 ﻿using ChatService.Application.Exceptions;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Hubs;
+using ChatService.Application.Interfaces.Hubs;
+using ChatService.Application.Interfaces.Repositories;
+using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ChatService.Application.Commands.ChatCommands.RemoveUserFromChatCommand
 {
@@ -8,12 +12,15 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveUserFromChatComman
     {
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 
         public RemoveUserFromChatCommandHandler(IChatRepository chatRepository,
-                                                IUserRepository userRepository)
+                                                IUserRepository userRepository,
+                                                IHubContext<ChatHub, IChatHub> hubContext)
         {
             _chatRepository = chatRepository;
             _userRepository = userRepository;
+            _hubContext = hubContext;
         }
 
         public async Task<Unit> Handle(RemoveUserFromChatCommand request, CancellationToken cancellationToken)
@@ -32,6 +39,12 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveUserFromChatComman
 
             await _chatRepository.RemoveUserFromChatAsync(request.ChatId, request.UserId);
             await _chatRepository.UpdateFieldAsync(chat, c => c.UserCount, chat.UserCount - 1);
+
+            var userIds = chat.Users.Select(u => u.Id.ToString()).ToList();
+            chat.Users = new List<ChatUser> { chat.Users.First(u => u.Id == request.UserId) };
+            chat.UserCount--;
+            chat.Messages = new List<Message>();
+            await _hubContext.Clients.Users(userIds).RemoveUserFromChat(chat);
 
             return new Unit();
         }

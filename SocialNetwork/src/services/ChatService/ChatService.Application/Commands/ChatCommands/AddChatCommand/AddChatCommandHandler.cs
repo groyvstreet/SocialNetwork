@@ -1,7 +1,10 @@
 ﻿using ChatService.Application.Exceptions;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Hubs;
+using ChatService.Application.Interfaces.Hubs;
+using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
 {
@@ -9,12 +12,15 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
     {
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 
         public AddChatCommandHandler(IChatRepository chatRepository,
-                                     IUserRepository userRepository)
+                                     IUserRepository userRepository,
+                                     IHubContext<ChatHub, IChatHub> hubContext)
         {
             _chatRepository = chatRepository;
             _userRepository = userRepository;
+            _hubContext = hubContext;
         }
 
         public async Task<Unit> Handle(AddChatCommand request, CancellationToken cancellationToken)
@@ -43,6 +49,8 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
                 }
             };
             await _chatRepository.AddAsync(chat);
+
+            await _hubContext.Clients.User(user.Id.ToString()).CreateChat(chat);
 
             return new Unit();
         }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace ChatService.Application.Hubs
 {
     [Authorize]
-    public class ChatHub : Hub<IChatHub>
+    public class DialogHub : Hub<IDialogHub>
     {
     }
 }

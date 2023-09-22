@@ -1,7 +1,7 @@
 ﻿using ChatService.Domain.Entities;
 using System.Linq.Expressions;
 
-namespace ChatService.Application.Interfaces
+namespace ChatService.Application.Interfaces.Repositories
 {
     public interface IBaseRepository<T> where T : IEntity
     {

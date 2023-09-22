@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using ChatService.Application.DTOs.ChatDTOs;
 using ChatService.Application.Exceptions;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace ChatService.Application.Queries.ChatQueries.GetChatsQuery

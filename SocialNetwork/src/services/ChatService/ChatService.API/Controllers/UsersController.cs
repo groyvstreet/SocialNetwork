@@ -3,7 +3,7 @@ using ChatService.Application.Commands.ChatCommands.AddUserToChatCommand;
 using ChatService.Application.Commands.ChatCommands.RemoveUserFromChatCommand;
 using ChatService.Application.Commands.ChatCommands.SetUserAsChatAdminCommand;
 using ChatService.Application.Commands.ChatCommands.SetUserAsDefaultCommand;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

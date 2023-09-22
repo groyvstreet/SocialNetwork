@@ -23,6 +23,13 @@ namespace ChatService.Infrastructure.Data
                     FirstName = "Lyaps",
                     LastName = "User",
                     Image = "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
+                },
+                new User
+                {
+                    Id = Guid.Parse("aed9b92b-488e-4e23-a496-14a3de16ce84"),
+                    FirstName = "Ai",
+                    LastName = "User",
+                    Image = "https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
                 }
             };
             await usersCollection.InsertManyAsync(users);

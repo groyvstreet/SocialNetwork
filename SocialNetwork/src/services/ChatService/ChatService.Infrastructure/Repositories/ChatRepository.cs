@@ -1,4 +1,4 @@
-﻿using ChatService.Application.Interfaces;
+﻿using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
 using MongoDB.Driver;
 
@@ -35,6 +35,7 @@ namespace ChatService.Infrastructure.Repositories
                 .Project(c => new Chat
                 {
                     Id = c.Id,
+                    Name = c.Name,
                     MessageCount = c.MessageCount,
                     Users = c.Users,
                     Messages = c.Messages.Where(m => m.UsersRemoved.All(s => s != userId.ToString())).ToList()

@@ -1,4 +1,4 @@
-﻿using ChatService.Application.Interfaces;
+﻿using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
 using MongoDB.Driver;
 using System.Linq.Expressions;

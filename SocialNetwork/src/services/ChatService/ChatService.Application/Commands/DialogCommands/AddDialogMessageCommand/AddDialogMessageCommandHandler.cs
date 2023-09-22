@@ -1,6 +1,7 @@
 ﻿using ChatService.Application.Exceptions;
 using ChatService.Application.Hubs;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Interfaces.Hubs;
+using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
@@ -11,11 +12,11 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
     {
         private readonly IDialogRepository _dialogRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IHubContext<ChatHub, IChatHub> _hubContext;
+        private readonly IHubContext<DialogHub, IDialogHub> _hubContext;
 
         public AddDialogMessageCommandHandler(IDialogRepository dialogRepository,
                                               IUserRepository userRepository,
-                                              IHubContext<ChatHub, IChatHub> hubContext)
+                                              IHubContext<DialogHub, IDialogHub> hubContext)
         {
             _dialogRepository = dialogRepository;
             _userRepository = userRepository;
@@ -58,8 +59,9 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
             await _dialogRepository.UpdateFieldAsync(dialog, d => d.MessageCount, dialog.MessageCount + 1);
             
             dialog.Messages = new List<Message> { message };
-            await _hubContext.Clients.User(sender.Id.ToString()).SendToUser(receiver.Id.ToString(), dialog);
-            await _hubContext.Clients.User(receiver.Id.ToString()).SendToUser(receiver.Id.ToString(), dialog);
+            dialog.MessageCount++;
+            await _hubContext.Clients.User(dialog.Users[0].Id.ToString()).SendMessage(dialog);
+            await _hubContext.Clients.User(dialog.Users[1].Id.ToString()).SendMessage(dialog);
 
             return new Unit();
         }

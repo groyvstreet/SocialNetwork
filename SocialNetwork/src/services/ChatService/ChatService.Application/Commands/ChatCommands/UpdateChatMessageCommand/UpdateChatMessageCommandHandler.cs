@@ -1,6 +1,10 @@
 ﻿using ChatService.Application.Exceptions;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Hubs;
+using ChatService.Application.Interfaces.Hubs;
+using ChatService.Application.Interfaces.Repositories;
+using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ChatService.Application.Commands.ChatCommands.UpdateChatMessageCommand
 {
@@ -8,12 +12,15 @@ namespace ChatService.Application.Commands.ChatCommands.UpdateChatMessageCommand
     {
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IHubContext<ChatHub, IChatHub> _hubContext;
 
         public UpdateChatMessageCommandHandler(IChatRepository chatRepository,
-                                               IUserRepository userRepository)
+                                               IUserRepository userRepository,
+                                               IHubContext<ChatHub, IChatHub> hubContext)
         {
             _chatRepository = chatRepository;
             _userRepository = userRepository;
+            _hubContext = hubContext;
         }
 
         public async Task<Unit> Handle(UpdateChatMessageCommand request, CancellationToken cancellationToken)
@@ -31,7 +38,13 @@ namespace ChatService.Application.Commands.ChatCommands.UpdateChatMessageCommand
             }
 
             await _chatRepository.UpdateChatMessageAsync(request.ChatId, request.MessageId, request.Text);
-            
+
+            var userIds = chat.Users.Select(u => u.Id.ToString()).ToList();
+            chat.Users.Clear();
+            chat.Messages = new List<Message> { chat.Messages.First(m => m.Id == request.MessageId) };
+            chat.Messages.First().Text = request.Text;
+            await _hubContext.Clients.Users(userIds).UpdateMessage(chat);
+
             return new Unit();
         }
     }

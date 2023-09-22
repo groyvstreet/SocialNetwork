@@ -1,6 +1,7 @@
 ﻿using ChatService.Application.AutoMapperProfiles;
 using ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand;
-using ChatService.Application.Interfaces;
+using ChatService.Application.Hubs;
+using ChatService.Application.Interfaces.Repositories;
 using ChatService.Infrastructure.Repositories;
 using MediatR;
 using MongoDB.Driver;
@@ -38,6 +39,26 @@ namespace ChatService.API.Extensions
                 var mongoDatabase = provider.GetService<IMongoDatabase>()!;
 
                 return new ChatRepository(mongoDatabase, "chats");
+            });
+        }
+
+        public static void MapSignalR(this IEndpointRouteBuilder endpointRouteBuilder)
+        {
+            endpointRouteBuilder.MapHub<DialogHub>("/dialogs");
+            endpointRouteBuilder.MapHub<ChatHub>("/chats");
+        }
+
+        public static void AddCorsPolicy(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                    builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithOrigins("http://127.0.0.1:3000")
+                        .AllowCredentials()
+                        .SetIsOriginAllowed((hosts) => true));
             });
         }
     }

@@ -1,22 +1,9 @@
 using ChatService.API.Extensions;
-using ChatService.Application.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CORSPolicy",
-        builder => builder
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        //.AllowAnyOrigin()
-        .WithOrigins("http://127.0.0.1:3000")
-        .AllowCredentials()
-        .SetIsOriginAllowed((hosts) => true));
-});
-
+builder.Services.AddCorsPolicy();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddSignalR();
 builder.Services.AddAutoMapper();
@@ -35,19 +22,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseGlobalExceptionHandler();
+app.UseGlobalExceptionHandler();
 
-app.UseCors("CORSPolicy");
+app.UseCors();
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseDefaultFiles();
-app.UseStaticFiles();
-
 app.MapControllers();
-app.MapHub<ChatHub>("/dialogs");
+
+app.MapSignalR();
 
 await app.InitializeDatabaseAsync();
 
