@@ -15,6 +15,7 @@ using System.Security.Claims;
 namespace ChatService.API.Controllers
 {
     [Route("api/messages")]
+    [Authorize]
     [ApiController]
     public class MessagesController : ControllerBase
     {
@@ -27,31 +28,28 @@ namespace ChatService.API.Controllers
 
         [HttpPost]
         [Route("/api/dialogs/messages")]
-        [Authorize]
         public async Task<IActionResult> AddDialogMessageAsync([FromBody] AddDialogMessageDTO addDialogMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var command = new AddDialogMessageCommand(addDialogMessageDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpPut]
         [Route("/api/dialogs/messages")]
-        [Authorize]
         public async Task<IActionResult> UpdateDialogMessage([FromBody] UpdateDialogMessageDTO updateDialogMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var command = new UpdateDialogMessageCommand(updateDialogMessageDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpDelete]
         [Route("/api/dialogs/messages")]
-        [Authorize]
         public async Task<IActionResult> RemoveDialogMessageAsync([FromBody] RemoveDialogMessageDTO removeDialogMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -63,7 +61,6 @@ namespace ChatService.API.Controllers
 
         [HttpDelete]
         [Route("/api/dialogs/users/messages")]
-        [Authorize]
         public async Task<IActionResult> RemoveDialogMessageFromUserAsync([FromBody] RemoveDialogMessageFromUserDTO removeDialogMessageFromUserDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -75,19 +72,17 @@ namespace ChatService.API.Controllers
 
         [HttpPost]
         [Route("/api/chats/messages")]
-        [Authorize]
         public async Task<IActionResult> AddChatMessageAsync([FromBody] AddChatMessageDTO addChatMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var command = new AddChatMessageCommand(addChatMessageDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpPut]
         [Route("/api/chats/messages")]
-        [Authorize]
         public async Task<IActionResult> UpdateChatMessageAsync([FromBody] UpdateChatMessageDTO updateChatMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -99,7 +94,6 @@ namespace ChatService.API.Controllers
 
         [HttpDelete]
         [Route("/api/chats/messages")]
-        [Authorize]
         public async Task<IActionResult> RemoveChatMessageAsync([FromBody] RemoveChatMessageDTO removeChatMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -111,7 +105,6 @@ namespace ChatService.API.Controllers
 
         [HttpDelete]
         [Route("/api/chats/users/messages")]
-        [Authorize]
         public async Task<IActionResult> RemoveChatMessageFromUserAsync([FromBody] RemoveChatMessageFromUserDTO removeChatMessageFromUserDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

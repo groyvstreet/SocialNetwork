@@ -7,6 +7,7 @@ using System.Security.Claims;
 namespace ChatService.API.Controllers
 {
     [Route("api/dialogs")]
+    [Authorize]
     [ApiController]
     public class DialogsController : ControllerBase
     {
@@ -18,7 +19,6 @@ namespace ChatService.API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetDialogsByUserId(Guid userId)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

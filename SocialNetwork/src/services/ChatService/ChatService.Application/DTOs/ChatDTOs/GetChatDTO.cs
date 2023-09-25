@@ -9,6 +9,8 @@ namespace ChatService.Application.DTOs.ChatDTOs
 
         public string Name { get; set; } = string.Empty;
 
+        public string Image { get; set; } = string.Empty;
+
         public ulong UserCount { get; set; }
 
         public ulong MessageCount { get; set; }

@@ -19,22 +19,13 @@ namespace ChatService.API.Middlewares
             }
             catch (Exception ex)
             {
-                switch (ex)
+                context.Response.StatusCode = ex switch
                 {
-                    case NotFoundException:
-                        context.Response.StatusCode = 404;
-                        break;
-                    case AlreadyExistsException:
-                        context.Response.StatusCode = 409;
-                        break;
-                    case ForbiddenException:
-                        context.Response.StatusCode = 403;
-                        break;
-                    default:
-                        context.Response.StatusCode = 500;
-                        break;
-                }
-
+                    NotFoundException => 404,
+                    AlreadyExistsException => 409,
+                    ForbiddenException => 403,
+                    _ => 500,
+                };
                 context.Response.Headers.ContentType = "text/json; charset=utf-8";
                 var response = new { ex.Message };
                 await context.Response.WriteAsJsonAsync(response);

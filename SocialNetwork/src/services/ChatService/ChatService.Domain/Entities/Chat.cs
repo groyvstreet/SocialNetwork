@@ -1,14 +1,14 @@
 ﻿namespace ChatService.Domain.Entities
 {
-    public class Chat : IEntity
+    public class Chat : Entity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         public string Name { get; set; } = string.Empty;
 
-        public ulong UserCount { get; set; }
+        public string Image { get; set; } = string.Empty;
 
-        public ulong MessageCount { get; set; }
+        public long UserCount { get; set; }
+
+        public long MessageCount { get; set; }
 
         public List<ChatUser> Users { get; set; } = new List<ChatUser>();
 

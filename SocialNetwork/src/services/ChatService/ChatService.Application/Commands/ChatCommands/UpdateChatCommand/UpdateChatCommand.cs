@@ -5,16 +5,13 @@ namespace ChatService.Application.Commands.ChatCommands.UpdateChatCommand
 {
     public class UpdateChatCommand : IRequest
     {
-        public Guid Id { get; set; }
-
-        public string Name { get; set; } = string.Empty;
+        public UpdateChatDTO DTO { get; set; }
 
         public Guid AuthenticatedUserId { get; set; }
 
         public UpdateChatCommand(UpdateChatDTO updateChatDTO, Guid authenticatedUserId)
         {
-            Id = updateChatDTO.Id;
-            Name = updateChatDTO.Name;
+            DTO = updateChatDTO;
             AuthenticatedUserId = authenticatedUserId;
         }
     }

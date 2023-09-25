@@ -5,16 +5,13 @@ namespace ChatService.Application.Commands.ChatCommands.SetUserAsDefaultCommand
 {
     public class SetUserAsDefaultCommand : IRequest
     {
-        public Guid ChatId { get; set; }
-
-        public Guid UserId { get; set; }
+        public SetUserAsDefaultDTO DTO { get; set; }
 
         public Guid AuthenticatedUserId { get; set; }
 
         public SetUserAsDefaultCommand(SetUserAsDefaultDTO setUserAsDefaultDTO, Guid authenticatedUserId)
         {
-            ChatId = setUserAsDefaultDTO.ChatId;
-            UserId = setUserAsDefaultDTO.UserId;
+            DTO = setUserAsDefaultDTO;
             AuthenticatedUserId = authenticatedUserId;
         }
     }

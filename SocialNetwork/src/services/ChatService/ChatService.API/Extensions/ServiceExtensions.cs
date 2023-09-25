@@ -1,8 +1,11 @@
 ﻿using ChatService.Application.AutoMapperProfiles;
 using ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand;
-using ChatService.Application.Hubs;
 using ChatService.Application.Interfaces.Repositories;
+using ChatService.Application.Interfaces.Services;
+using ChatService.Infrastructure.Hubs.ChatHub;
+using ChatService.Infrastructure.Hubs.DialogHub;
 using ChatService.Infrastructure.Repositories;
+using ChatService.Infrastructure.Services;
 using MediatR;
 using MongoDB.Driver;
 
@@ -40,6 +43,8 @@ namespace ChatService.API.Extensions
 
                 return new ChatRepository(mongoDatabase, "chats");
             });
+            services.AddScoped<IDialogNotificationService, DialogNotificationService>();
+            services.AddScoped<IChatNotificationService, ChatNotificationService>();
         }
 
         public static void MapSignalR(this IEndpointRouteBuilder endpointRouteBuilder)

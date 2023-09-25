@@ -1,42 +1,38 @@
 ﻿using ChatService.Application.Exceptions;
-using ChatService.Application.Hubs;
-using ChatService.Application.Interfaces.Hubs;
 using ChatService.Application.Interfaces.Repositories;
-using ChatService.Domain.Entities;
+using ChatService.Application.Interfaces.Services;
 using MediatR;
-using Microsoft.AspNetCore.SignalR;
 
 namespace ChatService.Application.Commands.ChatCommands.RemoveChatMessageCommand
 {
     public class RemoveChatMessageCommandHandler : IRequestHandler<RemoveChatMessageCommand>
     {
         private readonly IChatRepository _chatRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IHubContext<ChatHub, IChatHub> _hubContext;
+        private readonly IChatNotificationService _chatNotificationService;
 
         public RemoveChatMessageCommandHandler(IChatRepository chatRepository,
-                                               IUserRepository userRepository,
-                                               IHubContext<ChatHub, IChatHub> hubContext)
+                                               IChatNotificationService chatNotificationService)
         {
             _chatRepository = chatRepository;
-            _userRepository = userRepository;
-            _hubContext = hubContext;
+            _chatNotificationService = chatNotificationService;
         }
 
         public async Task<Unit> Handle(RemoveChatMessageCommand request, CancellationToken cancellationToken)
         {
-            var chat = await _chatRepository.GetFirstOrDefaultByAsync(c => c.Id == request.ChatId);
+            var DTO = request.DTO;
+
+            var chat = await _chatRepository.GetFirstOrDefaultByAsync(c => c.Id == DTO.ChatId);
 
             if (chat is null)
             {
-                throw new NotFoundException($"no such chat with id = {request.ChatId}");
+                throw new NotFoundException($"no such chat with id = {DTO.ChatId}");
             }
 
-            var message = chat.Messages.FirstOrDefault(m => m.Id == request.MessageId);
+            var message = chat.Messages.FirstOrDefault(m => m.Id == DTO.MessageId);
 
             if (message is null)
             {
-                throw new NotFoundException($"no such message with id = {request.MessageId}");
+                throw new NotFoundException($"no such message with id = {DTO.MessageId}");
             }
 
             if (message.User.Id != request.AuthenticatedUserId)
@@ -44,14 +40,9 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveChatMessageCommand
                 throw new ForbiddenException("forbidden");
             }
 
-            await _chatRepository.RemoveChatMessageAsync(request.ChatId, request.MessageId);
-            await _chatRepository.UpdateFieldAsync(chat, c => c.MessageCount, chat.MessageCount - 1);
+            await _chatRepository.RemoveChatMessageAsync(DTO.ChatId, DTO.MessageId);
 
-            var userIds = chat.Users.Select(u => u.Id.ToString()).ToList();
-            chat.Users = new List<ChatUser>();
-            chat.Messages = new List<Message> { chat.Messages.First(m => m.Id == request.MessageId) };
-            chat.MessageCount--;
-            await _hubContext.Clients.Users(userIds).RemoveMessage(chat);
+            await _chatNotificationService.RemoveMessageAsync(chat, message);
 
             return new Unit();
         }

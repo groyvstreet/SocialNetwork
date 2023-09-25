@@ -5,14 +5,14 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
 {
     public class AddChatCommand : IRequest
     {
-        public string Name { get; set; } = string.Empty;
+        public AddChatDTO DTO { get; set; }
 
-        public Guid UserId { get; set; }
+        public Guid AuthenticatedUserId { get; set; }
 
-        public AddChatCommand(AddChatDTO addChatDTO)
+        public AddChatCommand(AddChatDTO addChatDTO, Guid authenticatedUserId)
         {
-            Name = addChatDTO.Name;
-            UserId = addChatDTO.UserId;
+            DTO = addChatDTO;
+            AuthenticatedUserId = authenticatedUserId;
         }
     }
 }

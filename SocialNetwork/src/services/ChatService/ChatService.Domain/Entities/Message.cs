@@ -1,9 +1,7 @@
 ﻿namespace ChatService.Domain.Entities
 {
-    public class Message : IEntity
+    public class Message : Entity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         public DateTimeOffset DateTime { get; set; }
 
         public string Text { get; set; } = string.Empty;

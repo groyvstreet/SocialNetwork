@@ -5,19 +5,13 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
 {
     public class AddDialogMessageCommand : IRequest
     {
-        public string Text { get; set; } = string.Empty;
-
-        public Guid SenderId { get; set; }
-
-        public Guid ReceiverId { get; set; }
+        public AddDialogMessageDTO DTO { get; set; }
 
         public Guid AuthenticatedUserId { get; set; }
 
         public AddDialogMessageCommand(AddDialogMessageDTO addDialogMessageDTO, Guid authenticatedUserId)
         {
-            Text = addDialogMessageDTO.Text;
-            SenderId = addDialogMessageDTO.SenderId;
-            ReceiverId = addDialogMessageDTO.ReceiverId;
+            DTO = addDialogMessageDTO;
             AuthenticatedUserId = authenticatedUserId;
         }
     }

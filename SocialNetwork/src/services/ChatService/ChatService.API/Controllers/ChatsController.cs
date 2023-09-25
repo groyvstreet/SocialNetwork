@@ -10,6 +10,7 @@ using System.Security.Claims;
 namespace ChatService.API.Controllers
 {
     [Route("api/chats")]
+    [Authorize]
     [ApiController]
     public class ChatsController : ControllerBase
     {
@@ -21,7 +22,6 @@ namespace ChatService.API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> GetChatsByUserId(Guid userId)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -32,24 +32,23 @@ namespace ChatService.API.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> AddChatAsync([FromBody] AddChatDTO addChatDTO)
         {
-            var command = new AddChatCommand(addChatDTO);
+            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var command = new AddChatCommand(addChatDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpPut]
-        [Authorize]
         public async Task<IActionResult> UpdateChatAsync([FromBody] UpdateChatDTO updateChatDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var command = new UpdateChatCommand(updateChatDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

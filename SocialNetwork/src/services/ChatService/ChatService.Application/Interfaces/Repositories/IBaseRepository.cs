@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace ChatService.Application.Interfaces.Repositories
 {
-    public interface IBaseRepository<T> where T : IEntity
+    public interface IBaseRepository<T> where T : Entity
     {
         Task<List<T>> GetAllAsync();
 

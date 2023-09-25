@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace ChatService.Infrastructure.Repositories
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : IEntity
+    public class BaseRepository<T> : IBaseRepository<T> where T : Entity
     {
         protected readonly IMongoCollection<T> _collection;
         protected readonly FilterDefinitionBuilder<T> _filterDefinitionBuilder;

@@ -5,16 +5,13 @@ namespace ChatService.Application.Commands.ChatCommands.RemoveUserFromChatComman
 {
     public class RemoveUserFromChatCommand : IRequest
     {
-        public Guid ChatId { get; set; }
-
-        public Guid UserId { get; set; }
+        public RemoveUserFromChatDTO DTO { get; set; }
 
         public Guid AuthenticatedUserId { get; set; }
 
         public RemoveUserFromChatCommand(RemoveUserFromChatDTO removeUserFromChatDTO, Guid authenticatedUserId)
         {
-            ChatId = removeUserFromChatDTO.ChatId;
-            UserId = removeUserFromChatDTO.UserId;
+            DTO = removeUserFromChatDTO;
             AuthenticatedUserId = authenticatedUserId;
         }
     }

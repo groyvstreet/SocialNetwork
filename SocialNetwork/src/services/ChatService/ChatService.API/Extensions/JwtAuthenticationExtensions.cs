@@ -40,7 +40,7 @@ namespace ChatService.API.Extensions
                         var path = context.HttpContext.Request.Path;
 
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/dialogs")))
+                            (path.StartsWithSegments("/dialogs") || path.StartsWithSegments("/chats")))
                         {
                             context.Token = accessToken;
                         }

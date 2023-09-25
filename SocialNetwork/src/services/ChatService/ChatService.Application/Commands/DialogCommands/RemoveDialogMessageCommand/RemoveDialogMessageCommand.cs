@@ -5,16 +5,13 @@ namespace ChatService.Application.Commands.DialogCommands.RemoveDialogMessageCom
 {
     public class RemoveDialogMessageCommand : IRequest
     {
-        public Guid DialogId { get; set; }
-
-        public Guid MessageId { get; set; }
+        public RemoveDialogMessageDTO DTO { get; set; }
 
         public Guid AuthenticatedUserId { get; set; }
 
         public RemoveDialogMessageCommand(RemoveDialogMessageDTO removeDialogMessageDTO, Guid authenticatedUserId)
         {
-            DialogId = removeDialogMessageDTO.DialogId;
-            MessageId = removeDialogMessageDTO.MessageId;
+            DTO = removeDialogMessageDTO;
             AuthenticatedUserId = authenticatedUserId;
         }
     }
