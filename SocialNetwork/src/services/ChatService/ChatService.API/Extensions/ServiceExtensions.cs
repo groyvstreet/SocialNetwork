@@ -1,4 +1,5 @@
 ﻿using ChatService.Application.AutoMapperProfiles;
+using ChatService.Application.Behaviours;
 using ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand;
 using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
@@ -8,6 +9,8 @@ using ChatService.Infrastructure.Repositories;
 using ChatService.Infrastructure.Services;
 using MediatR;
 using MongoDB.Driver;
+using FluentValidation;
+using ChatService.Application.Validators.DialogCommandValidators;
 
 namespace ChatService.API.Extensions
 {
@@ -21,6 +24,8 @@ namespace ChatService.API.Extensions
         public static void AddMediatR(this IServiceCollection services)
         {
             services.AddMediatR(typeof(AddDialogMessageCommandHandler).Assembly);
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
+            services.AddValidatorsFromAssemblyContaining<AddDialogMessageCommandValidator>();
         }
 
         public static void AddServices(this IServiceCollection services)

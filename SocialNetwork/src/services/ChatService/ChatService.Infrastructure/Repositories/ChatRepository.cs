@@ -10,20 +10,18 @@ namespace ChatService.Infrastructure.Repositories
 
         public async Task AddChatMessageAsync(Guid chatId, Message message)
         {
-            var pushMessage = _updateDefinitionBuilder.Push(c => c.Messages, message);
-            await _collection.UpdateOneAsync(c => c.Id == chatId, pushMessage);
-
-            var incMessageCount = _updateDefinitionBuilder.Inc(c => c.MessageCount, 1);
-            await _collection.UpdateOneAsync(c => c.Id == chatId, incMessageCount);
+            var update = _updateDefinitionBuilder
+                .Push(c => c.Messages, message)
+                .Inc(c => c.MessageCount, 1);
+            await _collection.UpdateOneAsync(c => c.Id == chatId, update);
         }
 
         public async Task AddUserToChatAsync(Guid chatId, ChatUser user)
         {
-            var pushUser = _updateDefinitionBuilder.Push(c => c.Users, user);
+            var pushUser = _updateDefinitionBuilder
+                .Push(c => c.Users, user)
+                .Inc(c => c.UserCount, 1);
             await _collection.UpdateOneAsync(c => c.Id == chatId, pushUser);
-
-            var incUserCount = _updateDefinitionBuilder.Inc(c => c.UserCount, 1);
-            await _collection.UpdateOneAsync(c => c.Id == chatId, incUserCount);
         }
 
         public async Task AddUserToInvitedUsers(Guid chatId, Guid userId, Guid invitedUserId)
@@ -52,11 +50,10 @@ namespace ChatService.Infrastructure.Repositories
 
         public async Task RemoveChatMessageAsync(Guid chatId, Guid messageId)
         {
-            var pullMessage = _updateDefinitionBuilder.PullFilter(d => d.Messages, m => m.Id == messageId);
-            await _collection.UpdateOneAsync(c => c.Id == chatId, pullMessage);
-
-            var decUserCount = _updateDefinitionBuilder.Inc(c => c.UserCount, -1);
-            await _collection.UpdateOneAsync(c => c.Id == chatId, decUserCount);
+            var update = _updateDefinitionBuilder
+                .PullFilter(d => d.Messages, m => m.Id == messageId)
+                .Inc(c => c.MessageCount, -1);
+            await _collection.UpdateOneAsync(c => c.Id == chatId, update);
         }
 
         public async Task RemoveChatMessageFromUserAsync(Guid chatId, Guid messageId, Guid userId)
@@ -69,11 +66,10 @@ namespace ChatService.Infrastructure.Repositories
 
         public async Task RemoveUserFromChatAsync(Guid chatId, Guid userId)
         {
-            var pullUser = _updateDefinitionBuilder.PullFilter(c => c.Users, u => u.Id == userId);
-            await _collection.UpdateOneAsync(c => c.Id == chatId, pullUser);
-
-            var decUserCount = _updateDefinitionBuilder.Inc(c => c.UserCount, -1);
-            await _collection.UpdateOneAsync(c => c.Id == chatId, decUserCount);
+            var update = _updateDefinitionBuilder
+                .PullFilter(c => c.Users, u => u.Id == userId)
+                .Inc(c => c.UserCount, -1);
+            await _collection.UpdateOneAsync(c => c.Id == chatId, update);
         }
 
         public async Task SetUserAsChatAdminAsync(Guid chatId, Guid userId, bool isAdmin)

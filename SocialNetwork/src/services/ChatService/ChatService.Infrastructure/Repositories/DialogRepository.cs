@@ -26,11 +26,10 @@ namespace ChatService.Infrastructure.Repositories
 
         public async Task AddDialogMessageAsync(Guid dialogId, Message message)
         {
-            var pushMessage = _updateDefinitionBuilder.Push(d => d.Messages, message);
-            await _collection.UpdateOneAsync(d => d.Id == dialogId, pushMessage);
-
-            var incMessageCount = _updateDefinitionBuilder.Inc(d => d.MessageCount, 1);
-            await _collection.UpdateOneAsync(d => d.Id == dialogId, incMessageCount);
+            var update = _updateDefinitionBuilder
+                .Push(d => d.Messages, message)
+                .Inc(d => d.MessageCount, 1);
+            await _collection.UpdateOneAsync(d => d.Id == dialogId, update);
         }
 
         public async Task UpdateDialogMessageAsync(Guid dialogId, Guid messageId, string text)
@@ -43,11 +42,10 @@ namespace ChatService.Infrastructure.Repositories
 
         public async Task RemoveDialogMessageAsync(Guid dialogId, Guid messageId)
         {
-            var pullMessage = _updateDefinitionBuilder.PullFilter(d => d.Messages, m => m.Id == messageId);
-            await _collection.UpdateOneAsync(d => d.Id == dialogId, pullMessage);
-
-            var decMessageCount = _updateDefinitionBuilder.Inc(d => d.MessageCount, -1);
-            await _collection.UpdateOneAsync(d => d.Id == dialogId, pullMessage);
+            var update = _updateDefinitionBuilder
+                .PullFilter(d => d.Messages, m => m.Id == messageId)
+                .Inc(d => d.MessageCount, -1);
+            await _collection.UpdateOneAsync(d => d.Id == dialogId, update);
         }
 
         public async Task RemoveDialogMessageFromUserAsync(Guid dialogId, Guid messageId, Guid userId)
