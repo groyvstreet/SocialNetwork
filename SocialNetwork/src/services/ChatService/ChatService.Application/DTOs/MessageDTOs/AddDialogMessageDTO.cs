@@ -1,0 +1,11 @@
+﻿namespace ChatService.Application.DTOs.MessageDTOs
+{
+    public class AddDialogMessageDTO
+    {
+        public string Text { get; set; } = string.Empty;
+
+        public Guid SenderId { get; set; }
+
+        public Guid ReceiverId { get; set; }
+    }
+}

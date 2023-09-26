@@ -1,14 +1,18 @@
-using MongoDB.Driver;
+using ChatService.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connection = builder.Configuration.GetSection("MongoConnection").Get<string>();
-var database = builder.Configuration.GetSection("MongoDatabase").Get<string>();
-builder.Services.AddSingleton(new MongoClient(connection).GetDatabase(database));
+builder.Services.AddDatabaseConnection(builder.Configuration);
+builder.Services.AddCorsPolicy();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddSignalR();
+builder.Services.AddAutoMapper();
+builder.Services.AddMediatR();
+builder.Services.AddServices();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerAuthorization();
 
 var app = builder.Build();
 
@@ -18,10 +22,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseGlobalExceptionHandler();
+
+app.UseCors();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapSignalR();
+
+await app.InitializeDatabaseAsync();
 
 app.Run();

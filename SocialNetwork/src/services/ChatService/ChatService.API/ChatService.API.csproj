@@ -10,6 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.21.0" />
@@ -17,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="AutoMapperProfiles\" />
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\ChatService.Application\ChatService.Application.csproj" />
+    <ProjectReference Include="..\ChatService.Infrastructure\ChatService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
