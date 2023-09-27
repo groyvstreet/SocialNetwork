@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using PostService.Application.AutoMapperProfiles;
 using PostService.Application.Interfaces.CommentInterfaces;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
@@ -9,6 +10,7 @@ using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Application.Services;
 using PostService.Application.Validators.PostValidators;
 using PostService.Infrastructure.Repositories;
+using PostService.Infrastructure.Services;
 
 namespace PostService.API.Extensions
 {
@@ -38,6 +40,8 @@ namespace PostService.API.Extensions
             services.AddScoped<IPostLikeService, PostLikeService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICommentLikeService, CommentLikeService>();
+
+            services.AddSingleton<IHostedService, KafkaConsumerService>();
         }
     }
 }

@@ -7,6 +7,7 @@ services:
       dockerfile: /src/services/PostService/PostService.API/Dockerfile
     depends_on:
       - postgresql-db
+      - kafka
 
   postgresql-db:
     image: postgres:latest
@@ -17,6 +18,7 @@ services:
       dockerfile: /src/services/IdentityService/IdentityService.PL/Dockerfile
     depends_on:
       - mssqlserver-db
+      - kafka
 
   mssqlserver-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -30,3 +32,11 @@ services:
 
   mongo-db:
     image: mongo
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    depends_on:
+      - zookeeper

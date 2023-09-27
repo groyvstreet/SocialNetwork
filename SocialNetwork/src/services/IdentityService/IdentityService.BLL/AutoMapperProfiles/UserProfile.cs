@@ -8,6 +8,8 @@ namespace IdentityService.BLL.AutoMapperProfiles
     {
         public UserProfile()
         {
+            CreateMap<DateTime, DateOnly>().ConstructUsing(dt => DateOnly.FromDateTime(dt));
+            CreateMap<DateOnly, DateTime>().ConstructUsing(d => d.ToDateTime(TimeOnly.MinValue));
             CreateMap<User, GetUserDTO>();
             CreateMap<AddUserDTO, User>();
             CreateMap<UpdateUserDTO, User>();

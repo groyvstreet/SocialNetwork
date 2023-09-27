@@ -31,6 +31,15 @@ namespace IdentityService.PL.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IIdentityService, BLL.Services.IdentityService>();
+
+            services.AddSingleton<IKafkaProducerService>(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
+                var connection = configuration.GetSection("KafkaOptions").GetSection("Connection").Value!;
+                var topic = configuration.GetSection("KafkaOptions").GetSection("Topic").Value!;
+
+                return new KafkaProducerService(connection, topic);
+            });
         }
     }
 }

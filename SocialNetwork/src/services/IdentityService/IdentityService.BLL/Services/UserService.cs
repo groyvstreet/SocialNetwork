@@ -4,6 +4,7 @@ using IdentityService.BLL.Exceptions;
 using IdentityService.BLL.Interfaces;
 using IdentityService.DAL.Data;
 using IdentityService.DAL.Interfaces;
+using System.Text.Json;
 
 namespace IdentityService.BLL.Services
 {
@@ -11,12 +12,15 @@ namespace IdentityService.BLL.Services
     {
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
+        private readonly IKafkaProducerService _kafkaProducerService;
 
         public UserService(IMapper mapper,
-                           IUserRepository userRepository)
+                           IUserRepository userRepository,
+                           IKafkaProducerService kafkaProducerService)
         {
             _mapper = mapper;
             _userRepository = userRepository;
+            _kafkaProducerService = kafkaProducerService;
         }
 
         public async Task<List<GetUserDTO>> GetUsersAsync()
@@ -61,6 +65,8 @@ namespace IdentityService.BLL.Services
             await _userRepository.UpdateUserAsync(user);
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
 
+            await _kafkaProducerService.SendUserRequestAsync(UserRequest.Update, getUserDTO);
+
             return getUserDTO;
         }
 
@@ -79,6 +85,9 @@ namespace IdentityService.BLL.Services
             }
 
             await _userRepository.RemoveUserAsync(user);
+
+            var getUserDTO = _mapper.Map<GetUserDTO>(user);
+            await _kafkaProducerService.SendUserRequestAsync(UserRequest.Remove, getUserDTO);
         }
     }
 }
