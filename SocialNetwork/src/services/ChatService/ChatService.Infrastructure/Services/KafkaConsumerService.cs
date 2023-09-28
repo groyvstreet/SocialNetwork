@@ -1,26 +1,30 @@
-﻿using Confluent.Kafka;
+﻿using ChatService.Application;
+using ChatService.Application.Interfaces.Repositories;
+using ChatService.Domain.Entities;
+using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using PostService.Application;
-using PostService.Application.Interfaces.UserInterfaces;
-using PostService.Domain.Entities;
 using System.Text.Json;
 
-namespace PostService.Infrastructure.Services
+namespace ChatService.Infrastructure.Services
 {
     public class KafkaConsumerService : BackgroundService
     {
         private readonly string _bootstrapServers;
-        private readonly string _groupId = "post_group";
+        private readonly string _groupId = "chat_group";
         private readonly IUserRepository _userRepository;
-        
+        private readonly IDialogRepository _dialogRepository;
+        private readonly IChatRepository _chatRepository;
+
         public KafkaConsumerService(IOptions<KafkaOptions> kafkaOptions, IServiceProvider serviceProvider)
         {
             _bootstrapServers = kafkaOptions.Value.BootstrapServers;
 
             var scope = serviceProvider.CreateScope();
             _userRepository = scope.ServiceProvider.GetService<IUserRepository>()!;
+            _dialogRepository = scope.ServiceProvider.GetService<IDialogRepository>()!;
+            _chatRepository = scope.ServiceProvider.GetService<IChatRepository>()!;
         }
 
         private async Task SubscribeOnTopic<T>(string topic, Func<Request<T>, Task> handle)
@@ -55,21 +59,18 @@ namespace PostService.Infrastructure.Services
                     await _userRepository.AddAsync(request.Data);
                     break;
                 case RequestOperation.Update:
-                    var userForUpdate = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == request.Data.Id);
-                    userForUpdate!.FirstName = request.Data.FirstName;
-                    userForUpdate.LastName = request.Data.LastName;
-                    userForUpdate.BirthDate = request.Data.BirthDate;
-                    userForUpdate.Image = request.Data.Image;
+                    await _userRepository.UpdateAsync(request.Data);
+                    await _dialogRepository.UpdateUserAsync(request.Data);
+                    await _chatRepository.UpdateUserAsync(request.Data);
                     break;
                 case RequestOperation.Remove:
-                    var userForRemove = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == request.Data.Id);
-                    _userRepository.Remove(userForRemove!);
+                    await _userRepository.RemoveAsync(request.Data);
+                    await _dialogRepository.RemoveUserAsync(request.Data);
+                    await _chatRepository.RemoveUserAsync(request.Data);
                     break;
                 default:
                     break;
             }
-
-            await _userRepository.SaveChangesAsync();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)

@@ -2,33 +2,32 @@
 using Confluent.Kafka;
 using System.Text.Json;
 using IdentityService.BLL.DTOs.UserDTOs;
+using Microsoft.Extensions.Options;
 
 namespace IdentityService.BLL.Services
 {
     public class KafkaProducerService : IKafkaProducerService
     {
         private readonly IProducer<Null, string> _producer;
-        private readonly string _topic;
 
-        public KafkaProducerService(string bootstrapServers, string topic)
+        public KafkaProducerService(IOptions<KafkaOptions> kafkaOptions)
         {
             var producerConfig = new ProducerConfig
             {
-                BootstrapServers = bootstrapServers
+                BootstrapServers = kafkaOptions.Value.BootstrapServers
             };
             _producer = new ProducerBuilder<Null, string>(producerConfig).Build();
-            _topic = topic;
         }
 
-        public async Task SendUserRequestAsync(UserRequest userRequest, GetUserDTO user)
+        public async Task SendUserRequestAsync(RequestOperation operationRequest, GetUserDTO user)
         {
             var request = new
             {
-                Operation = userRequest,
+                Operation = operationRequest,
                 Data = user
             };
             var message = new Message<Null, string> { Value = JsonSerializer.Serialize(request) };
-            await _producer.ProduceAsync(_topic, message);
+            await _producer.ProduceAsync("users", message);
         }
     }
 }

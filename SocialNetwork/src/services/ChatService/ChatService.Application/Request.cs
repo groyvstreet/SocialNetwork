@@ -1,4 +1,4 @@
-﻿namespace PostService.Application
+﻿namespace ChatService.Application
 {
     public class Request<T>
     {

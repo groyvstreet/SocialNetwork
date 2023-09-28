@@ -26,8 +26,13 @@ namespace PostService.Application.Services
             _userRepository = userRepository;
         }
 
-        public async Task<GetCommentLikeDTO> AddCommentLikeAsync(AddRemoveCommentLikeDTO addCommentLikeDTO)
+        public async Task<GetCommentLikeDTO> AddCommentLikeAsync(AddRemoveCommentLikeDTO addCommentLikeDTO, Guid authenticatedUserId)
         {
+            if (addCommentLikeDTO.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
+            }
+
             var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == addCommentLikeDTO.CommentId);
 
             if (comment is null)
@@ -61,8 +66,13 @@ namespace PostService.Application.Services
             return getCommentsUserDTO;
         }
 
-        public async Task RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
+        public async Task RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO, Guid authenticatedUserId)
         {
+            if (addRemoveCommentLikeDTO.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
+            }
+
             var commentLike = await _commentLikeRepository.GetFirstOrDefaultByAsync(cl => 
                 cl.CommentId == addRemoveCommentLikeDTO.CommentId && cl.UserId == addRemoveCommentLikeDTO.UserId);
 

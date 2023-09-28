@@ -4,6 +4,6 @@ namespace IdentityService.BLL.Interfaces
 {
     public interface IKafkaProducerService
     {
-        Task SendUserRequestAsync(UserRequest userRequest, GetUserDTO user);
+        Task SendUserRequestAsync(RequestOperation operationRequest, GetUserDTO user);
     }
 }

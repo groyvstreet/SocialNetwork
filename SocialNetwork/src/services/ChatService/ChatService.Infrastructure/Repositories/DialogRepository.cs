@@ -1,5 +1,6 @@
 ﻿using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
@@ -54,6 +55,21 @@ namespace ChatService.Infrastructure.Repositories
             var messageIndex = dialog.Messages.FindIndex(m => m.Id == messageId);
             var update = _updateDefinitionBuilder.AddToSet(d => d.Messages[messageIndex].UsersRemoved, userId.ToString());
             await _collection.UpdateOneAsync(d => d.Id == dialogId, update);
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            var update = _updateDefinitionBuilder.Set(d => d.Users.FirstMatchingElement().FirstName, user.FirstName)
+                .Set(d => d.Users.FirstMatchingElement().LastName, user.LastName)
+                .Set(d => d.Users.FirstMatchingElement().Image, user.Image);
+            await _collection.UpdateManyAsync(d => d.Users.Any(u => u.Id == user.Id), update);
+        }
+
+        public async Task RemoveUserAsync(User user)
+        {
+            var filter = _filterDefinitionBuilder.Empty;
+            var update = _updateDefinitionBuilder.PullFilter(d => d.Users, u => u.Id == user.Id);
+            await _collection.UpdateManyAsync(filter, update);
         }
     }
 }

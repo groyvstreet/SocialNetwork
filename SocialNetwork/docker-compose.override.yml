@@ -60,6 +60,7 @@ services:
       - "82:80"
     networks:
       - chat-service-network
+      - kafka-network
 
   mongo-db:
     container_name: mongo
@@ -80,22 +81,11 @@ services:
   kafka:
     ports:
       - "9092:9092"
-      # - "29092:29092"
     environment:
       KAFKA_CREATE_TOPICS: "users:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_PORT: 9092
-      # KAFKA_BROKER_ID: 0
-      # KAFKA_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://0.0.0.0:9092 
-      # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      # KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-
-      # KAFKA_LISTENERS: LISTENER_BOB://kafka:29092,LISTENER_FRED://kafka:9092
-      # KAFKA_ADVERTISED_LISTENERS: LISTENER_BOB://kafka:29092,LISTENER_FRED://localhost:9092
-      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_BOB:PLAINTEXT,LISTENER_FRED:PLAINTEXT
-      # KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_BOB
     networks:
       - kafka-network
       - zookeeper-network

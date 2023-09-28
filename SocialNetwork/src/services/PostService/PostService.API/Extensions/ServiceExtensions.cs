@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using PostService.Application;
 using PostService.Application.AutoMapperProfiles;
 using PostService.Application.Interfaces.CommentInterfaces;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
@@ -27,7 +27,7 @@ namespace PostService.API.Extensions
             services.AddAutoMapper(typeof(UserProfile).Assembly);
         }
 
-        public static void AddServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
@@ -41,7 +41,8 @@ namespace PostService.API.Extensions
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICommentLikeService, CommentLikeService>();
 
-            services.AddSingleton<IHostedService, KafkaConsumerService>();
+            services.Configure<KafkaOptions>(configuration.GetSection("KafkaOptions"));
+            services.AddHostedService<KafkaConsumerService>();
         }
     }
 }

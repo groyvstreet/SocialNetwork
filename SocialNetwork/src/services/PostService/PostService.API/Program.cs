@@ -4,15 +4,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
 
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
 builder.Services.AddFluentValidation();
 
 builder.Services.AddAutoMapper();
 
-builder.Services.AddServices();
+builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerAuthorization();
 
 var app = builder.Build();
 

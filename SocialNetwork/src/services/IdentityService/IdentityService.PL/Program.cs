@@ -12,7 +12,7 @@ builder.Services.AddFluentValidation();
 
 builder.Services.AddAutoMapper();
 
-builder.Services.AddServices();
+builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

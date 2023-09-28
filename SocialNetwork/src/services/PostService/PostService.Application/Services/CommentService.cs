@@ -82,8 +82,13 @@ namespace PostService.Application.Services
             return getCommentDTOs;
         }
 
-        public async Task<GetCommentDTO> AddCommentAsync(AddCommentDTO addCommentDTO)
+        public async Task<GetCommentDTO> AddCommentAsync(AddCommentDTO addCommentDTO, Guid authenticatedUserId)
         {
+            if (addCommentDTO.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
+            }
+
             var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == addCommentDTO.PostId);
 
             if (post is null)
@@ -110,13 +115,18 @@ namespace PostService.Application.Services
             return getCommentDTO;
         }
 
-        public async Task<GetCommentDTO> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO)
+        public async Task<GetCommentDTO> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO, Guid authenticatedUserId)
         {
             var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == updateCommentDTO.Id);
 
             if (comment is null)
             {
                 throw new NotFoundException($"no such comment with id = {updateCommentDTO.Id}");
+            }
+
+            if (comment.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
             }
 
             comment.Text = updateCommentDTO.Text;
@@ -126,13 +136,18 @@ namespace PostService.Application.Services
             return getCommentDTO;
         }
 
-        public async Task RemoveCommentByIdAsync(Guid id)
+        public async Task RemoveCommentByIdAsync(Guid id, Guid authenticatedUserId)
         {
             var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
 
             if (comment is null)
             {
                 throw new NotFoundException($"no such comment with id = {id}");
+            }
+
+            if (comment.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
             }
 
             _commentRepository.Remove(comment);

@@ -4,8 +4,8 @@ namespace PostService.Application.Interfaces.PostLikeInterfaces
 {
     public interface IPostLikeService
     {
-        Task<GetPostLikeDTO> AddPostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO);
+        Task<GetPostLikeDTO> AddPostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO, Guid authenticatedUserId);
 
-        Task RemovePostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO);
+        Task RemovePostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO, Guid authenticatedUserId);
     }
 }

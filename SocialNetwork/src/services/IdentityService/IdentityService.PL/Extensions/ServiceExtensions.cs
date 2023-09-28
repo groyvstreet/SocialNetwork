@@ -6,6 +6,8 @@ using IdentityService.BLL.AutoMapperProfiles;
 using IdentityService.BLL.Validators.UserValidators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.Extensions.Configuration;
+using IdentityService.BLL;
 
 namespace IdentityService.PL.Extensions
 {
@@ -22,7 +24,7 @@ namespace IdentityService.PL.Extensions
             services.AddAutoMapper(typeof(UserProfile));
         }
 
-        public static void AddServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -32,14 +34,8 @@ namespace IdentityService.PL.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IIdentityService, BLL.Services.IdentityService>();
 
-            services.AddSingleton<IKafkaProducerService>(provider =>
-            {
-                var configuration = provider.GetRequiredService<IConfiguration>();
-                var connection = configuration.GetSection("KafkaOptions").GetSection("Connection").Value!;
-                var topic = configuration.GetSection("KafkaOptions").GetSection("Topic").Value!;
-
-                return new KafkaProducerService(connection, topic);
-            });
+            services.Configure<KafkaOptions>(configuration.GetSection("KafkaOptions"));
+            services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
         }
     }
 }

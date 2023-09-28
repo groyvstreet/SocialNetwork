@@ -29,6 +29,7 @@ services:
       dockerfile: /src/services/ChatService/ChatService.API/Dockerfile
     depends_on:
       - mongo-db
+      - kafka
 
   mongo-db:
     image: mongo

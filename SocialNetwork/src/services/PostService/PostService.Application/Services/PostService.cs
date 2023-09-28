@@ -78,8 +78,13 @@ namespace PostService.Application.Services
             return getPostDTOs;
         }
 
-        public async Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO)
+        public async Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO, Guid authenticatedUserId)
         {
+            if (addPostDTO.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
+            }
+
             var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addPostDTO.UserId);
 
             if (user is null)
@@ -96,13 +101,18 @@ namespace PostService.Application.Services
             return getPostDTO;
         }
 
-        public async Task<GetPostDTO> UpdatePostAsync(UpdatePostDTO updatePostDTO)
+        public async Task<GetPostDTO> UpdatePostAsync(UpdatePostDTO updatePostDTO, Guid authenticatedUserId)
         {
             var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == updatePostDTO.Id);
             
             if (post is null)
             {
                 throw new NotFoundException($"no such post with id = {updatePostDTO.Id}");
+            }
+
+            if (post.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
             }
 
             post.Text = updatePostDTO.Text;
@@ -112,13 +122,18 @@ namespace PostService.Application.Services
             return getPostDTO;
         }
 
-        public async Task RemovePostByIdAsync(Guid id)
+        public async Task RemovePostByIdAsync(Guid id, Guid authenticatedUserId)
         {
             var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == id);
 
             if (post is null)
             {
                 throw new NotFoundException($"no such post with id = {id}");
+            }
+
+            if (post.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
             }
 
             _postRepository.Remove(post);

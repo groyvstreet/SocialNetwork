@@ -13,5 +13,9 @@ namespace ChatService.Application.Interfaces.Repositories
         Task RemoveDialogMessageAsync(Guid dialogId, Guid messageId);
 
         Task RemoveDialogMessageFromUserAsync(Guid dialogId, Guid messageId, Guid userId);
+
+        Task UpdateUserAsync(User user);
+
+        Task RemoveUserAsync(User user);
     }
 }

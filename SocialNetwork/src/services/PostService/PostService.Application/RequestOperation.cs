@@ -1,6 +1,6 @@
 ﻿namespace PostService.Application
 {
-    public enum UserRequest
+    public enum RequestOperation
     {
         Create,
         Update,

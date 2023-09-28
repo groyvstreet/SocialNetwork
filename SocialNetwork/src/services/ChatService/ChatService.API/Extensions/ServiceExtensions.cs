@@ -11,6 +11,8 @@ using MediatR;
 using MongoDB.Driver;
 using FluentValidation;
 using ChatService.Application.Validators.DialogCommandValidators;
+using ChatService.Application;
+using Microsoft.Extensions.Configuration;
 
 namespace ChatService.API.Extensions
 {
@@ -28,7 +30,7 @@ namespace ChatService.API.Extensions
             services.AddValidatorsFromAssemblyContaining<AddDialogMessageCommandValidator>();
         }
 
-        public static void AddServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IUserRepository>(provider =>
             {
@@ -48,8 +50,12 @@ namespace ChatService.API.Extensions
 
                 return new ChatRepository(mongoDatabase, "chats");
             });
+
             services.AddScoped<IDialogNotificationService, DialogNotificationService>();
             services.AddScoped<IChatNotificationService, ChatNotificationService>();
+
+            services.Configure<KafkaOptions>(configuration.GetSection("KafkaOptions"));
+            services.AddHostedService<KafkaConsumerService>();
         }
 
         public static void MapSignalR(this IEndpointRouteBuilder endpointRouteBuilder)

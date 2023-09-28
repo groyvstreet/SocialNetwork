@@ -1,6 +1,6 @@
 ﻿namespace IdentityService.BLL
 {
-    public enum UserRequest
+    public enum RequestOperation
     {
         Create,
         Update,

@@ -61,11 +61,11 @@ namespace IdentityService.BLL.Services
 
             user.FirstName = updateUserDTO.FirstName;
             user.LastName = updateUserDTO.LastName;
-            user.BirthDate = updateUserDTO.BirthDate;
+            user.BirthDate = updateUserDTO.BirthDate.ToDateTime(TimeOnly.MinValue);
             await _userRepository.UpdateUserAsync(user);
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
 
-            await _kafkaProducerService.SendUserRequestAsync(UserRequest.Update, getUserDTO);
+            await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Update, getUserDTO);
 
             return getUserDTO;
         }
@@ -87,7 +87,7 @@ namespace IdentityService.BLL.Services
             await _userRepository.RemoveUserAsync(user);
 
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
-            await _kafkaProducerService.SendUserRequestAsync(UserRequest.Remove, getUserDTO);
+            await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Remove, getUserDTO);
         }
     }
 }

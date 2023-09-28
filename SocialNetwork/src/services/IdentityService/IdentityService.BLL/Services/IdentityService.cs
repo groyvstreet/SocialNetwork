@@ -43,7 +43,7 @@ namespace IdentityService.BLL.Services
             await _userRepository.AddUserAsync(user, addUserDTO.Password, Roles.User);
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
             
-            await _kafkaProducerService.SendUserRequestAsync(UserRequest.Create, getUserDTO);
+            await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Create, getUserDTO);
 
             return getUserDTO;
         }
