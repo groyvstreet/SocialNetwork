@@ -37,5 +37,19 @@ namespace IdentityService.PL.Extensions
             services.Configure<KafkaOptions>(configuration.GetSection("KafkaOptions"));
             services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
         }
+
+        public static void AddCorsPolicy(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                    builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithOrigins("http://127.0.0.1:3000")
+                        .AllowCredentials()
+                        .SetIsOriginAllowed((hosts) => true));
+            });
+        }
     }
 }

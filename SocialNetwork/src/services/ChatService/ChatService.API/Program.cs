@@ -34,6 +34,4 @@ app.MapControllers();
 
 app.MapSignalR();
 
-await app.InitializeDatabaseAsync();
-
 app.Run();

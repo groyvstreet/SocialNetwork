@@ -3,15 +3,11 @@ using IdentityService.PL.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
-
+builder.Services.AddCorsPolicy();
 builder.Services.AddIdentity();
-
 builder.Services.AddJwtAuthentication(builder.Configuration);
-
 builder.Services.AddFluentValidation();
-
 builder.Services.AddAutoMapper();
-
 builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers();
@@ -27,6 +23,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseGlobalExceptionHandler();
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 

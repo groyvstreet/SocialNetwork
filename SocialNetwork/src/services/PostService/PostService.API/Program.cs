@@ -33,6 +33,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.ApplyMigrations();
-await app.InitializeDatabaseAsync();
 
 app.Run();
