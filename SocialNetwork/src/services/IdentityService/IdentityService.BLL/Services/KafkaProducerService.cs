@@ -8,7 +8,7 @@ namespace IdentityService.BLL.Services
 {
     public class KafkaProducerService : IKafkaProducerService
     {
-        private readonly IProducer<Null, string> _producer;
+        private readonly IProducer<string, string> _producer;
 
         public KafkaProducerService(IOptions<KafkaOptions> kafkaOptions)
         {
@@ -16,17 +16,21 @@ namespace IdentityService.BLL.Services
             {
                 BootstrapServers = kafkaOptions.Value.BootstrapServers
             };
-            _producer = new ProducerBuilder<Null, string>(producerConfig).Build();
+            _producer = new ProducerBuilder<string, string>(producerConfig).Build();
         }
 
-        public async Task SendUserRequestAsync(RequestOperation operationRequest, GetUserDTO user)
+        public async Task SendUserRequestAsync(RequestOperation requestOperation, GetUserDTO user)
         {
-            var request = new
+            /*var request = new
             {
-                Operation = operationRequest,
+                Operation = requestOperation,
                 Data = user
+            };*/
+            var message = new Message<string, string>
+            {
+                Key = JsonSerializer.Serialize(requestOperation),
+                Value = JsonSerializer.Serialize(user)
             };
-            var message = new Message<Null, string> { Value = JsonSerializer.Serialize(request) };
             await _producer.ProduceAsync("users", message);
         }
     }

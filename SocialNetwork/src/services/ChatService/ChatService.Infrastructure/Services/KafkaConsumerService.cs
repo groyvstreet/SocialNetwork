@@ -12,7 +12,7 @@ namespace ChatService.Infrastructure.Services
     public class KafkaConsumerService : BackgroundService
     {
         private readonly string _bootstrapServers;
-        private readonly string _groupId = "chat_group";
+        private readonly string _groupId;
         private readonly IUserRepository _userRepository;
         private readonly IDialogRepository _dialogRepository;
         private readonly IChatRepository _chatRepository;
@@ -20,6 +20,7 @@ namespace ChatService.Infrastructure.Services
         public KafkaConsumerService(IOptions<KafkaOptions> kafkaOptions, IServiceProvider serviceProvider)
         {
             _bootstrapServers = kafkaOptions.Value.BootstrapServers;
+            _groupId = kafkaOptions.Value.GroupId;
 
             var scope = serviceProvider.CreateScope();
             _userRepository = scope.ServiceProvider.GetService<IUserRepository>()!;
