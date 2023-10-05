@@ -11,6 +11,12 @@ using MediatR;
 using MongoDB.Driver;
 using FluentValidation;
 using ChatService.Application.Validators.DialogCommandValidators;
+using Hangfire;
+using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies.Backup;
+using Hangfire.Mongo.Migration.Strategies;
+using Microsoft.Extensions.Configuration;
+using ChatService.API.Hangfire;
 
 namespace ChatService.API.Extensions
 {
@@ -26,6 +32,34 @@ namespace ChatService.API.Extensions
             services.AddMediatR(typeof(AddDialogMessageCommandHandler).Assembly);
             services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             services.AddValidatorsFromAssemblyContaining<AddDialogMessageCommandValidator>();
+        }
+
+        public static void AddHangfire(this IServiceCollection services, IConfiguration configuration)
+        {
+            var connection = configuration.GetSection("MongoConnection").Get<string>();
+            var database = configuration.GetSection("MongoDatabase").Get<string>();
+
+            var mongoMigrationOptions = new MongoMigrationOptions
+            {
+                MigrationStrategy = new DropMongoMigrationStrategy(),
+                BackupStrategy = new CollectionMongoBackupStrategy()
+            };
+
+            var mongoStorageOptions = new MongoStorageOptions
+            {
+                MigrationOptions = mongoMigrationOptions,
+                CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.TailNotificationsCollection,
+                CheckConnection = false
+            };
+
+            services.AddHangfire(config =>
+            {
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170);
+                config.UseSimpleAssemblyNameTypeSerializer();
+                config.UseRecommendedSerializerSettings();
+                config.UseMongoStorage(connection, database, mongoStorageOptions);
+            });
+            services.AddHangfireServer();
         }
 
         public static void AddServices(this IServiceCollection services)
@@ -50,6 +84,9 @@ namespace ChatService.API.Extensions
             });
             services.AddScoped<IDialogNotificationService, DialogNotificationService>();
             services.AddScoped<IChatNotificationService, ChatNotificationService>();
+            services.AddScoped<IBackgroundJobService, BackgroundJobService>();
+            services.AddScoped<IChatService, Application.Services.ChatService>();
+            services.AddHostedService<RecurringJobExecutorService>();
         }
 
         public static void MapSignalR(this IEndpointRouteBuilder endpointRouteBuilder)
@@ -69,6 +106,14 @@ namespace ChatService.API.Extensions
                         .WithOrigins("http://127.0.0.1:3000")
                         .AllowCredentials()
                         .SetIsOriginAllowed((hosts) => true));
+            });
+        }
+
+        public static void UseHangfireDashboardUI(this IApplicationBuilder app)
+        {
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
             });
         }
     }

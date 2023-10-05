@@ -8,6 +8,7 @@ namespace ChatService.Application.Validators.DialogCommandValidators
         public AddDialogMessageCommandValidator()
         {
             RuleFor(c => c.DTO.Text).NotEmpty();
+            RuleFor(c => c.DateTime).GreaterThan(DateTimeOffset.Now);
         }
     }
 }

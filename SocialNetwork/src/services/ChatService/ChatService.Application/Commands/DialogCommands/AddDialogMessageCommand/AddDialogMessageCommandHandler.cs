@@ -1,4 +1,5 @@
-﻿using ChatService.Application.Exceptions;
+﻿using ChatService.Application.DTOs.MessageDTOs;
+using ChatService.Application.Exceptions;
 using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
 using ChatService.Domain.Entities;
@@ -11,14 +12,17 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
         private readonly IDialogRepository _dialogRepository;
         private readonly IUserRepository _userRepository;
         private readonly IDialogNotificationService _dialogNotificationService;
+        private readonly IBackgroundJobService _backgroundJobService;
 
         public AddDialogMessageCommandHandler(IDialogRepository dialogRepository,
                                               IUserRepository userRepository,
-                                              IDialogNotificationService dialogNotificationService)
+                                              IDialogNotificationService dialogNotificationService,
+                                              IBackgroundJobService backgroundJobService)
         {
             _dialogRepository = dialogRepository;
             _userRepository = userRepository;
             _dialogNotificationService = dialogNotificationService;
+            _backgroundJobService = backgroundJobService;
         }
 
         public async Task<Unit> Handle(AddDialogMessageCommand request, CancellationToken cancellationToken)
@@ -44,6 +48,34 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
                 throw new NotFoundException($"no such user with id = {DTO.ReceiverId}");
             }
 
+            if (request.DateTime is null)
+            {
+                await AddDialogMessageAsync(request.DTO);
+            }
+            else
+            {
+                _backgroundJobService.AddSchedule(() => AddDialogMessageAsync(request.DTO), request.DateTime.Value - DateTimeOffset.Now);
+            }
+
+            return new Unit();
+        }
+        
+        public async Task AddDialogMessageAsync(AddDialogMessageDTO DTO)
+        {
+            var sender = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.SenderId);
+
+            if (sender is null)
+            {
+                return;
+            }
+
+            var receiver = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.ReceiverId);
+
+            if (receiver is null)
+            {
+                return;
+            }
+
             var dialog = await _dialogRepository.GetFirstOrDefaultByAsync(d =>
                 d.Users.Any(u => u.Id == DTO.SenderId) && d.Users.Any(u => u.Id == DTO.ReceiverId));
 
@@ -63,8 +95,6 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
             await _dialogRepository.AddDialogMessageAsync(dialog.Id, message);
 
             await _dialogNotificationService.SendMessageAsync(dialog, message);
-
-            return new Unit();
         }
     }
 }

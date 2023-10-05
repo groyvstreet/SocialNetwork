@@ -50,5 +50,10 @@ namespace ChatService.Infrastructure.Repositories
         {
             await _collection.DeleteOneAsync(e => e.Id == entity.Id);
         }
+
+        public async Task RemoveRangeAsync(Expression<Func<T, bool>> predicate)
+        {
+            await _collection.DeleteManyAsync(predicate);
+        }
     }
 }

@@ -16,5 +16,7 @@ namespace ChatService.Application.Interfaces.Repositories
         Task UpdateFieldAsync<K>(T entity, Expression<Func<T, K>> field, K value);
 
         Task RemoveAsync(T entity);
+
+        Task RemoveRangeAsync(Expression<Func<T, bool>> predicate);
     }
 }

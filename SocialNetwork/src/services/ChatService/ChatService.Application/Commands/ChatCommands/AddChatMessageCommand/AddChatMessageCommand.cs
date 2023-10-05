@@ -9,10 +9,13 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
 
         public Guid AuthenticatedUserId { get; set; }
 
-        public AddChatMessageCommand(AddChatMessageDTO addChatMessageDTO, Guid authenticatedUserId)
+        public DateTimeOffset? DateTime { get; set; }
+
+        public AddChatMessageCommand(AddChatMessageDTO addChatMessageDTO, Guid authenticatedUserId, DateTimeOffset? dateTime)
         {
             DTO = addChatMessageDTO;
             AuthenticatedUserId = authenticatedUserId;
+            DateTime = dateTime;
         }
     }
 }

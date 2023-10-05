@@ -1,4 +1,5 @@
 using ChatService.API.Extensions;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddSignalR();
 builder.Services.AddAutoMapper();
 builder.Services.AddMediatR();
+builder.Services.AddHangfire(builder.Configuration);
 builder.Services.AddServices();
 
 builder.Services.AddControllers();
@@ -33,6 +35,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapSignalR();
+
+app.UseHangfireDashboardUI();
 
 await app.InitializeDatabaseAsync();
 
