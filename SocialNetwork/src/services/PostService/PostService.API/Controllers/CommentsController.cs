@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PostService.API.Extensions;
 using PostService.Application.DTOs.CommentDTOs;
 using PostService.Application.Interfaces.CommentInterfaces;
-using System.Security.Claims;
 
 namespace PostService.API.Controllers
 {
@@ -56,8 +56,7 @@ namespace PostService.API.Controllers
         [Authorize]
         public async Task<IActionResult> AddCommentAsync([FromBody] AddCommentDTO addCommentDTO)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var comment = await _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId);
+            var comment = await _commentService.AddCommentAsync(addCommentDTO, User.AuthenticatedUserId());
 
             return Ok(comment);
         }
@@ -66,8 +65,7 @@ namespace PostService.API.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateCommentAsync([FromBody] UpdateCommentDTO updateCommentDTO)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var comment = await _commentService.UpdateCommentAsync(updateCommentDTO, authenticatedUserId);
+            var comment = await _commentService.UpdateCommentAsync(updateCommentDTO, User.AuthenticatedUserId());
 
             return Ok(comment);
         }
@@ -77,8 +75,7 @@ namespace PostService.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> RemoveCommentByIdAsync(Guid id)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _commentService.RemoveCommentByIdAsync(id, authenticatedUserId);
+            await _commentService.RemoveCommentByIdAsync(id, User.AuthenticatedUserId());
 
             return NoContent();
         }

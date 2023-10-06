@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PostService.API.Extensions;
 using PostService.Application.DTOs.PostLikeDTOs;
 using PostService.Application.Interfaces.PostLikeInterfaces;
-using System.Security.Claims;
 
 namespace PostService.API.Controllers
 {
@@ -21,8 +21,7 @@ namespace PostService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPostLikeAsync([FromBody] AddRemovePostLikeDTO addRemovePostLikeDTO)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var postLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
+            var postLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, User.AuthenticatedUserId());
 
             return Ok(postLike);
         }
@@ -30,8 +29,7 @@ namespace PostService.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> RemovePostLikeAsync([FromBody] AddRemovePostLikeDTO addRemovePostLikeDTO)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
+            await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, User.AuthenticatedUserId());
 
             return NoContent();
         }

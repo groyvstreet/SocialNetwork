@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PostService.API.Extensions;
 using PostService.Application.DTOs.PostDTOs;
 using PostService.Application.Interfaces.PostInterfaces;
-using System.Security.Claims;
 
 namespace PostService.API.Controllers
 {
@@ -57,8 +57,7 @@ namespace PostService.API.Controllers
         [Authorize]
         public async Task<IActionResult> AddPostAsync([FromBody] AddPostDTO addPostDTO)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var post = await _postService.AddPostAsync(addPostDTO, authenticatedUserId);
+            var post = await _postService.AddPostAsync(addPostDTO, User.AuthenticatedUserId());
 
             return Ok(post);
         }
@@ -67,8 +66,7 @@ namespace PostService.API.Controllers
         [Authorize]
         public async Task<IActionResult> UpdatePostAsync([FromBody] UpdatePostDTO updatePostDTO)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var post = await _postService.UpdatePostAsync(updatePostDTO, authenticatedUserId);
+            var post = await _postService.UpdatePostAsync(updatePostDTO, User.AuthenticatedUserId());
 
             return Ok(post);
         }
@@ -78,8 +76,7 @@ namespace PostService.API.Controllers
         [Route("{id}")]
         public async Task<IActionResult> RemovePostByIdAsync(Guid id)
         {
-            var authenticatedUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await _postService.RemovePostByIdAsync(id, authenticatedUserId);
+            await _postService.RemovePostByIdAsync(id, User.AuthenticatedUserId());
 
             return NoContent();
         }
