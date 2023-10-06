@@ -48,13 +48,13 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
                 throw new NotFoundException($"no such user with id = {DTO.ReceiverId}");
             }
 
-            if (request.DateTime is null)
+            if (request.DTO.DateTime is null)
             {
                 await AddDialogMessageAsync(request.DTO);
             }
             else
             {
-                _backgroundJobService.AddSchedule(() => AddDialogMessageAsync(request.DTO), request.DateTime.Value - DateTimeOffset.Now);
+                _backgroundJobService.AddSchedule(() => AddDialogMessageAsync(request.DTO), request.DTO.DateTime.Value - DateTimeOffset.Now);
             }
 
             return new Unit();

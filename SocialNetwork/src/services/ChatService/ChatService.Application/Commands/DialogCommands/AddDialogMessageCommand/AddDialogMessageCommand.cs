@@ -9,13 +9,10 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
 
         public Guid AuthenticatedUserId { get; set; }
 
-        public DateTimeOffset? DateTime { get; set; }
-
-        public AddDialogMessageCommand(AddDialogMessageDTO addDialogMessageDTO, Guid authenticatedUserId, DateTimeOffset? dateTime)
+        public AddDialogMessageCommand(AddDialogMessageDTO addDialogMessageDTO, Guid authenticatedUserId)
         {
             DTO = addDialogMessageDTO;
             AuthenticatedUserId = authenticatedUserId;
-            DateTime = dateTime;
         }
     }
 }

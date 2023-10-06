@@ -7,5 +7,7 @@
         public Guid SenderId { get; set; }
 
         public Guid ReceiverId { get; set; }
+
+        public DateTimeOffset? DateTime { get; set; }
     }
 }

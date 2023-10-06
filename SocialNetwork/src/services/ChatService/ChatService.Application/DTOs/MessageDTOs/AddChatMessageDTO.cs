@@ -7,5 +7,7 @@
         public string Text { get; set; } = string.Empty;
 
         public Guid UserId { get; set; }
+
+        public DateTimeOffset? DateTime { get; set; }
     }
 }

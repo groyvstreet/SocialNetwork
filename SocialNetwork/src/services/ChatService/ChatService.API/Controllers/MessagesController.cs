@@ -28,10 +28,10 @@ namespace ChatService.API.Controllers
 
         [HttpPost]
         [Route("/api/dialogs/messages")]
-        public async Task<IActionResult> AddDialogMessageAsync([FromBody] AddDialogMessageDTO addDialogMessageDTO, [FromQuery] DateTimeOffset? dateTime)
+        public async Task<IActionResult> AddDialogMessageAsync([FromBody] AddDialogMessageDTO addDialogMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var command = new AddDialogMessageCommand(addDialogMessageDTO, Guid.Parse(authenticatedUserId), dateTime);
+            var command = new AddDialogMessageCommand(addDialogMessageDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
             return NoContent();
@@ -72,10 +72,10 @@ namespace ChatService.API.Controllers
 
         [HttpPost]
         [Route("/api/chats/messages")]
-        public async Task<IActionResult> AddChatMessageAsync([FromBody] AddChatMessageDTO addChatMessageDTO, [FromQuery] DateTimeOffset? dateTime)
+        public async Task<IActionResult> AddChatMessageAsync([FromBody] AddChatMessageDTO addChatMessageDTO)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var command = new AddChatMessageCommand(addChatMessageDTO, Guid.Parse(authenticatedUserId), dateTime);
+            var command = new AddChatMessageCommand(addChatMessageDTO, Guid.Parse(authenticatedUserId));
             await _mediator.Send(command);
 
             return NoContent();

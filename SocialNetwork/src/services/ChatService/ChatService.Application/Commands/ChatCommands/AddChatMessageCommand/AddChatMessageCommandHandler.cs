@@ -53,13 +53,13 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
                 throw new ForbiddenException($"no such user with id = {DTO.UserId} in chat with id = {DTO.ChatId}");
             }
 
-            if (request.DateTime is null)
+            if (request.DTO.DateTime is null)
             {
                 await AddChatMessageAsync(request.DTO);
             }
             else
             {
-                _backgroundJobService.AddSchedule(() => AddChatMessageAsync(request.DTO), request.DateTime.Value - DateTimeOffset.Now);
+                _backgroundJobService.AddSchedule(() => AddChatMessageAsync(request.DTO), request.DTO.DateTime.Value - DateTimeOffset.Now);
             }
 
             return new Unit();
