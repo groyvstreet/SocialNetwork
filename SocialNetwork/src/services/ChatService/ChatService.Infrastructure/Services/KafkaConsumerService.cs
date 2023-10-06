@@ -1,6 +1,4 @@
-﻿using ChatService.Application;
-using ChatService.Application.Interfaces.Repositories;
-using ChatService.Domain.Entities;
+﻿using ChatService.Infrastructure.Interfaces;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,76 +7,48 @@ using System.Text.Json;
 
 namespace ChatService.Infrastructure.Services
 {
-    public class KafkaConsumerService : BackgroundService
+    public class KafkaConsumerService<TOperation, TData> : BackgroundService
     {
-        private readonly string _bootstrapServers;
-        private readonly string _groupId;
-        private readonly IUserRepository _userRepository;
-        private readonly IDialogRepository _dialogRepository;
-        private readonly IChatRepository _chatRepository;
+        private readonly KafkaConsumerConfig<TOperation, TData> _config;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public KafkaConsumerService(IOptions<KafkaOptions> kafkaOptions, IServiceProvider serviceProvider)
+        public KafkaConsumerService(IOptions<KafkaConsumerConfig<TOperation, TData>> config,
+                                    IServiceScopeFactory serviceScopeFactory)
         {
-            _bootstrapServers = kafkaOptions.Value.BootstrapServers;
-            _groupId = kafkaOptions.Value.GroupId;
-
-            var scope = serviceProvider.CreateScope();
-            _userRepository = scope.ServiceProvider.GetService<IUserRepository>()!;
-            _dialogRepository = scope.ServiceProvider.GetService<IDialogRepository>()!;
-            _chatRepository = scope.ServiceProvider.GetService<IChatRepository>()!;
+            _config = config.Value;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
-        private async Task SubscribeOnTopic<T>(string topic, Func<Request<T>, Task> handle)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            var config = new ConsumerConfig
-            {
-                GroupId = _groupId,
-                BootstrapServers = _bootstrapServers,
-                AutoOffsetReset = AutoOffsetReset.Earliest
-            };
+            using var scope = _serviceScopeFactory.CreateScope();
+            var _handler = scope.ServiceProvider.GetRequiredService<IKafkaConsumerHandler<TOperation, TData>>();
 
-            using var consumer = new ConsumerBuilder<Ignore, string>(config).Build();
-            consumer.Subscribe(topic);
+            var builder = new ConsumerBuilder<string, string>(_config);
 
-            while (true)
+            using var consumer = builder.Build();
+            consumer.Subscribe(_config.Topic);
+
+            while (!cancellationToken.IsCancellationRequested)
             {
+                await Task.Delay(5);
+
                 try
                 {
-                    var result = consumer.Consume();
-                    var request = JsonSerializer.Deserialize<Request<T>>(result.Message.Value)!;
-                    await handle(request);
+                    var result = consumer.Consume(TimeSpan.FromMilliseconds(15));
+
+                    if (result != null)
+                    {
+                        var operation = JsonSerializer.Deserialize<TOperation>(result.Message.Key)!;
+                        var data = JsonSerializer.Deserialize<TData>(result.Message.Value)!;
+                        await _handler.HandleAsync(operation, data);
+
+                        consumer.Commit(result);
+                        consumer.StoreOffset(result);
+                    }
                 }
                 catch { }
             }
-        }
-
-        private async Task UserRequestHandle(Request<User> request)
-        {
-            switch (request.Operation)
-            {
-                case RequestOperation.Create:
-                    await _userRepository.AddAsync(request.Data);
-                    break;
-                case RequestOperation.Update:
-                    await _userRepository.UpdateAsync(request.Data);
-                    await _dialogRepository.UpdateUserAsync(request.Data);
-                    await _chatRepository.UpdateUserAsync(request.Data);
-                    break;
-                case RequestOperation.Remove:
-                    await _userRepository.RemoveAsync(request.Data);
-                    await _dialogRepository.RemoveUserAsync(request.Data);
-                    await _chatRepository.RemoveUserAsync(request.Data);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _ = Task.Run(async () => await SubscribeOnTopic<User>("users", UserRequestHandle));
-
-            return Task.CompletedTask;
         }
     }
 }

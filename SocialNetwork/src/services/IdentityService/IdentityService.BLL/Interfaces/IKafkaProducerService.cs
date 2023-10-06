@@ -1,9 +1,7 @@
-﻿using IdentityService.BLL.DTOs.UserDTOs;
-
-namespace IdentityService.BLL.Interfaces
+﻿namespace IdentityService.BLL.Interfaces
 {
-    public interface IKafkaProducerService
+    public interface IKafkaProducerService<TOperation, TData>
     {
-        Task SendUserRequestAsync(RequestOperation operationRequest, GetUserDTO user);
+        Task SendUserRequestAsync(TOperation operationRequest, TData user);
     }
 }

@@ -8,6 +8,8 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using IdentityService.BLL;
+using IdentityService.DAL.Entities;
+using IdentityService.BLL.DTOs.UserDTOs;
 
 namespace IdentityService.PL.Extensions
 {
@@ -34,8 +36,13 @@ namespace IdentityService.PL.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IIdentityService, BLL.Services.IdentityService>();
 
-            services.Configure<KafkaOptions>(configuration.GetSection("KafkaOptions"));
-            services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
+            services.Configure<KafkaProducerConfig<RequestOperation, GetUserDTO>>(ko =>
+            {
+                var section = configuration.GetSection("KafkaOptions");
+                ko.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();
+                ko.Topic = "users";
+            });
+            services.AddSingleton<IKafkaProducerService<RequestOperation, GetUserDTO>, KafkaProducerService<RequestOperation, GetUserDTO>>();
         }
 
         public static void AddCorsPolicy(this IServiceCollection services)

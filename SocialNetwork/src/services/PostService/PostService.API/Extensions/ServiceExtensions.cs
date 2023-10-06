@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.Configuration;
 using PostService.Application;
 using PostService.Application.AutoMapperProfiles;
 using PostService.Application.Interfaces.CommentInterfaces;
@@ -45,8 +44,7 @@ namespace PostService.API.Extensions
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICommentLikeService, CommentLikeService>();
 
-            //services.Configure<KafkaOptions>(configuration.GetSection("KafkaOptions"));
-            services.Configure<ConsumerConfigKafka<RequestOperation, User>>(ko =>
+            services.Configure<KafkaConsumerConfig<RequestOperation, User>>(ko =>
             {
                 var section = configuration.GetSection("KafkaOptions");
                 ko.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();

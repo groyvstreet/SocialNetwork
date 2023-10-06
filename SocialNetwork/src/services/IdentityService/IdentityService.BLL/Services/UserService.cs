@@ -4,7 +4,6 @@ using IdentityService.BLL.Exceptions;
 using IdentityService.BLL.Interfaces;
 using IdentityService.DAL.Data;
 using IdentityService.DAL.Interfaces;
-using System.Text.Json;
 
 namespace IdentityService.BLL.Services
 {
@@ -12,11 +11,11 @@ namespace IdentityService.BLL.Services
     {
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
-        private readonly IKafkaProducerService _kafkaProducerService;
+        private readonly IKafkaProducerService<RequestOperation, GetUserDTO> _kafkaProducerService;
 
         public UserService(IMapper mapper,
                            IUserRepository userRepository,
-                           IKafkaProducerService kafkaProducerService)
+                           IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService)
         {
             _mapper = mapper;
             _userRepository = userRepository;

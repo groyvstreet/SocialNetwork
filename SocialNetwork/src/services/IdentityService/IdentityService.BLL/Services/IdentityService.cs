@@ -7,7 +7,6 @@ using IdentityService.DAL.Data;
 using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace IdentityService.BLL.Services
 {
@@ -16,12 +15,12 @@ namespace IdentityService.BLL.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
-        private readonly IKafkaProducerService _kafkaProducerService;
+        private readonly IKafkaProducerService<RequestOperation, GetUserDTO> _kafkaProducerService;
 
         public IdentityService(IMapper mapper,
                                IUserRepository userRepository,
                                ITokenService tokenService,
-                               IKafkaProducerService kafkaProducerService)
+                               IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService)
         {
             _mapper = mapper;
             _userRepository = userRepository;

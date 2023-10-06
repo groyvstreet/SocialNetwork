@@ -2,7 +2,7 @@
 
 namespace PostService.Infrastructure
 {
-    public class ConsumerConfigKafka<TOperation, TData> : ConsumerConfig
+    public class KafkaConsumerConfig<TOperation, TData> : ConsumerConfig
     {
         public string Topic { get; set; } = string.Empty;
     }

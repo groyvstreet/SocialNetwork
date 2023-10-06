@@ -13,6 +13,9 @@ using FluentValidation;
 using ChatService.Application.Validators.DialogCommandValidators;
 using ChatService.Application;
 using Microsoft.Extensions.Configuration;
+using ChatService.Infrastructure.Interfaces;
+using ChatService.Infrastructure;
+using ChatService.Domain.Entities;
 
 namespace ChatService.API.Extensions
 {
@@ -54,8 +57,15 @@ namespace ChatService.API.Extensions
             services.AddScoped<IDialogNotificationService, DialogNotificationService>();
             services.AddScoped<IChatNotificationService, ChatNotificationService>();
 
-            services.Configure<KafkaOptions>(configuration.GetSection("KafkaOptions"));
-            services.AddHostedService<KafkaConsumerService>();
+            services.Configure<KafkaConsumerConfig<RequestOperation, User>>(ko =>
+            {
+                var section = configuration.GetSection("KafkaOptions");
+                ko.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();
+                ko.GroupId = section.GetSection("GroupId").Get<string>();
+                ko.Topic = "users";
+            });
+            services.AddHostedService<KafkaConsumerService<RequestOperation, User>>();
+            services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
         }
 
         public static void MapSignalR(this IEndpointRouteBuilder endpointRouteBuilder)
