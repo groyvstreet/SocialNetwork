@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using ChatService.Infrastructure.Interfaces;
 using ChatService.Infrastructure;
 using ChatService.Domain.Entities;
+using ChatService.Infrastructure.Services.GrpcServices;
 
 namespace ChatService.API.Extensions
 {
@@ -66,6 +67,7 @@ namespace ChatService.API.Extensions
             });
             services.AddHostedService<KafkaConsumerService<RequestOperation, User>>();
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
+            services.AddScoped<IPostService, PostService>();
         }
 
         public static void MapSignalR(this IEndpointRouteBuilder endpointRouteBuilder)

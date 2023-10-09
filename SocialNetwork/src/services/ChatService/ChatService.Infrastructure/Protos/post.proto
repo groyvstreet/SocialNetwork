@@ -1,0 +1,20 @@
+﻿syntax = "proto3";
+ 
+option csharp_namespace = "ChatService.Infrastructure.Protos";
+
+import "google/protobuf/empty.proto";
+
+package post;
+
+service Post {
+  rpc IsPostExists (Request) returns (Reply);
+  rpc UpdatePost (Request) returns (google.protobuf.Empty);
+}
+
+message Request {
+  string postId = 1;
+}
+
+message Reply {
+  bool isPostExists = 1;
+}

@@ -12,6 +12,8 @@
 
         public ulong LikeCount { get; set; }
 
+        public ulong RepostCount { get; set; }
+
         public Guid UserId { get; set; }
     }
 }
