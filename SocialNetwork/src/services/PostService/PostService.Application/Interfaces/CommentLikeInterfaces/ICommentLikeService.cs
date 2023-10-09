@@ -4,8 +4,8 @@ namespace PostService.Application.Interfaces.CommentLikeInterfaces
 {
     public interface ICommentLikeService
     {
-        Task<GetCommentLikeDTO> AddCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO);
+        Task<GetCommentLikeDTO> AddCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO, Guid authenticatedUserId);
         
-        Task RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO);
+        Task RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO, Guid authenticatedUserId);
     }
 }

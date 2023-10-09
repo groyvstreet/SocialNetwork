@@ -10,6 +10,8 @@
 
         public string LastName { get; set; } = string.Empty;
 
-        public DateTime BirthDate { get; set; }
+        public string Image { get; set; } = string.Empty;
+
+        public DateOnly BirthDate { get; set; }
     }
 }

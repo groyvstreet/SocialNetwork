@@ -6,6 +6,10 @@ using IdentityService.BLL.AutoMapperProfiles;
 using IdentityService.BLL.Validators.UserValidators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.Extensions.Configuration;
+using IdentityService.BLL;
+using IdentityService.DAL.Entities;
+using IdentityService.BLL.DTOs.UserDTOs;
 
 namespace IdentityService.PL.Extensions
 {
@@ -22,7 +26,7 @@ namespace IdentityService.PL.Extensions
             services.AddAutoMapper(typeof(UserProfile));
         }
 
-        public static void AddServices(this IServiceCollection services)
+        public static void AddServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -31,6 +35,28 @@ namespace IdentityService.PL.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IIdentityService, BLL.Services.IdentityService>();
+
+            services.Configure<KafkaProducerConfig<RequestOperation, GetUserDTO>>(ko =>
+            {
+                var section = configuration.GetSection("KafkaOptions");
+                ko.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();
+                ko.Topic = "users";
+            });
+            services.AddSingleton<IKafkaProducerService<RequestOperation, GetUserDTO>, KafkaProducerService<RequestOperation, GetUserDTO>>();
+        }
+
+        public static void AddCorsPolicy(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                    builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithOrigins("http://127.0.0.1:3000")
+                        .AllowCredentials()
+                        .SetIsOriginAllowed((hosts) => true));
+            });
         }
     }
 }

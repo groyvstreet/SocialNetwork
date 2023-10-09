@@ -12,10 +12,10 @@ namespace PostService.Application.Interfaces.PostInterfaces
 
         Task<List<GetPostDTO>> GetLikedPostsByUserIdAsync(Guid userId);
 
-        Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO);
+        Task<GetPostDTO> AddPostAsync(AddPostDTO addPostDTO, Guid authenticatedUserId);
 
-        Task<GetPostDTO> UpdatePostAsync(UpdatePostDTO updatePostDTO);
+        Task<GetPostDTO> UpdatePostAsync(UpdatePostDTO updatePostDTO, Guid authenticatedUserId);
 
-        Task RemovePostByIdAsync(Guid id);
+        Task RemovePostByIdAsync(Guid id, Guid authenticatedUserId);
     }
 }

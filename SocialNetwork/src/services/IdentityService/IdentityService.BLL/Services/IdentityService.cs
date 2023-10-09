@@ -15,14 +15,17 @@ namespace IdentityService.BLL.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly IKafkaProducerService<RequestOperation, GetUserDTO> _kafkaProducerService;
 
         public IdentityService(IMapper mapper,
                                IUserRepository userRepository,
-                               ITokenService tokenService)
+                               ITokenService tokenService,
+                               IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _kafkaProducerService = kafkaProducerService;
         }
 
         public async Task<GetUserDTO> SignUpAsync(AddUserDTO addUserDTO)
@@ -38,6 +41,8 @@ namespace IdentityService.BLL.Services
             user.UserName = user.Email;
             await _userRepository.AddUserAsync(user, addUserDTO.Password, Roles.User);
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
+            
+            await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Create, getUserDTO);
 
             return getUserDTO;
         }

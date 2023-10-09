@@ -21,5 +21,9 @@ namespace ChatService.Application.Interfaces.Repositories
         Task RemoveUserFromChatAsync(Guid chatId, Guid userId);
 
         Task SetUserAsChatAdminAsync(Guid chatId, Guid userId, bool isAdmin);
+
+        Task UpdateUserAsync(User user);
+
+        Task RemoveUserAsync(User user);
     }
 }

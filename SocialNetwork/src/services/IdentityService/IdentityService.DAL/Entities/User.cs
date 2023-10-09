@@ -8,6 +8,8 @@ namespace IdentityService.DAL.Entities
 
         public string LastName { get; set; } = string.Empty;
 
+        public string Image { get; set; } = string.Empty;
+
         public DateTime BirthDate { get; set; }
     }
 }

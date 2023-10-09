@@ -26,8 +26,13 @@ namespace PostService.Application.Services
             _userRepository = userRepository;
         }
 
-        public async Task<GetPostLikeDTO> AddPostLikeAsync(AddRemovePostLikeDTO addPostLikeDTO)
+        public async Task<GetPostLikeDTO> AddPostLikeAsync(AddRemovePostLikeDTO addPostLikeDTO, Guid authenticatedUserId)
         {
+            if (addPostLikeDTO.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
+            }
+
             var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == addPostLikeDTO.PostId);
 
             if (post is null)
@@ -61,8 +66,13 @@ namespace PostService.Application.Services
             return getPostLikeDTO;
         }
 
-        public async Task RemovePostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO)
+        public async Task RemovePostLikeAsync(AddRemovePostLikeDTO addRemovePostLikeDTO, Guid authenticatedUserId)
         {
+            if (addRemovePostLikeDTO.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
+            }
+
             var postLike = await _postLikeRepository.GetFirstOrDefaultByAsync(pl => 
                 pl.PostId == addRemovePostLikeDTO.PostId && pl.UserId == addRemovePostLikeDTO.UserId);
 
