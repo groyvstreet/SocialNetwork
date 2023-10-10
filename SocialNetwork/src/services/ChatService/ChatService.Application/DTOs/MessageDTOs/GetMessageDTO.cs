@@ -10,6 +10,8 @@ namespace ChatService.Application.DTOs.MessageDTOs
 
         public string Text { get; set; } = string.Empty;
 
+        public string? PostId { get; set; }
+
         public User User { get; set; }
     }
 }

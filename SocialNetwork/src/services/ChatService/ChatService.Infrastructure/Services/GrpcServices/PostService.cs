@@ -1,6 +1,7 @@
 ﻿using ChatService.Application.Interfaces.Services;
 using ChatService.Infrastructure.Protos;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Options;
 
 namespace ChatService.Infrastructure.Services.GrpcServices
 {
@@ -8,9 +9,9 @@ namespace ChatService.Infrastructure.Services.GrpcServices
     {
         private readonly Post.PostClient _postClient;
 
-        public PostService()
+        public PostService(IOptions<GrpcOptions> grpcOptions)
         {
-            var channel = GrpcChannel.ForAddress("http://host.docker.internal:8080");
+            var channel = GrpcChannel.ForAddress(grpcOptions.Value.Address);
             _postClient = new Post.PostClient(channel);
         }
 

@@ -67,6 +67,8 @@ namespace ChatService.API.Extensions
             });
             services.AddHostedService<KafkaConsumerService<RequestOperation, User>>();
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
+
+            services.Configure<GrpcOptions>(configuration.GetSection("GrpcOptions"));
             services.AddScoped<IPostService, PostService>();
         }
 

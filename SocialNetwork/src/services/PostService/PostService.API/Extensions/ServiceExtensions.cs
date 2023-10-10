@@ -54,5 +54,10 @@ namespace PostService.API.Extensions
             services.AddHostedService<KafkaConsumerService<RequestOperation, User>>();
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
         }
+
+        public static void MapGrpc(this IEndpointRouteBuilder endpointRouteBuilder)
+        {
+            endpointRouteBuilder.MapGrpcService<Infrastructure.Services.GrpcServices.PostService>();
+        }
     }
 }
