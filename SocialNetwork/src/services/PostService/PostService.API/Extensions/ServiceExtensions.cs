@@ -2,6 +2,7 @@
 using FluentValidation.AspNetCore;
 using PostService.Application;
 using PostService.Application.AutoMapperProfiles;
+using PostService.Application.Interfaces;
 using PostService.Application.Interfaces.CommentInterfaces;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
@@ -11,6 +12,7 @@ using PostService.Application.Services;
 using PostService.Application.Validators.PostValidators;
 using PostService.Domain.Entities;
 using PostService.Infrastructure;
+using PostService.Infrastructure.CacheRepositories;
 using PostService.Infrastructure.Interfaces;
 using PostService.Infrastructure.Repositories;
 using PostService.Infrastructure.Services;
@@ -53,6 +55,20 @@ namespace PostService.API.Extensions
             });
             services.AddHostedService<KafkaConsumerService<RequestOperation, User>>();
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
+        }
+
+        public static void AddRedisCache(this IServiceCollection services)
+        {
+            services.AddStackExchangeRedisCache(redisCacheOptions =>
+            {
+                redisCacheOptions.Configuration = "redis:6379";
+            });
+
+            services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();
+            services.AddScoped<ICacheRepository<Post>, CacheRepository<Post>>();
+            services.AddScoped<ICacheRepository<Comment>, CacheRepository<Comment>>();
+            services.AddScoped<ICacheRepository<PostLike>, CacheRepository<PostLike>>();
+            services.AddScoped<ICacheRepository<CommentLike>, CacheRepository<CommentLike>>();
         }
     }
 }

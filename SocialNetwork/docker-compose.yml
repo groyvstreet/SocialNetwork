@@ -8,6 +8,7 @@ services:
     depends_on:
       - postgresql-db
       - kafka
+      - redis
 
   postgresql-db:
     image: postgres:latest
@@ -41,3 +42,6 @@ services:
     image: wurstmeister/kafka:latest
     depends_on:
       - zookeeper
+
+  redis:
+    image: redis:latest

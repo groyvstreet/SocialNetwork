@@ -16,6 +16,9 @@ networks:
   zookeeper-network:
     driver: bridge
 
+  redis-network:
+    driver: bridge
+
 services:
   post-service-app: 
     container_name: post-service
@@ -24,6 +27,7 @@ services:
     networks:
       - post-service-network
       - kafka-network
+      - redis-network
 
   postgresql-db:
     container_name: postgresql
@@ -89,3 +93,9 @@ services:
     networks:
       - kafka-network
       - zookeeper-network
+
+  redis:
+    ports:
+      - "6379:6379"
+    networks:
+      - redis-network

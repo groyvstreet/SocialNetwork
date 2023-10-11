@@ -36,6 +36,11 @@ namespace PostService.Infrastructure.Repositories
             await _dbSet.AddAsync(entity);
         }
 
+        public async void Update(T entity)
+        {
+            _dbSet.Update(entity);
+        }
+
         public void Remove(T entity)
         {
             _dbSet.Remove(entity);
