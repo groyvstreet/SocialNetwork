@@ -57,11 +57,11 @@ namespace PostService.API.Extensions
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
         }
 
-        public static void AddRedisCache(this IServiceCollection services)
+        public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddStackExchangeRedisCache(redisCacheOptions =>
             {
-                redisCacheOptions.Configuration = "redis:6379";
+                redisCacheOptions.Configuration = configuration.GetConnectionString("Redis");
             });
 
             services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();

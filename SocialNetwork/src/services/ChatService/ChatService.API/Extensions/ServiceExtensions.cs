@@ -12,10 +12,10 @@ using MongoDB.Driver;
 using FluentValidation;
 using ChatService.Application.Validators.DialogCommandValidators;
 using ChatService.Application;
-using Microsoft.Extensions.Configuration;
 using ChatService.Infrastructure.Interfaces;
 using ChatService.Infrastructure;
 using ChatService.Domain.Entities;
+using ChatService.Infrastructure.CacheRepositories;
 
 namespace ChatService.API.Extensions
 {
@@ -72,6 +72,16 @@ namespace ChatService.API.Extensions
         {
             endpointRouteBuilder.MapHub<DialogHub>("/dialogs");
             endpointRouteBuilder.MapHub<ChatHub>("/chats");
+        }
+
+        public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(redisCacheOptions =>
+            {
+                redisCacheOptions.Configuration = configuration.GetConnectionString("Redis");
+            });
+            
+            services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();
         }
 
         public static void AddCorsPolicy(this IServiceCollection services)

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using IdentityService.BLL;
 using IdentityService.DAL.Entities;
 using IdentityService.BLL.DTOs.UserDTOs;
+using IdentityService.DAL.CacheRepositories;
 
 namespace IdentityService.PL.Extensions
 {
@@ -43,6 +44,16 @@ namespace IdentityService.PL.Extensions
                 ko.Topic = "users";
             });
             services.AddSingleton<IKafkaProducerService<RequestOperation, GetUserDTO>, KafkaProducerService<RequestOperation, GetUserDTO>>();
+        }
+
+        public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(redisCacheOptions =>
+            {
+                redisCacheOptions.Configuration = configuration.GetConnectionString("Redis");
+            });
+
+            services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();
         }
 
         public static void AddCorsPolicy(this IServiceCollection services)
