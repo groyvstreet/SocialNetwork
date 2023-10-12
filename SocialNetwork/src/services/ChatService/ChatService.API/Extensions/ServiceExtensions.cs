@@ -78,7 +78,7 @@ namespace ChatService.API.Extensions
         {
             services.AddStackExchangeRedisCache(redisCacheOptions =>
             {
-                redisCacheOptions.Configuration = configuration.GetConnectionString("Redis");
+                redisCacheOptions.Configuration = configuration.GetSection("RedisConnection").Get<string>();
             });
             
             services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();

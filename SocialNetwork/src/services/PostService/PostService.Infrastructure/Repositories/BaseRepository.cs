@@ -31,12 +31,17 @@ namespace PostService.Infrastructure.Repositories
             return await _dbSet.FirstOrDefaultAsync(predicate);
         }
 
+        public async Task<T?> GetFirstOrDefaultAsNoTrackingByAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate);
+        }
+
         public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
         }
 
-        public async void Update(T entity)
+        public void Update(T entity)
         {
             _dbSet.Update(entity);
         }
@@ -49,6 +54,11 @@ namespace PostService.Infrastructure.Repositories
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public void ClearTrackedEntities()
+        {
+            _context.ChangeTracker.Clear();
         }
     }
 }

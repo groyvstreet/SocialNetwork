@@ -10,6 +10,8 @@ namespace PostService.Application.Interfaces
 
         Task<T?> GetFirstOrDefaultByAsync(Expression<Func<T, bool>> predicate);
 
+        Task<T?> GetFirstOrDefaultAsNoTrackingByAsync(Expression<Func<T, bool>> predicate);
+
         Task AddAsync(T entity);
 
         void Update(T entity);
@@ -17,5 +19,7 @@ namespace PostService.Application.Interfaces
         void Remove(T entity);
 
         Task SaveChangesAsync();
+
+        void ClearTrackedEntities();
     }
 }
