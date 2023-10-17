@@ -1,18 +1,15 @@
 ﻿using ChatService.Application.Interfaces.Services;
-using ChatService.Infrastructure.Protos;
-using Grpc.Net.Client;
-using Microsoft.Extensions.Options;
+using ChatService.Application.Grpc.Protos;
 
-namespace ChatService.Infrastructure.Services.GrpcServices
+namespace ChatService.Application.Grpc.Services
 {
     public class PostService : IPostService
     {
         private readonly Post.PostClient _postClient;
 
-        public PostService(IOptions<GrpcOptions> grpcOptions)
+        public PostService(Post.PostClient postClient)
         {
-            var channel = GrpcChannel.ForAddress(grpcOptions.Value.Address);
-            _postClient = new Post.PostClient(channel);
+            _postClient = postClient;
         }
 
         public async Task<bool> IsPostExistsAsync(Guid postId)

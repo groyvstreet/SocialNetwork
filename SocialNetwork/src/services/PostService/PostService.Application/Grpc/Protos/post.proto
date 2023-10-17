@@ -1,6 +1,6 @@
 ﻿syntax = "proto3";
- 
-option csharp_namespace = "PostService.Infrastructure.Protos";
+
+option csharp_namespace = "PostService.Application.Grpc.Protos";
 
 import "google/protobuf/empty.proto";
 

@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
-    <Protobuf Include="Protos\post.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,9 +1,9 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using PostService.Application.Grpc.Protos;
 using PostService.Application.Interfaces.PostInterfaces;
-using PostService.Infrastructure.Protos;
 
-namespace PostService.Infrastructure.Services.GrpcServices
+namespace PostService.Application.Grpc.Services
 {
     public class PostService : Post.PostBase
     {
