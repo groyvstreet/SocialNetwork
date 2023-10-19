@@ -3,6 +3,8 @@ using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
 using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
 {
@@ -12,16 +14,19 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
         private readonly IUserRepository _userRepository;
         private readonly IChatNotificationService _chatNotificationService;
         private readonly IPostService _postService;
+        private readonly ILogger<AddChatMessageCommandHandler> _logger;
 
         public AddChatMessageCommandHandler(IChatRepository chatRepository,
                                             IUserRepository userRepository,
                                             IChatNotificationService chatNotificationService,
-                                            IPostService postService)
+                                            IPostService postService,
+                                            ILogger<AddChatMessageCommandHandler> logger)
         {
             _chatRepository = chatRepository;
             _userRepository = userRepository;
             _chatNotificationService = chatNotificationService;
             _postService = postService;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(AddChatMessageCommand request, CancellationToken cancellationToken)
@@ -33,21 +38,21 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
                 throw new ForbiddenException("forbidden");
             }
 
-            var chat = await _chatRepository.GetFirstOrDefaultByAsync(c => c.Id == DTO.ChatId);
+            var chat = await _chatRepository.GetFirstOrDefaultByAsync(chat => chat.Id == DTO.ChatId);
 
             if (chat is null)
             {
                 throw new NotFoundException($"no such chat with id = {DTO.ChatId}");
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+            var user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.UserId);
 
             if (user is null)
             {
                 throw new NotFoundException($"no such user with id = {DTO.UserId}");
             }
 
-            if (!chat.Users.Any(u => u.Id == DTO.UserId))
+            if (!chat.Users.Any(user => user.Id == DTO.UserId))
             {
                 throw new ForbiddenException($"no such user with id = {DTO.UserId} in chat with id = {DTO.ChatId}");
             }
@@ -74,6 +79,8 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
             await _chatRepository.AddChatMessageAsync(DTO.ChatId, message);
 
             await _chatNotificationService.SendMessageAsync(chat, message);
+
+            _logger.LogInformation("message - {message} added to chat with id {id}", JsonSerializer.Serialize(message), chat.Id);
 
             return new Unit();
         }

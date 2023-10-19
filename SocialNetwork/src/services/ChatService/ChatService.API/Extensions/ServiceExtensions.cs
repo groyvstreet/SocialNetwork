@@ -17,6 +17,9 @@ using ChatService.Infrastructure;
 using ChatService.Domain.Entities;
 using ChatService.Application.Grpc.Protos;
 using ChatService.Application.Grpc.Services;
+using System.Reflection;
+using Serilog.Sinks.Elasticsearch;
+using Serilog;
 
 namespace ChatService.API.Extensions
 {
@@ -90,6 +93,30 @@ namespace ChatService.API.Extensions
         {
             endpointRouteBuilder.MapHub<DialogHub>("/dialogs");
             endpointRouteBuilder.MapHub<ChatHub>("/chats");
+        }
+
+        public static void ConfigureLogging(this IConfiguration configuration)
+        {
+            var stringUri = configuration.GetSection("ElasticConfiguration").GetSection("Uri").Get<string>()!;
+            var node = new Uri(stringUri);
+            var environmentVariable = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            var options = new ElasticsearchSinkOptions(node)
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"{Assembly.GetExecutingAssembly()
+                    .GetName().Name
+                    ?.ToLower()
+                    .Replace('.', '-')}-{environmentVariable?.ToLower()}-{DateTime.UtcNow:yyyy-MM}",
+                NumberOfReplicas = 1,
+                NumberOfShards = 2
+            };
+
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Elasticsearch(options)
+                .Enrich.WithProperty("Environment", environmentVariable)
+                .CreateLogger();
         }
 
         public static void AddCorsPolicy(this IServiceCollection services)

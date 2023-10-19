@@ -16,6 +16,9 @@ networks:
   zookeeper-network:
     driver: bridge
 
+  elk-network:
+    driver: bridge
+
 services:
   post-service-app: 
     container_name: post-service
@@ -25,6 +28,7 @@ services:
     networks:
       - post-service-network
       - kafka-network
+      - elk-network
 
   postgresql-db:
     container_name: postgresql
@@ -44,6 +48,7 @@ services:
     networks:
       - identity-service-network
       - kafka-network
+      - elk-network
 
   mssqlserver-db:
     container_name: mssqlserver
@@ -62,6 +67,7 @@ services:
     networks:
       - chat-service-network
       - kafka-network
+      - elk-network
 
   mongo-db:
     container_name: mongo
@@ -90,3 +96,11 @@ services:
     networks:
       - kafka-network
       - zookeeper-network
+
+  elk:
+    ports:
+      - "5601:5601"
+      - "9200:9200"
+      - "5044:5044"
+    networks:
+      - elk-network

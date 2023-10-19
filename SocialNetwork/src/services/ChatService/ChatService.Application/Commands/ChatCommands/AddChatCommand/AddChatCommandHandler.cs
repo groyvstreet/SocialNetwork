@@ -4,6 +4,8 @@ using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
 using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
 {
@@ -13,16 +15,19 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
         private readonly IChatNotificationService _chatNotificationService;
+        private readonly ILogger<AddChatCommandHandler> _logger;
 
         public AddChatCommandHandler(IMapper mapper,
                                      IChatRepository chatRepository,
                                      IUserRepository userRepository,
-                                     IChatNotificationService chatNotificationService)
+                                     IChatNotificationService chatNotificationService,
+                                     ILogger<AddChatCommandHandler> logger)
         {
             _mapper = mapper;
             _chatRepository = chatRepository;
             _userRepository = userRepository;
             _chatNotificationService = chatNotificationService;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(AddChatCommand request, CancellationToken cancellationToken)
@@ -34,7 +39,7 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
                 throw new ForbiddenException("forbidden");
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+            var user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.UserId);
 
             if (user is null)
             {
@@ -53,6 +58,8 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
             await _chatRepository.AddAsync(chat);
 
             await _chatNotificationService.CreateChatAsync(chat);
+
+            _logger.LogInformation("chat - {chat} added", JsonSerializer.Serialize(chat));
 
             return new Unit();
         }

@@ -14,6 +14,9 @@ using PostService.Infrastructure;
 using PostService.Infrastructure.Interfaces;
 using PostService.Infrastructure.Repositories;
 using PostService.Infrastructure.Services;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
+using System.Reflection;
 
 namespace PostService.API.Extensions
 {
@@ -62,6 +65,30 @@ namespace PostService.API.Extensions
         public static void MapGrpc(this IEndpointRouteBuilder endpointRouteBuilder)
         {
             endpointRouteBuilder.MapGrpcService<Application.Grpc.Services.PostService>();
+        }
+
+        public static void ConfigureLogging(this IConfiguration configuration)
+        {
+            var stringUri = configuration.GetSection("ElasticConfiguration").GetSection("Uri").Get<string>()!;
+            var node = new Uri(stringUri);
+            var environmentVariable = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            var options = new ElasticsearchSinkOptions(node)
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"{Assembly.GetExecutingAssembly()
+                    .GetName().Name
+                    ?.ToLower()
+                    .Replace('.', '-')}-{environmentVariable?.ToLower()}-{DateTime.UtcNow:yyyy-MM}",
+                NumberOfReplicas = 1,
+                NumberOfShards = 2
+            };
+
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Elasticsearch(options)
+                .Enrich.WithProperty("Environment", environmentVariable)
+                .CreateLogger();
         }
     }
 }
