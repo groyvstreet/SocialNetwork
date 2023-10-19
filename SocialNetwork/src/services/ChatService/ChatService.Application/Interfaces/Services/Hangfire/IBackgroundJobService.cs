@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace ChatService.Application.Interfaces.Services
+namespace ChatService.Application.Interfaces.Services.Hangfire
 {
     public interface IBackgroundJobService
     {

@@ -1,4 +1,5 @@
 ﻿using Hangfire.Dashboard;
+using System.Security.Claims;
 
 namespace ChatService.API.Hangfire
 {
@@ -6,7 +7,10 @@ namespace ChatService.API.Hangfire
     {
         public bool Authorize(DashboardContext context)
         {
-            return true;
+            var httpContext = context.GetHttpContext();
+            
+            return (httpContext.User.Identity?.IsAuthenticated ?? false) &&
+                httpContext.User.FindFirstValue(ClaimTypes.Role) == "admin";
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using ChatService.Application.Interfaces.Services;
+﻿using ChatService.Application.Interfaces.Services.Hangfire;
 using Hangfire;
 using System.Linq.Expressions;
 
-namespace ChatService.Infrastructure.Services
+namespace ChatService.Application.Services.Hangfire
 {
     public class BackgroundJobService : IBackgroundJobService
     {

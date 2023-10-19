@@ -15,8 +15,10 @@ using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using Hangfire.Mongo.Migration.Strategies;
-using Microsoft.Extensions.Configuration;
 using ChatService.API.Hangfire;
+using ChatService.Application.Interfaces.Services.Hangfire;
+using ChatService.Infrastructure.Services.Hangfire;
+using ChatService.Application.Services.Hangfire;
 
 namespace ChatService.API.Extensions
 {

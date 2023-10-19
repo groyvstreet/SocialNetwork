@@ -3,7 +3,7 @@ using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace ChatService.Infrastructure.Services
+namespace ChatService.Infrastructure.Services.Hangfire
 {
     public class RecurringJobExecutorService : BackgroundService
     {
@@ -18,10 +18,9 @@ namespace ChatService.Infrastructure.Services
         {
             using var scope = _serviceProvider.CreateScope();
 
-            var backgroundJobService = scope.ServiceProvider.GetRequiredService<IBackgroundJobService>();
             var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
 
-            backgroundJobService.AddRecurringJob(Guid.NewGuid().ToString(), () => chatService.RemoveEmptyChatsAsync(), Cron.Daily);
+            RecurringJob.AddOrUpdate(Guid.NewGuid().ToString(), () => chatService.RemoveEmptyChatsAsync(), Cron.Daily);
 
             return Task.CompletedTask;
         }

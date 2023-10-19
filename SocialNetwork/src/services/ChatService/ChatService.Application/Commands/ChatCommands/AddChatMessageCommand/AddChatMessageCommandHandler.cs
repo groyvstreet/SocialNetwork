@@ -2,6 +2,7 @@
 using ChatService.Application.Exceptions;
 using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
+using ChatService.Application.Interfaces.Services.Hangfire;
 using ChatService.Domain.Entities;
 using MediatR;
 
