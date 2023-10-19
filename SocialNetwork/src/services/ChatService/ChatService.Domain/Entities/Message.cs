@@ -6,6 +6,8 @@
 
         public string Text { get; set; } = string.Empty;
 
+        public string? PostId { get; set; }
+
         public User User { get; set; }
 
         public List<string> UsersRemoved { get; set; } = new List<string>();

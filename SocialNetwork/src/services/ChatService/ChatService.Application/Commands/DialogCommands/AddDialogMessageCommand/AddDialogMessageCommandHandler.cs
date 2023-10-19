@@ -11,14 +11,17 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
         private readonly IDialogRepository _dialogRepository;
         private readonly IUserRepository _userRepository;
         private readonly IDialogNotificationService _dialogNotificationService;
+        private readonly IPostService _postService;
 
         public AddDialogMessageCommandHandler(IDialogRepository dialogRepository,
                                               IUserRepository userRepository,
-                                              IDialogNotificationService dialogNotificationService)
+                                              IDialogNotificationService dialogNotificationService,
+                                              IPostService postService)
         {
             _dialogRepository = dialogRepository;
             _userRepository = userRepository;
             _dialogNotificationService = dialogNotificationService;
+            _postService = postService;
         }
 
         public async Task<Unit> Handle(AddDialogMessageCommand request, CancellationToken cancellationToken)
@@ -54,10 +57,23 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
                 await _dialogRepository.AddAsync(dialog);
             }
 
+            if (DTO.PostId is not null)
+            {
+                var isPostExists = await _postService.IsPostExistsAsync(DTO.PostId.Value);
+
+                if (!isPostExists)
+                {
+                    throw new NotFoundException($"no such post with id = {DTO.PostId}");
+                }
+
+                await _postService.UpdatePostAsync(DTO.PostId.Value);
+            }
+
             var message = new Message
             {
                 DateTime = DateTimeOffset.Now,
                 Text = DTO.Text,
+                PostId = DTO.PostId?.ToString(),
                 User = sender
             };
             await _dialogRepository.AddDialogMessageAsync(dialog.Id, message);

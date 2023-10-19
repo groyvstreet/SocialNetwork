@@ -2,14 +2,14 @@ using PostService.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel();
+
 builder.Services.AddDatabaseConnection(builder.Configuration);
-
 builder.Services.AddJwtAuthentication(builder.Configuration);
-
 builder.Services.AddFluentValidation();
-
 builder.Services.AddAutoMapper();
-
+builder.Services.AddGrpc();
+builder.Services.AddKafkaServices(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers();
@@ -25,6 +25,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseGlobalExceptionHandler();
+
+app.MapGrpc();
 
 app.UseHttpsRedirection();
 

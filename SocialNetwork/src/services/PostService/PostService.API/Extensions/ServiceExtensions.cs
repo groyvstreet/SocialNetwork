@@ -43,16 +43,25 @@ namespace PostService.API.Extensions
             services.AddScoped<IPostLikeService, PostLikeService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICommentLikeService, CommentLikeService>();
+        }
 
-            services.Configure<KafkaConsumerConfig<RequestOperation, User>>(ko =>
+        public static void AddKafkaServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<KafkaConsumerConfig<RequestOperation, User>>(kafkaConsumerConfig =>
             {
                 var section = configuration.GetSection("KafkaOptions");
-                ko.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();
-                ko.GroupId = section.GetSection("GroupId").Get<string>();
-                ko.Topic = "users";
+                kafkaConsumerConfig.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();
+                kafkaConsumerConfig.GroupId = section.GetSection("GroupId").Get<string>();
+                kafkaConsumerConfig.Topic = "users";
             });
+
             services.AddHostedService<KafkaConsumerService<RequestOperation, User>>();
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
+        }
+
+        public static void MapGrpc(this IEndpointRouteBuilder endpointRouteBuilder)
+        {
+            endpointRouteBuilder.MapGrpcService<Application.Grpc.Services.PostService>();
         }
     }
 }
