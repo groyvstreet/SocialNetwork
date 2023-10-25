@@ -1,4 +1,4 @@
-﻿using ChatService.Application.AutoMapperProfiles;
+using ChatService.Application.AutoMapperProfiles;
 using ChatService.Application.Behaviours;
 using ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand;
 using ChatService.Application.Interfaces.Repositories;
@@ -11,10 +11,19 @@ using MediatR;
 using MongoDB.Driver;
 using FluentValidation;
 using ChatService.Application.Validators.DialogCommandValidators;
+using Hangfire;
+using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies.Backup;
+using Hangfire.Mongo.Migration.Strategies;
+using ChatService.API.Hangfire;
+using ChatService.Application.Interfaces.Services.Hangfire;
+using ChatService.Infrastructure.Services.Hangfire;
+using ChatService.Application.Services.Hangfire;
 using ChatService.Application;
 using ChatService.Infrastructure.Interfaces;
 using ChatService.Infrastructure;
 using ChatService.Domain.Entities;
+using ChatService.Infrastructure.CacheRepositories;
 using ChatService.Application.Grpc.Protos;
 using ChatService.Application.Grpc.Services;
 using System.Reflection;
@@ -37,7 +46,35 @@ namespace ChatService.API.Extensions
             services.AddValidatorsFromAssemblyContaining<AddDialogMessageCommandValidator>();
         }
 
-        public static void AddServices(this IServiceCollection services, IConfiguration configuration)
+        public static void AddHangfire(this IServiceCollection services, IConfiguration configuration)
+        {
+            var connection = configuration.GetSection("MongoConnection").Get<string>();
+            var database = configuration.GetSection("MongoDatabase").Get<string>();
+
+            var mongoMigrationOptions = new MongoMigrationOptions
+            {
+                MigrationStrategy = new DropMongoMigrationStrategy(),
+                BackupStrategy = new CollectionMongoBackupStrategy()
+            };
+
+            var mongoStorageOptions = new MongoStorageOptions
+            {
+                MigrationOptions = mongoMigrationOptions,
+                CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.TailNotificationsCollection,
+                CheckConnection = false
+            };
+
+            services.AddHangfire(config =>
+            {
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170);
+                config.UseSimpleAssemblyNameTypeSerializer();
+                config.UseRecommendedSerializerSettings();
+                config.UseMongoStorage(connection, database, mongoStorageOptions);
+            });
+            services.AddHangfireServer();
+        }
+
+        public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IUserRepository>(provider =>
             {
@@ -62,6 +99,9 @@ namespace ChatService.API.Extensions
 
             services.AddScoped<IDialogNotificationService, DialogNotificationService>();
             services.AddScoped<IChatNotificationService, ChatNotificationService>();
+            services.AddScoped<IBackgroundJobService, BackgroundJobService>();
+            services.AddScoped<IChatService, Application.Services.ChatService>();
+            services.AddHostedService<RecurringJobExecutorService>();
         }
 
         public static void AddKafkaServices(this IServiceCollection services, IConfiguration configuration)
@@ -118,6 +158,16 @@ namespace ChatService.API.Extensions
                 .Enrich.WithProperty("Environment", environmentVariable)
                 .CreateLogger();
         }
+  
+        public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(redisCacheOptions =>
+            {
+                redisCacheOptions.Configuration = configuration.GetSection("RedisConnection").Get<string>();
+            });
+            
+            services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();
+        }
 
         public static void AddCorsPolicy(this IServiceCollection services)
         {
@@ -130,6 +180,14 @@ namespace ChatService.API.Extensions
                         .WithOrigins("http://127.0.0.1:3000")
                         .AllowCredentials()
                         .SetIsOriginAllowed((hosts) => true));
+            });
+        }
+
+        public static void UseHangfireDashboardUI(this IApplicationBuilder app)
+        {
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
             });
         }
     }

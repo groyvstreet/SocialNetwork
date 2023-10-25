@@ -12,6 +12,7 @@ builder.Services.AddIdentity();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddFluentValidation();
 builder.Services.AddAutoMapper();
+builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers();

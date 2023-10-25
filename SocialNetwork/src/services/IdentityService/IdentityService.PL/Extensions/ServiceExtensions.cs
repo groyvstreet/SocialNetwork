@@ -1,4 +1,4 @@
-﻿using IdentityService.DAL.Interfaces;
+using IdentityService.DAL.Interfaces;
 using IdentityService.DAL.Repositories;
 using IdentityService.BLL.Interfaces;
 using IdentityService.BLL.Services;
@@ -11,6 +11,7 @@ using IdentityService.BLL.DTOs.UserDTOs;
 using Serilog.Sinks.Elasticsearch;
 using Serilog;
 using System.Reflection;
+using IdentityService.DAL.CacheRepositories;
 
 namespace IdentityService.PL.Extensions
 {
@@ -70,6 +71,16 @@ namespace IdentityService.PL.Extensions
                 .CreateLogger();
         }
         
+        public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(redisCacheOptions =>
+            {
+                redisCacheOptions.Configuration = configuration.GetConnectionString("Redis");
+            });
+
+            services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();
+        }
+
         public static void AddCorsPolicy(this IServiceCollection services)
         {
             services.AddCors(options =>

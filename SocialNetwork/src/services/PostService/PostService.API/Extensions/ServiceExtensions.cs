@@ -1,7 +1,8 @@
-﻿using FluentValidation;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using PostService.Application;
 using PostService.Application.AutoMapperProfiles;
+using PostService.Application.Interfaces;
 using PostService.Application.Interfaces.CommentInterfaces;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
@@ -11,6 +12,7 @@ using PostService.Application.Services;
 using PostService.Application.Validators.PostValidators;
 using PostService.Domain.Entities;
 using PostService.Infrastructure;
+using PostService.Infrastructure.CacheRepositories;
 using PostService.Infrastructure.Interfaces;
 using PostService.Infrastructure.Repositories;
 using PostService.Infrastructure.Services;
@@ -62,6 +64,20 @@ namespace PostService.API.Extensions
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
         }
 
+        public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(redisCacheOptions =>
+            {
+                redisCacheOptions.Configuration = configuration.GetConnectionString("Redis");
+            });
+
+            services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();
+            services.AddScoped<ICacheRepository<Post>, CacheRepository<Post>>();
+            services.AddScoped<ICacheRepository<Comment>, CacheRepository<Comment>>();
+            services.AddScoped<ICacheRepository<PostLike>, CacheRepository<PostLike>>();
+            services.AddScoped<ICacheRepository<CommentLike>, CacheRepository<CommentLike>>();
+        }
+      
         public static void MapGrpc(this IEndpointRouteBuilder endpointRouteBuilder)
         {
             endpointRouteBuilder.MapGrpcService<Application.Grpc.Services.PostService>();

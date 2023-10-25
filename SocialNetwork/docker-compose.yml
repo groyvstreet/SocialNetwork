@@ -9,6 +9,7 @@ services:
       - postgresql-db
       - kafka
       - elk
+      - post-redis
 
   postgresql-db:
     image: postgres:latest
@@ -21,6 +22,7 @@ services:
       - mssqlserver-db
       - kafka
       - elk
+      - identity-redis
 
   mssqlserver-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -33,6 +35,7 @@ services:
       - mongo-db
       - kafka
       - elk
+      - chat-redis
 
   mongo-db:
     image: mongo
@@ -47,3 +50,12 @@ services:
 
   elk:
     image: sebp/elk
+
+  post-redis:
+    image: redis:latest
+
+  identity-redis:
+    image: redis:latest
+
+  chat-redis:
+    image: redis:latest

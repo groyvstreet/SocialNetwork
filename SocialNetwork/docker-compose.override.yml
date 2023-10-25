@@ -18,6 +18,15 @@ networks:
 
   elk-network:
     driver: bridge
+    
+  post-redis-network:
+    driver: bridge
+
+  identity-redis-network:
+    driver: bridge
+
+  chat-redis-network:
+    driver: bridge
 
 services:
   post-service-app: 
@@ -29,6 +38,7 @@ services:
       - post-service-network
       - kafka-network
       - elk-network
+      - post-redis-network
 
   postgresql-db:
     container_name: postgresql
@@ -49,6 +59,7 @@ services:
       - identity-service-network
       - kafka-network
       - elk-network
+      - identity-redis-network
 
   mssqlserver-db:
     container_name: mssqlserver
@@ -68,6 +79,7 @@ services:
       - chat-service-network
       - kafka-network
       - elk-network
+      - chat-redis-network
 
   mongo-db:
     container_name: mongo
@@ -104,3 +116,21 @@ services:
       - "5044:5044"
     networks:
       - elk-network
+      
+  post-redis:
+    ports:
+      - "6379:6379"
+    networks:
+      - post-redis-network
+  
+  identity-redis:
+    ports:
+      - "6380:6379"
+    networks:
+      - identity-redis-network
+
+  chat-redis:
+    ports:
+      - "6381:6379"
+    networks:
+      - chat-redis-network
