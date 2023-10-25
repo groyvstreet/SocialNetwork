@@ -41,3 +41,12 @@ services:
     image: wurstmeister/kafka:latest
     depends_on:
       - zookeeper
+
+  nginx:
+    build:
+      context: .
+      dockerfile: /nginx/Dockerfile
+    depends_on:
+      - identity-service-app
+      - post-service-app
+      - chat-service-app
