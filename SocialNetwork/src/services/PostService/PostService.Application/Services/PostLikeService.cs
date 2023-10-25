@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using PostService.Application.DTOs.PostLikeDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces;
@@ -6,6 +7,7 @@ using PostService.Application.Interfaces.PostInterfaces;
 using PostService.Application.Interfaces.PostLikeInterfaces;
 using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
+using System.Text.Json;
 
 namespace PostService.Application.Services
 {
@@ -15,6 +17,7 @@ namespace PostService.Application.Services
         private readonly IPostLikeRepository _postLikeRepository;
         private readonly IPostRepository _postRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ILogger<PostLikeService> _logger;
         private readonly ICacheRepository<Post> _postCacheRepository;
         private readonly ICacheRepository<User> _userCacheRepository;
         private readonly ICacheRepository<PostLike> _postLikeCacheRepository;
@@ -23,6 +26,7 @@ namespace PostService.Application.Services
                                IPostLikeRepository postLikeRepository,
                                IPostRepository postRepository,
                                IUserRepository userRepository,
+                               ILogger<PostLikeService> logger)
                                ICacheRepository<Post> postCacheRepository,
                                ICacheRepository<User> userCacheRepository,
                                ICacheRepository<PostLike> postLikeCacheRepository)
@@ -31,6 +35,7 @@ namespace PostService.Application.Services
             _postLikeRepository = postLikeRepository;
             _postRepository = postRepository;
             _userRepository = userRepository;
+            _logger = logger;
             _userCacheRepository = userCacheRepository;
             _postCacheRepository = postCacheRepository;
             _postLikeCacheRepository = postLikeCacheRepository;
@@ -101,6 +106,8 @@ namespace PostService.Application.Services
             await _postRepository.SaveChangesAsync();
 
             await _postCacheRepository.SetAsync(post.Id.ToString(), post);
+            
+            _logger.LogInformation("postLike - {postLike} added", JsonSerializer.Serialize(postLike));
 
             return getPostLikeDTO;
         }
@@ -145,6 +152,8 @@ namespace PostService.Application.Services
             await _postRepository.SaveChangesAsync();
 
             await _postCacheRepository.SetAsync(post.Id.ToString(), post);
+            
+            _logger.LogInformation("postLike - {postLike} removed", JsonSerializer.Serialize(postLike));
         }
     }
 }

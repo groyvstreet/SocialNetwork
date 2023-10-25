@@ -11,7 +11,7 @@ namespace PostService.API.Middlewares
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, ILogger<ExceptionHandlerMiddleware> logger)
         {
             try
             {
@@ -29,6 +29,8 @@ namespace PostService.API.Middlewares
                 context.Response.Headers.ContentType = "text/json; charset=utf-8";
                 var response = new { ex.Message };
                 await context.Response.WriteAsJsonAsync(response);
+
+                logger.LogError("exception {exception}", ex.ToString());
             }
         }
     }

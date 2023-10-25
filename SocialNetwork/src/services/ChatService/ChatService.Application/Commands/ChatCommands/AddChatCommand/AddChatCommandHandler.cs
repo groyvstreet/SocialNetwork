@@ -1,9 +1,11 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ChatService.Application.Exceptions;
 using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
 using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
 {
@@ -13,18 +15,21 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
         private readonly IChatNotificationService _chatNotificationService;
+        private readonly ILogger<AddChatCommandHandler> _logger;
         private readonly ICacheRepository<User> _userCacheRepository;
 
         public AddChatCommandHandler(IMapper mapper,
                                      IChatRepository chatRepository,
                                      IUserRepository userRepository,
                                      IChatNotificationService chatNotificationService,
+                                     ILogger<AddChatCommandHandler> logger)
                                      ICacheRepository<User> userCacheRepository)
         {
             _mapper = mapper;
             _chatRepository = chatRepository;
             _userRepository = userRepository;
             _chatNotificationService = chatNotificationService;
+            _logger = logger;
             _userCacheRepository = userCacheRepository;
         }
 
@@ -63,6 +68,8 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
             await _chatRepository.AddAsync(chat);
 
             await _chatNotificationService.CreateChatAsync(chat);
+
+            _logger.LogInformation("chat - {chat} added", JsonSerializer.Serialize(chat));
 
             return new Unit();
         }

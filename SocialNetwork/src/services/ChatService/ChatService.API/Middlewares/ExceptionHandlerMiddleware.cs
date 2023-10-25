@@ -1,6 +1,5 @@
 ﻿using ChatService.Application.Exceptions;
 using FluentValidation;
-using System;
 
 namespace ChatService.API.Middlewares
 {
@@ -13,7 +12,7 @@ namespace ChatService.API.Middlewares
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, ILogger<ExceptionHandlerMiddleware> logger)
         {
             try
             {
@@ -45,6 +44,8 @@ namespace ChatService.API.Middlewares
                     var response = new { ex.Message };
                     await context.Response.WriteAsJsonAsync(response);
                 }
+
+                logger.LogError("exception {exception}", ex.ToString());
             }
         }
     }

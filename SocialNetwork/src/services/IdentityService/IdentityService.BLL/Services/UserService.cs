@@ -1,10 +1,12 @@
-﻿using AutoMapper;
+using AutoMapper;
 using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Exceptions;
 using IdentityService.BLL.Interfaces;
 using IdentityService.DAL.Data;
 using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace IdentityService.BLL.Services
 {
@@ -13,16 +15,19 @@ namespace IdentityService.BLL.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IKafkaProducerService<RequestOperation, GetUserDTO> _kafkaProducerService;
+        private readonly ILogger<UserService> _logger;
         private readonly ICacheRepository<User> _userCacheRepository;
 
         public UserService(IMapper mapper,
                            IUserRepository userRepository,
                            IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService,
+                           ILogger<UserService> logger)
                            ICacheRepository<User> userCacheRepository)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _kafkaProducerService = kafkaProducerService;
+            _logger = logger;
             _userCacheRepository = userCacheRepository;
         }
 
@@ -30,6 +35,8 @@ namespace IdentityService.BLL.Services
         {
             var users = await _userRepository.GetUsersAsync();
             var getUserDTOs = users.Select(_mapper.Map<GetUserDTO>).ToList();
+
+            _logger.LogInformation("users - {users} getted", JsonSerializer.Serialize(getUserDTOs));
 
             return getUserDTOs;
         }
@@ -51,6 +58,8 @@ namespace IdentityService.BLL.Services
             }
 
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
+
+            _logger.LogInformation("user - {user} getted", JsonSerializer.Serialize(getUserDTO));
 
             return getUserDTO;
         }
@@ -84,6 +93,8 @@ namespace IdentityService.BLL.Services
 
             await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Update, getUserDTO);
 
+            _logger.LogInformation("user - {user} updated", getUserDTO);
+
             return getUserDTO;
         }
 
@@ -112,6 +123,8 @@ namespace IdentityService.BLL.Services
 
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
             await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Remove, getUserDTO);
+
+            _logger.LogInformation("user - {user} removed", JsonSerializer.Serialize(getUserDTO));
         }
     }
 }

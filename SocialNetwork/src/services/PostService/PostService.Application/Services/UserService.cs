@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using PostService.Application.DTOs.UserDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces;
@@ -7,6 +8,7 @@ using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
 using PostService.Application.Interfaces.PostLikeInterfaces;
 using PostService.Application.Interfaces.UserInterfaces;
+using System.Text.Json;
 using PostService.Domain.Entities;
 
 namespace PostService.Application.Services
@@ -18,6 +20,7 @@ namespace PostService.Application.Services
         private readonly ICommentLikeRepository _commentLikeRepository;
         private readonly IPostRepository _postRepository;
         private readonly IPostLikeRepository _postLikeRepository;
+        private readonly ILogger<UserService> _logger;
         private readonly ICacheRepository<Comment> _commentCacheRepository;
         private readonly ICacheRepository<Post> _postCacheRepository;
 
@@ -26,6 +29,7 @@ namespace PostService.Application.Services
                            ICommentLikeRepository commentLikeRepository,
                            IPostRepository postRepository,
                            IPostLikeRepository postLikeRepository,
+                           ILogger<UserService> logger)
                            ICacheRepository<Comment> commentCacheRepository,
                            ICacheRepository<Post> postCacheRepository)
         {
@@ -34,6 +38,7 @@ namespace PostService.Application.Services
             _commentLikeRepository = commentLikeRepository;
             _postRepository = postRepository;
             _postLikeRepository = postLikeRepository;
+            _logger = logger;
             _commentCacheRepository = commentCacheRepository;
             _postCacheRepository = postCacheRepository;
         }
@@ -55,8 +60,10 @@ namespace PostService.Application.Services
             }
 
             var commentLikes = await _commentLikeRepository.GetCommentLikesWithUserByCommentIdAsync(commentId);
-            var users = commentLikes.Select(cl => cl.User);
+            var users = commentLikes.Select(commentLike => commentLike.User);
             var getUserDTOs = users.Select(_mapper.Map<GetUserDTO>).ToList();
+
+            _logger.LogInformation("users - {users} getted", JsonSerializer.Serialize(users));
 
             return getUserDTOs;
         }
@@ -78,8 +85,10 @@ namespace PostService.Application.Services
             }
 
             var postLikes = await _postLikeRepository.GetPostLikesWithUserByPostIdAsync(postId);
-            var users = postLikes.Select(pl => pl.User);
+            var users = postLikes.Select(postLike => postLike.User);
             var getUserDTOs = users.Select(_mapper.Map<GetUserDTO>).ToList();
+
+            _logger.LogInformation("users - {users} getted", JsonSerializer.Serialize(users));
 
             return getUserDTOs;
         }

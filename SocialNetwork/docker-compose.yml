@@ -8,6 +8,7 @@ services:
     depends_on:
       - postgresql-db
       - kafka
+      - elk
       - post-redis
 
   postgresql-db:
@@ -20,6 +21,7 @@ services:
     depends_on:
       - mssqlserver-db
       - kafka
+      - elk
       - identity-redis
 
   mssqlserver-db:
@@ -32,6 +34,7 @@ services:
     depends_on:
       - mongo-db
       - kafka
+      - elk
       - chat-redis
 
   mongo-db:
@@ -44,6 +47,9 @@ services:
     image: wurstmeister/kafka:latest
     depends_on:
       - zookeeper
+
+  elk:
+    image: sebp/elk
 
   post-redis:
     image: redis:latest

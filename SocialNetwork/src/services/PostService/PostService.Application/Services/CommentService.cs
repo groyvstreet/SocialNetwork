@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using PostService.Application.DTOs.CommentDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces;
@@ -7,6 +8,7 @@ using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
 using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
+using System.Text.Json;
 
 namespace PostService.Application.Services
 {
@@ -17,6 +19,7 @@ namespace PostService.Application.Services
         private readonly IPostRepository _postRepository;
         private readonly IUserRepository _userRepository;
         private readonly ICommentLikeRepository _commentLikeRepository;
+        private readonly ILogger<CommentService> _logger;
         private readonly ICacheRepository<Comment> _commentCacheRepository;
         private readonly ICacheRepository<Post> _postCacheRepository;
         private readonly ICacheRepository<User> _userCacheRepository;
@@ -26,6 +29,7 @@ namespace PostService.Application.Services
                               IPostRepository postRepository,
                               IUserRepository userRepository,
                               ICommentLikeRepository commentLikeRepository,
+                              ILogger<CommentService> logger)
                               ICacheRepository<Comment> commentCacheRepository,
                               ICacheRepository<Post> postCacheRepository,
                               ICacheRepository<User> userCacheRepository)
@@ -35,6 +39,7 @@ namespace PostService.Application.Services
             _postRepository = postRepository;
             _userRepository = userRepository;
             _commentLikeRepository = commentLikeRepository;
+            _logger = logger;
             _commentCacheRepository = commentCacheRepository;
             _postCacheRepository = postCacheRepository;
             _userCacheRepository = userCacheRepository;
@@ -44,6 +49,8 @@ namespace PostService.Application.Services
         {
             var comments = await _commentRepository.GetAllAsync();
             var getCommentDTOs = comments.Select(_mapper.Map<GetCommentDTO>).ToList();
+
+            _logger.LogInformation("comments - {comments} getted", JsonSerializer.Serialize(comments));
 
             return getCommentDTOs;
         }
@@ -66,6 +73,8 @@ namespace PostService.Application.Services
 
             var getCommentDTO = _mapper.Map<GetCommentDTO>(comment);
 
+            _logger.LogInformation("comment - {comment} getted", JsonSerializer.Serialize(comment));
+
             return getCommentDTO;
         }
 
@@ -79,6 +88,8 @@ namespace PostService.Application.Services
             }
 
             var getCommentDTOs = post.Comments.Select(_mapper.Map<GetCommentDTO>).ToList();
+
+            _logger.LogInformation("comments - {comments} getted", JsonSerializer.Serialize(post.Comments));
 
             return getCommentDTOs;
         }
@@ -100,8 +111,10 @@ namespace PostService.Application.Services
             }
 
             var commentLikes = await _commentLikeRepository.GetCommentLikesWithCommentByUserIdAsync(userId);
-            var comments = commentLikes.Select(cl => cl.Comment);
+            var comments = commentLikes.Select(commentLike => commentLike.Comment);
             var getCommentDTOs = comments.Select(_mapper.Map<GetCommentDTO>).ToList();
+
+            _logger.LogInformation("comments - {comments} getted", JsonSerializer.Serialize(comments));
 
             return getCommentDTOs;
         }
@@ -155,6 +168,8 @@ namespace PostService.Application.Services
             await _postRepository.SaveChangesAsync();
 
             await _postCacheRepository.SetAsync(post.Id.ToString(), post);
+            
+             _logger.LogInformation("comment - {comment} added", JsonSerializer.Serialize(comment));
 
             return getCommentDTO;
         }
@@ -187,6 +202,8 @@ namespace PostService.Application.Services
             var getCommentDTO = _mapper.Map<GetCommentDTO>(comment);
 
             await _commentCacheRepository.SetAsync(comment.Id.ToString(), comment);
+            
+            _logger.LogInformation("comment - {comment} updated", JsonSerializer.Serialize(comment));
 
             return getCommentDTO;
         }
@@ -226,6 +243,8 @@ namespace PostService.Application.Services
 
             post!.CommentCount--;
             await _postRepository.SaveChangesAsync();
+
+            _logger.LogInformation("comment - {comment} removed", JsonSerializer.Serialize(comment));
         }
     }
 }

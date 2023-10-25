@@ -1,7 +1,11 @@
 using ChatService.API.Extensions;
+using Serilog;
 using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.ConfigureLogging();
+builder.Host.UseSerilog();
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
 builder.Services.AddCorsPolicy();

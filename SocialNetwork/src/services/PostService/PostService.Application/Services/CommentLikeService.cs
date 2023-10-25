@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using PostService.Application.DTOs.CommentLikeDTOs;
 using PostService.Application.Exceptions;
 using PostService.Application.Interfaces;
@@ -6,6 +7,7 @@ using PostService.Application.Interfaces.CommentInterfaces;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
+using System.Text.Json;
 
 namespace PostService.Application.Services
 {
@@ -15,6 +17,7 @@ namespace PostService.Application.Services
         private readonly ICommentLikeRepository _commentLikeRepository;
         private readonly ICommentRepository _commentRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ILogger<CommentLikeService> _logger;
         private readonly ICacheRepository<Comment> _commentCacheRepository;
         private readonly ICacheRepository<User> _userCacheRepository;
         private readonly ICacheRepository<CommentLike> _commentLikeCacheRepository;
@@ -23,6 +26,7 @@ namespace PostService.Application.Services
                                   ICommentLikeRepository commentLikeRepository,
                                   ICommentRepository commentRepository,
                                   IUserRepository userRepository,
+                                  ILogger<CommentLikeService> logger,
                                   ICacheRepository<Comment> commentCacheRepository,
                                   ICacheRepository<User> userCacheRepository,
                                   ICacheRepository<CommentLike> commentLikeCacheRepository)
@@ -31,6 +35,7 @@ namespace PostService.Application.Services
             _commentLikeRepository = commentLikeRepository;
             _commentRepository = commentRepository;
             _userRepository = userRepository;
+            _logger = logger;
             _userCacheRepository = userCacheRepository;
             _commentCacheRepository = commentCacheRepository;
             _commentLikeCacheRepository = commentLikeCacheRepository;
@@ -95,14 +100,16 @@ namespace PostService.Application.Services
             commentLike = _mapper.Map<CommentLike>(addCommentLikeDTO);
             await _commentLikeRepository.AddAsync(commentLike);
             await _commentLikeRepository.SaveChangesAsync();
-            var getCommentsUserDTO = _mapper.Map<GetCommentLikeDTO>(commentLike);
+            var getCommentLikeDTO = _mapper.Map<GetCommentLikeDTO>(commentLike);
 
             comment.LikeCount++;
             await _commentRepository.SaveChangesAsync();
 
             await _commentCacheRepository.SetAsync(comment.Id.ToString(), comment);
+            
+            _logger.LogInformation("commentLike - {commentLike} added", JsonSerializer.Serialize(commentLike));
 
-            return getCommentsUserDTO;
+            return getCommentLikeDTO;
         }
 
         public async Task RemoveCommentLikeAsync(AddRemoveCommentLikeDTO addRemoveCommentLikeDTO, Guid authenticatedUserId)
@@ -143,6 +150,8 @@ namespace PostService.Application.Services
 
             comment!.LikeCount--;
             await _commentRepository.SaveChangesAsync();
+
+            _logger.LogInformation("commentLike - {commentLike} removed", JsonSerializer.Serialize(commentLike));
         }
     }
 }

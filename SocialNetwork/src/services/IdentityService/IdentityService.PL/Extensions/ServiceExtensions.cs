@@ -1,4 +1,4 @@
-﻿using IdentityService.DAL.Interfaces;
+using IdentityService.DAL.Interfaces;
 using IdentityService.DAL.Repositories;
 using IdentityService.BLL.Interfaces;
 using IdentityService.BLL.Services;
@@ -6,10 +6,11 @@ using IdentityService.BLL.AutoMapperProfiles;
 using IdentityService.BLL.Validators.UserValidators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.Configuration;
 using IdentityService.BLL;
-using IdentityService.DAL.Entities;
 using IdentityService.BLL.DTOs.UserDTOs;
+using Serilog.Sinks.Elasticsearch;
+using Serilog;
+using System.Reflection;
 using IdentityService.DAL.CacheRepositories;
 
 namespace IdentityService.PL.Extensions
@@ -46,6 +47,30 @@ namespace IdentityService.PL.Extensions
             services.AddSingleton<IKafkaProducerService<RequestOperation, GetUserDTO>, KafkaProducerService<RequestOperation, GetUserDTO>>();
         }
 
+        public static void ConfigureLogging(this IConfiguration configuration)
+        {
+            var stringUri = configuration.GetSection("ElasticConfiguration").GetSection("Uri").Get<string>()!;
+            var node = new Uri(stringUri);
+            var environmentVariable = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            
+            var options = new ElasticsearchSinkOptions(node)
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = $"{Assembly.GetExecutingAssembly()
+                    .GetName().Name
+                    ?.ToLower()
+                    .Replace('.', '-')}-{environmentVariable?.ToLower()}-{DateTime.UtcNow:yyyy-MM}",
+                NumberOfReplicas = 1,
+                NumberOfShards = 2
+            };
+
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Elasticsearch(options)
+                .Enrich.WithProperty("Environment", environmentVariable)
+                .CreateLogger();
+        }
+        
         public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddStackExchangeRedisCache(redisCacheOptions =>

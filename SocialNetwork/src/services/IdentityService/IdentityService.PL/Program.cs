@@ -1,6 +1,10 @@
 using IdentityService.PL.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.ConfigureLogging();
+builder.Host.UseSerilog();
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
 builder.Services.AddCorsPolicy();

@@ -5,6 +5,8 @@ using ChatService.Application.Interfaces.Services;
 using ChatService.Application.Interfaces.Services.Hangfire;
 using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
 {
@@ -16,10 +18,13 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
         private readonly IBackgroundJobService _backgroundJobService;
         private readonly ICacheRepository<User> _userCacheRepository;
         private readonly IPostService _postService;
+        private readonly ILogger<AddChatMessageCommandHandler> _logger;
 
         public AddChatMessageCommandHandler(IChatRepository chatRepository,
                                             IUserRepository userRepository,
                                             IChatNotificationService chatNotificationService,
+                                            IPostService postService,
+                                            ILogger<AddChatMessageCommandHandler> logger)
                                             IBackgroundJobService backgroundJobService)
                                             ICacheRepository<User> userCacheRepository)
                                             IPostService postService)
@@ -30,6 +35,7 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
             _backgroundJobService = backgroundJobService;
             _userCacheRepository = userCacheRepository;
             _postService = postService;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(AddChatMessageCommand request, CancellationToken cancellationToken)
@@ -41,7 +47,7 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
                 throw new ForbiddenException("forbidden");
             }
 
-            var chat = await _chatRepository.GetFirstOrDefaultByAsync(c => c.Id == DTO.ChatId);
+            var chat = await _chatRepository.GetFirstOrDefaultByAsync(chat => chat.Id == DTO.ChatId);
 
             if (chat is null)
             {
@@ -62,7 +68,7 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
                 await _userCacheRepository.SetAsync(user.Id.ToString(), user);
             }
 
-            if (!chat.Users.Any(u => u.Id == DTO.UserId))
+            if (!chat.Users.Any(user => user.Id == DTO.UserId))
             {
                 throw new ForbiddenException($"no such user with id = {DTO.UserId} in chat with id = {DTO.ChatId}");
             }
@@ -122,6 +128,10 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
             await _chatRepository.AddChatMessageAsync(DTO.ChatId, message);
 
             await _chatNotificationService.SendMessageAsync(chat, message);
+
+            _logger.LogInformation("message - {message} added to chat with id {id}", JsonSerializer.Serialize(message), chat.Id);
+
+            return new Unit();
         }
     }
 }

@@ -5,6 +5,8 @@ using ChatService.Application.Interfaces.Services;
 using ChatService.Application.Interfaces.Services.Hangfire;
 using ChatService.Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand
 {
@@ -16,10 +18,13 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
         private readonly IBackgroundJobService _backgroundJobService;
         private readonly ICacheRepository<User> _userCacheRepository;
         private readonly IPostService _postService;
+        private readonly ILogger<AddDialogMessageCommandHandler> _logger;
 
         public AddDialogMessageCommandHandler(IDialogRepository dialogRepository,
                                               IUserRepository userRepository,
                                               IDialogNotificationService dialogNotificationService,
+                                              IPostService postService,
+                                              ILogger<AddDialogMessageCommandHandler> logger)
                                               IBackgroundJobService backgroundJobService)
                                               ICacheRepository<User> userCacheRepository)
                                               IPostService postService)
@@ -30,6 +35,7 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
             _backgroundJobService = backgroundJobService;
             _userCacheRepository = userCacheRepository;
             _postService = postService;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(AddDialogMessageCommand request, CancellationToken cancellationToken)
@@ -90,15 +96,15 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
                 return;
             }
 
-            var receiver = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.ReceiverId);
+            var receiver = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.ReceiverId);
 
             if (receiver is null)
             {
                 return;
             }
 
-            var dialog = await _dialogRepository.GetFirstOrDefaultByAsync(d =>
-                d.Users.Any(u => u.Id == DTO.SenderId) && d.Users.Any(u => u.Id == DTO.ReceiverId));
+            var dialog = await _dialogRepository.GetFirstOrDefaultByAsync(dialog =>
+                dialog.Users.Any(user => user.Id == DTO.SenderId) && dialog.Users.Any(user => user.Id == DTO.ReceiverId));
 
             if (dialog is null)
             {
@@ -129,6 +135,10 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
             await _dialogRepository.AddDialogMessageAsync(dialog.Id, message);
 
             await _dialogNotificationService.SendMessageAsync(dialog, message);
+
+            _logger.LogInformation("message - {message} added to dialog with id {id}", JsonSerializer.Serialize(message), dialog.Id);
+
+            return new Unit();
         }
     }
 }
