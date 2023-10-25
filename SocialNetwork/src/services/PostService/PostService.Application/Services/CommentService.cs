@@ -29,7 +29,7 @@ namespace PostService.Application.Services
                               IPostRepository postRepository,
                               IUserRepository userRepository,
                               ICommentLikeRepository commentLikeRepository,
-                              ILogger<CommentService> logger)
+                              ILogger<CommentService> logger,
                               ICacheRepository<Comment> commentCacheRepository,
                               ICacheRepository<Post> postCacheRepository,
                               ICacheRepository<User> userCacheRepository)

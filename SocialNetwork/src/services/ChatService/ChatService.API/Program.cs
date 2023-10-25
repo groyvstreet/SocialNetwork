@@ -18,7 +18,6 @@ builder.Services.AddServices();
 builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddKafkaServices(builder.Configuration);
 builder.Services.AddGrpcServices(builder.Configuration);
-builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

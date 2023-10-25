@@ -21,7 +21,7 @@ namespace IdentityService.BLL.Services
         public UserService(IMapper mapper,
                            IUserRepository userRepository,
                            IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService,
-                           ILogger<UserService> logger)
+                           ILogger<UserService> logger,
                            ICacheRepository<User> userCacheRepository)
         {
             _mapper = mapper;

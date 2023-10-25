@@ -24,10 +24,9 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
                                               IUserRepository userRepository,
                                               IDialogNotificationService dialogNotificationService,
                                               IPostService postService,
-                                              ILogger<AddDialogMessageCommandHandler> logger)
-                                              IBackgroundJobService backgroundJobService)
+                                              ILogger<AddDialogMessageCommandHandler> logger,
+                                              IBackgroundJobService backgroundJobService,
                                               ICacheRepository<User> userCacheRepository)
-                                              IPostService postService)
         {
             _dialogRepository = dialogRepository;
             _userRepository = userRepository;
@@ -137,8 +136,6 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
             await _dialogNotificationService.SendMessageAsync(dialog, message);
 
             _logger.LogInformation("message - {message} added to dialog with id {id}", JsonSerializer.Serialize(message), dialog.Id);
-
-            return new Unit();
         }
     }
 }

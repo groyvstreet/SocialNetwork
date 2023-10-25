@@ -12,6 +12,7 @@ using Serilog.Sinks.Elasticsearch;
 using Serilog;
 using System.Reflection;
 using IdentityService.DAL.CacheRepositories;
+using IdentityService.DAL.Entities;
 
 namespace IdentityService.PL.Extensions
 {

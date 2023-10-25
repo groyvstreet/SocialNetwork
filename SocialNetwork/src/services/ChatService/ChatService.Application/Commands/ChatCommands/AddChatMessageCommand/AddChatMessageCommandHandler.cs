@@ -24,10 +24,9 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
                                             IUserRepository userRepository,
                                             IChatNotificationService chatNotificationService,
                                             IPostService postService,
-                                            ILogger<AddChatMessageCommandHandler> logger)
-                                            IBackgroundJobService backgroundJobService)
+                                            ILogger<AddChatMessageCommandHandler> logger,
+                                            IBackgroundJobService backgroundJobService,
                                             ICacheRepository<User> userCacheRepository)
-                                            IPostService postService)
         {
             _chatRepository = chatRepository;
             _userRepository = userRepository;
@@ -130,8 +129,6 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
             await _chatNotificationService.SendMessageAsync(chat, message);
 
             _logger.LogInformation("message - {message} added to chat with id {id}", JsonSerializer.Serialize(message), chat.Id);
-
-            return new Unit();
         }
     }
 }

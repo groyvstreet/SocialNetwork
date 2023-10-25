@@ -22,7 +22,7 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatCommand
                                      IChatRepository chatRepository,
                                      IUserRepository userRepository,
                                      IChatNotificationService chatNotificationService,
-                                     ILogger<AddChatCommandHandler> logger)
+                                     ILogger<AddChatCommandHandler> logger,
                                      ICacheRepository<User> userCacheRepository)
         {
             _mapper = mapper;

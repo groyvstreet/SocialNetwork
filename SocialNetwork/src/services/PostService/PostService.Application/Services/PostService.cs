@@ -25,7 +25,7 @@ namespace PostService.Application.Services
                            IPostRepository postRepository,
                            IUserRepository userRepository,
                            IPostLikeRepository postLikeRepository,
-                           ILogger<PostService> logger)
+                           ILogger<PostService> logger,
                            ICacheRepository<Post> postCacheRepository,
                            ICacheRepository<User> userCacheRepository)
         {
