@@ -1,4 +1,5 @@
 ﻿using PostService.Application;
+using PostService.Application.Interfaces;
 using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Domain.Entities;
 using PostService.Infrastructure.Interfaces;
@@ -8,10 +9,13 @@ namespace PostService.Infrastructure.Services
     public class UserKafkaConsumerHandler : IKafkaConsumerHandler<RequestOperation, User>
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICacheRepository<User> _userCacheRepository;
 
-        public UserKafkaConsumerHandler(IUserRepository userRepository)
+        public UserKafkaConsumerHandler(IUserRepository userRepository,
+                                        ICacheRepository<User> userCacheRepository)
         {
             _userRepository = userRepository;
+            _userCacheRepository = userCacheRepository;
         }
 
         public async Task HandleAsync(RequestOperation operation, User user)
@@ -20,26 +24,49 @@ namespace PostService.Infrastructure.Services
             {
                 case RequestOperation.Create:
                     await _userRepository.AddAsync(user);
+
+                    await _userCacheRepository.SetAsync(user.Id.ToString(), user);
                     break;
                 case RequestOperation.Update:
-                    var userForUpdate = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == user.Id);
+                    var userForUpdate = await _userCacheRepository.GetAsync(user.Id.ToString());
 
                     if (userForUpdate is null)
                     {
-                        await _userRepository.AddAsync(user);
+                        userForUpdate = await _userRepository.GetFirstOrDefaultAsNoTrackingByAsync(u => u.Id == user.Id);
+
+                        if (userForUpdate is null)
+                        {
+                            await _userRepository.AddAsync(user);
+                        }
+                        else
+                        {
+                            _userRepository.Update(user);
+                        }
                     }
                     else
                     {
-                        _userRepository.Update(userForUpdate);
+                        _userRepository.Update(user);
                     }
 
+                    await _userCacheRepository.SetAsync(user.Id.ToString(), user);
                     break;
                 case RequestOperation.Remove:
-                    var userForRemove = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == user.Id);
+                    var userForRemove = await _userCacheRepository.GetAsync(user.Id.ToString());
 
-                    if (userForRemove is not null)
+                    if (userForRemove is null)
+                    {
+                        userForRemove = await _userRepository.GetFirstOrDefaultAsNoTrackingByAsync(u => u.Id == user.Id);
+
+                        if (userForRemove is not null)
+                        {
+                            _userRepository.Remove(userForRemove);
+                        }
+                    }
+                    else
                     {
                         _userRepository.Remove(userForRemove);
+
+                        await _userCacheRepository.RemoveAsync(user.Id.ToString());
                     }
 
                     break;
@@ -48,6 +75,7 @@ namespace PostService.Infrastructure.Services
             }
 
             await _userRepository.SaveChangesAsync();
+            _userRepository.ClearTrackedEntities();
         }
     }
 }

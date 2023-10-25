@@ -3,6 +3,7 @@ using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Exceptions;
 using IdentityService.BLL.Interfaces;
 using IdentityService.DAL.Data;
+using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
 
 namespace IdentityService.BLL.Services
@@ -12,14 +13,17 @@ namespace IdentityService.BLL.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IKafkaProducerService<RequestOperation, GetUserDTO> _kafkaProducerService;
+        private readonly ICacheRepository<User> _userCacheRepository;
 
         public UserService(IMapper mapper,
                            IUserRepository userRepository,
-                           IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService)
+                           IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService,
+                           ICacheRepository<User> userCacheRepository)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _kafkaProducerService = kafkaProducerService;
+            _userCacheRepository = userCacheRepository;
         }
 
         public async Task<List<GetUserDTO>> GetUsersAsync()
@@ -32,11 +36,18 @@ namespace IdentityService.BLL.Services
 
         public async Task<GetUserDTO> GetUserByIdAsync(string id)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
+            var user = await _userCacheRepository.GetAsync(id);
 
             if (user is null)
             {
-                throw new NotFoundException($"no such user with id = {id}");
+                user = await _userRepository.GetUserByIdAsync(id);
+
+                if (user is null)
+                {
+                    throw new NotFoundException($"no such user with id = {id}");
+                }
+
+                await _userCacheRepository.SetAsync(user.Id, user);
             }
 
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
@@ -51,11 +62,16 @@ namespace IdentityService.BLL.Services
                 throw new ForbiddenException();
             }
 
-            var user = await _userRepository.GetUserByIdAsync(updateUserDTO.Id);
+            var user = await _userCacheRepository.GetAsync(updateUserDTO.Id);
 
             if (user is null)
             {
-                throw new NotFoundException($"no such user with id = {updateUserDTO.Id}");
+                user = await _userRepository.GetUserByIdAsync(updateUserDTO.Id);
+
+                if (user is null)
+                {
+                    throw new NotFoundException($"no such user with id = {updateUserDTO.Id}");
+                }
             }
 
             user.FirstName = updateUserDTO.FirstName;
@@ -63,6 +79,8 @@ namespace IdentityService.BLL.Services
             user.BirthDate = updateUserDTO.BirthDate.ToDateTime(TimeOnly.MinValue);
             await _userRepository.UpdateUserAsync(user);
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
+
+            await _userCacheRepository.SetAsync(user.Id, user);
 
             await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Update, getUserDTO);
 
@@ -76,14 +94,21 @@ namespace IdentityService.BLL.Services
                 throw new ForbiddenException();
             }
 
-            var user = await _userRepository.GetUserByIdAsync(id);
+            var user = await _userCacheRepository.GetAsync(id);
 
             if (user is null)
             {
-                throw new NotFoundException($"no such user with id = {id}");
+                user = await _userRepository.GetUserByIdAsync(id);
+
+                if (user is null)
+                {
+                    throw new NotFoundException($"no such user with id = {id}");
+                }
             }
 
             await _userRepository.RemoveUserAsync(user);
+
+            await _userCacheRepository.RemoveAsync(id);
 
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
             await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Remove, getUserDTO);

@@ -8,6 +8,7 @@ services:
     depends_on:
       - postgresql-db
       - kafka
+      - post-redis
 
   postgresql-db:
     image: postgres:latest
@@ -19,6 +20,7 @@ services:
     depends_on:
       - mssqlserver-db
       - kafka
+      - identity-redis
 
   mssqlserver-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -30,6 +32,7 @@ services:
     depends_on:
       - mongo-db
       - kafka
+      - chat-redis
 
   mongo-db:
     image: mongo
@@ -41,3 +44,12 @@ services:
     image: wurstmeister/kafka:latest
     depends_on:
       - zookeeper
+
+  post-redis:
+    image: redis:latest
+
+  identity-redis:
+    image: redis:latest
+
+  chat-redis:
+    image: redis:latest

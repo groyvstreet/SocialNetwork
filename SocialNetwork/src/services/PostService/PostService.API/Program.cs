@@ -8,6 +8,7 @@ builder.Services.AddDatabaseConnection(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddFluentValidation();
 builder.Services.AddAutoMapper();
+builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddGrpc();
 builder.Services.AddKafkaServices(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);

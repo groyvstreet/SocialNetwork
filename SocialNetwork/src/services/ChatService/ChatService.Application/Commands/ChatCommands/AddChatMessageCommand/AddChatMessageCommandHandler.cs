@@ -1,4 +1,4 @@
-﻿using ChatService.Application.Exceptions;
+using ChatService.Application.Exceptions;
 using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
 using ChatService.Domain.Entities;
@@ -11,16 +11,19 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
         private readonly IChatNotificationService _chatNotificationService;
+        private readonly ICacheRepository<User> _userCacheRepository;
         private readonly IPostService _postService;
 
         public AddChatMessageCommandHandler(IChatRepository chatRepository,
                                             IUserRepository userRepository,
                                             IChatNotificationService chatNotificationService,
+                                            ICacheRepository<User> userCacheRepository)
                                             IPostService postService)
         {
             _chatRepository = chatRepository;
             _userRepository = userRepository;
             _chatNotificationService = chatNotificationService;
+            _userCacheRepository = userCacheRepository;
             _postService = postService;
         }
 
@@ -40,11 +43,18 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
                 throw new NotFoundException($"no such chat with id = {DTO.ChatId}");
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+            var user = await _userCacheRepository.GetAsync(DTO.UserId.ToString());
 
             if (user is null)
             {
-                throw new NotFoundException($"no such user with id = {DTO.UserId}");
+                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+
+                if (user is null)
+                {
+                    throw new NotFoundException($"no such user with id = {DTO.UserId}");
+                }
+
+                await _userCacheRepository.SetAsync(user.Id.ToString(), user);
             }
 
             if (!chat.Users.Any(u => u.Id == DTO.UserId))

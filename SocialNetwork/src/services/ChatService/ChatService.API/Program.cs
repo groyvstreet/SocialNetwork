@@ -8,6 +8,7 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddSignalR();
 builder.Services.AddAutoMapper();
 builder.Services.AddMediatR();
+builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddKafkaServices(builder.Configuration);
 builder.Services.AddGrpcServices(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);

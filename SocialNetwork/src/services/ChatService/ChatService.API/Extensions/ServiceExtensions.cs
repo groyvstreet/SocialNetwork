@@ -1,4 +1,4 @@
-﻿using ChatService.Application.AutoMapperProfiles;
+using ChatService.Application.AutoMapperProfiles;
 using ChatService.Application.Behaviours;
 using ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand;
 using ChatService.Application.Interfaces.Repositories;
@@ -15,6 +15,7 @@ using ChatService.Application;
 using ChatService.Infrastructure.Interfaces;
 using ChatService.Infrastructure;
 using ChatService.Domain.Entities;
+using ChatService.Infrastructure.CacheRepositories;
 using ChatService.Application.Grpc.Protos;
 using ChatService.Application.Grpc.Services;
 
@@ -90,6 +91,16 @@ namespace ChatService.API.Extensions
         {
             endpointRouteBuilder.MapHub<DialogHub>("/dialogs");
             endpointRouteBuilder.MapHub<ChatHub>("/chats");
+        }
+
+        public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddStackExchangeRedisCache(redisCacheOptions =>
+            {
+                redisCacheOptions.Configuration = configuration.GetSection("RedisConnection").Get<string>();
+            });
+            
+            services.AddScoped<ICacheRepository<User>, CacheRepository<User>>();
         }
 
         public static void AddCorsPolicy(this IServiceCollection services)
