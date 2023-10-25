@@ -7,5 +7,7 @@
         public Guid SenderId { get; set; }
 
         public Guid ReceiverId { get; set; }
+
+        public Guid? PostId { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using ChatService.Application.Exceptions;
+using ChatService.Application.Exceptions;
 using ChatService.Application.Interfaces.Repositories;
 using ChatService.Application.Interfaces.Services;
 using ChatService.Domain.Entities;
@@ -12,16 +12,19 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
         private readonly IUserRepository _userRepository;
         private readonly IDialogNotificationService _dialogNotificationService;
         private readonly ICacheRepository<User> _userCacheRepository;
+        private readonly IPostService _postService;
 
         public AddDialogMessageCommandHandler(IDialogRepository dialogRepository,
                                               IUserRepository userRepository,
                                               IDialogNotificationService dialogNotificationService,
                                               ICacheRepository<User> userCacheRepository)
+                                              IPostService postService)
         {
             _dialogRepository = dialogRepository;
             _userRepository = userRepository;
             _dialogNotificationService = dialogNotificationService;
             _userCacheRepository = userCacheRepository;
+            _postService = postService;
         }
 
         public async Task<Unit> Handle(AddDialogMessageCommand request, CancellationToken cancellationToken)
@@ -71,10 +74,23 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
                 await _dialogRepository.AddAsync(dialog);
             }
 
+            if (DTO.PostId is not null)
+            {
+                var isPostExists = await _postService.IsPostExistsAsync(DTO.PostId.Value);
+
+                if (!isPostExists)
+                {
+                    throw new NotFoundException($"no such post with id = {DTO.PostId}");
+                }
+
+                await _postService.UpdatePostAsync(DTO.PostId.Value);
+            }
+
             var message = new Message
             {
                 DateTime = DateTimeOffset.Now,
                 Text = DTO.Text,
+                PostId = DTO.PostId?.ToString(),
                 User = sender
             };
             await _dialogRepository.AddDialogMessageAsync(dialog.Id, message);

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace PostService.Domain.Entities
 {
@@ -13,6 +13,8 @@ namespace PostService.Domain.Entities
         public ulong CommentCount { get; set; }
 
         public ulong LikeCount { get; set; }
+
+        public ulong RepostCount { get; set; }
 
         [JsonIgnore]
         public User User { get; set; }

@@ -1,4 +1,4 @@
-﻿using ChatService.Application.AutoMapperProfiles;
+using ChatService.Application.AutoMapperProfiles;
 using ChatService.Application.Behaviours;
 using ChatService.Application.Commands.DialogCommands.AddDialogMessageCommand;
 using ChatService.Application.Interfaces.Repositories;
@@ -16,6 +16,8 @@ using ChatService.Infrastructure.Interfaces;
 using ChatService.Infrastructure;
 using ChatService.Domain.Entities;
 using ChatService.Infrastructure.CacheRepositories;
+using ChatService.Application.Grpc.Protos;
+using ChatService.Application.Grpc.Services;
 
 namespace ChatService.API.Extensions
 {
@@ -41,12 +43,14 @@ namespace ChatService.API.Extensions
 
                 return new UserRepository(mongoDatabase, "users");
             });
+
             services.AddScoped<IDialogRepository>(provider =>
             {
                 var mongoDatabase = provider.GetService<IMongoDatabase>()!;
 
                 return new DialogRepository(mongoDatabase, "dialogs");
             });
+
             services.AddScoped<IChatRepository>(provider =>
             {
                 var mongoDatabase = provider.GetService<IMongoDatabase>()!;
@@ -56,16 +60,31 @@ namespace ChatService.API.Extensions
 
             services.AddScoped<IDialogNotificationService, DialogNotificationService>();
             services.AddScoped<IChatNotificationService, ChatNotificationService>();
+        }
 
-            services.Configure<KafkaConsumerConfig<RequestOperation, User>>(ko =>
+        public static void AddKafkaServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<KafkaConsumerConfig<RequestOperation, User>>(kafkaConsumerConfig =>
             {
                 var section = configuration.GetSection("KafkaOptions");
-                ko.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();
-                ko.GroupId = section.GetSection("GroupId").Get<string>();
-                ko.Topic = "users";
+                kafkaConsumerConfig.BootstrapServers = section.GetSection("BootstrapServers").Get<string>();
+                kafkaConsumerConfig.GroupId = section.GetSection("GroupId").Get<string>();
+                kafkaConsumerConfig.Topic = "users";
             });
+
             services.AddHostedService<KafkaConsumerService<RequestOperation, User>>();
             services.AddTransient<IKafkaConsumerHandler<RequestOperation, User>, UserKafkaConsumerHandler>();
+        }
+
+        public static void AddGrpcServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddGrpcClient<Post.PostClient>(grpcClientFactoryOptions =>
+            {
+                var address = configuration.GetSection("GrpcOptions").GetSection("Address").Get<string>();
+                grpcClientFactoryOptions.Address = new Uri(address ?? string.Empty);
+            });
+
+            services.AddScoped<IPostService, PostService>();
         }
 
         public static void MapSignalR(this IEndpointRouteBuilder endpointRouteBuilder)

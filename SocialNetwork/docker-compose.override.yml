@@ -30,6 +30,7 @@ services:
     container_name: post-service
     ports:
       - "80:80"
+      - "8080:8080"
     networks:
       - post-service-network
       - kafka-network
