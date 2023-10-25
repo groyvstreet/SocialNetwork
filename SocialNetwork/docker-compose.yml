@@ -7,6 +7,8 @@ services:
       dockerfile: /src/services/PostService/PostService.API/Dockerfile
     depends_on:
       - postgresql-db
+      - kafka
+      - post-redis
 
   postgresql-db:
     image: postgres:latest
@@ -17,6 +19,8 @@ services:
       dockerfile: /src/services/IdentityService/IdentityService.PL/Dockerfile
     depends_on:
       - mssqlserver-db
+      - kafka
+      - identity-redis
 
   mssqlserver-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -27,6 +31,25 @@ services:
       dockerfile: /src/services/ChatService/ChatService.API/Dockerfile
     depends_on:
       - mongo-db
+      - kafka
+      - chat-redis
 
   mongo-db:
     image: mongo
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    depends_on:
+      - zookeeper
+
+  post-redis:
+    image: redis:latest
+
+  identity-redis:
+    image: redis:latest
+
+  chat-redis:
+    image: redis:latest

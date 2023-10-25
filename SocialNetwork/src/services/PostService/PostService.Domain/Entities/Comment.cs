@@ -1,4 +1,6 @@
-﻿namespace PostService.Domain.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace PostService.Domain.Entities
 {
     public class Comment
     {
@@ -14,10 +16,12 @@
 
         public Guid PostId { get; set; }
 
+        [JsonIgnore]
         public User User { get; set; }
 
         public Guid UserId { get; set; }
 
+        [JsonIgnore]
         public List<CommentLike> Likes { get; set; }
     }
 }

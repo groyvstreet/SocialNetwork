@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PostService.API.Extensions;
 using PostService.Application.DTOs.PostLikeDTOs;
 using PostService.Application.Interfaces.PostLikeInterfaces;
 
 namespace PostService.API.Controllers
 {
     [Route("api/post-likes")]
+    [Authorize]
     [ApiController]
     public class PostLikesController : ControllerBase
     {
@@ -18,7 +21,7 @@ namespace PostService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPostLikeAsync([FromBody] AddRemovePostLikeDTO addRemovePostLikeDTO)
         {
-            var postLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO);
+            var postLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, User.AuthenticatedUserId());
 
             return Ok(postLike);
         }
@@ -26,7 +29,7 @@ namespace PostService.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> RemovePostLikeAsync([FromBody] AddRemovePostLikeDTO addRemovePostLikeDTO)
         {
-            await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO);
+            await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, User.AuthenticatedUserId());
 
             return NoContent();
         }

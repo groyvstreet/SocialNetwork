@@ -1,4 +1,6 @@
-﻿namespace PostService.Domain.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace PostService.Domain.Entities
 {
     public class User
     {
@@ -12,12 +14,16 @@
 
         public string Image { get; set; } = string.Empty;
 
+        [JsonIgnore]
         public List<Post> Posts { get; set; }
 
+        [JsonIgnore]
         public List<Comment> Comments { get; set; }
 
+        [JsonIgnore]
         public List<PostLike> PostLikes { get; set; }
 
+        [JsonIgnore]
         public List<CommentLike> CommentLikes { get; set; }
     }
 }

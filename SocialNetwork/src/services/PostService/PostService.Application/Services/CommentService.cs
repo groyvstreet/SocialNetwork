@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using PostService.Application.DTOs.CommentDTOs;
 using PostService.Application.Exceptions;
+using PostService.Application.Interfaces;
 using PostService.Application.Interfaces.CommentInterfaces;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
 using PostService.Application.Interfaces.PostInterfaces;
@@ -16,18 +17,27 @@ namespace PostService.Application.Services
         private readonly IPostRepository _postRepository;
         private readonly IUserRepository _userRepository;
         private readonly ICommentLikeRepository _commentLikeRepository;
+        private readonly ICacheRepository<Comment> _commentCacheRepository;
+        private readonly ICacheRepository<Post> _postCacheRepository;
+        private readonly ICacheRepository<User> _userCacheRepository;
 
         public CommentService(IMapper mapper,
                               ICommentRepository commentRepository,
                               IPostRepository postRepository,
                               IUserRepository userRepository,
-                              ICommentLikeRepository commentLikeRepository)
+                              ICommentLikeRepository commentLikeRepository,
+                              ICacheRepository<Comment> commentCacheRepository,
+                              ICacheRepository<Post> postCacheRepository,
+                              ICacheRepository<User> userCacheRepository)
         {
             _mapper = mapper;
             _commentRepository = commentRepository;
             _postRepository = postRepository;
             _userRepository = userRepository;
             _commentLikeRepository = commentLikeRepository;
+            _commentCacheRepository = commentCacheRepository;
+            _postCacheRepository = postCacheRepository;
+            _userCacheRepository = userCacheRepository;
         }
 
         public async Task<List<GetCommentDTO>> GetCommentsAsync()
@@ -40,11 +50,18 @@ namespace PostService.Application.Services
 
         public async Task<GetCommentDTO> GetCommentByIdAsync(Guid id)
         {
-            var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
+            var comment = await _commentCacheRepository.GetAsync(id.ToString());
 
             if (comment is null)
             {
-                throw new NotFoundException($"no such comment with id = {id}");
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
+
+                if (comment is null)
+                {
+                    throw new NotFoundException($"no such comment with id = {id}");
+                }
+
+                await _commentCacheRepository.SetAsync(comment.Id.ToString(), comment);
             }
 
             var getCommentDTO = _mapper.Map<GetCommentDTO>(comment);
@@ -68,11 +85,18 @@ namespace PostService.Application.Services
 
         public async Task<List<GetCommentDTO>> GetLikedCommentsByUserIdAsync(Guid userId)
         {
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == userId);
+            var user = await _userCacheRepository.GetAsync(userId.ToString());
 
             if (user is null)
             {
-                throw new NotFoundException($"no such user with id = {userId}");
+                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == userId);
+
+                if (user is null)
+                {
+                    throw new NotFoundException($"no such user with id = {userId}");
+                }
+
+                await _userCacheRepository.SetAsync(user.Id.ToString(), user);
             }
 
             var commentLikes = await _commentLikeRepository.GetCommentLikesWithCommentByUserIdAsync(userId);
@@ -82,20 +106,41 @@ namespace PostService.Application.Services
             return getCommentDTOs;
         }
 
-        public async Task<GetCommentDTO> AddCommentAsync(AddCommentDTO addCommentDTO)
+        public async Task<GetCommentDTO> AddCommentAsync(AddCommentDTO addCommentDTO, Guid authenticatedUserId)
         {
-            var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == addCommentDTO.PostId);
+            if (addCommentDTO.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
+            }
+
+            var post = await _postCacheRepository.GetAsync(addCommentDTO.PostId.ToString());
 
             if (post is null)
             {
-                throw new NotFoundException($"no such post with id = {addCommentDTO.PostId}");
+                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == addCommentDTO.PostId);
+
+                if (post is null)
+                {
+                    throw new NotFoundException($"no such post with id = {addCommentDTO.PostId}");
+                }
+            }
+            else
+            {
+                _postRepository.Update(post);
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addCommentDTO.UserId);
+            var user = await _userCacheRepository.GetAsync(addCommentDTO.UserId.ToString());
 
             if (user is null)
             {
-                throw new NotFoundException($"no such user with id = {addCommentDTO.UserId}");
+                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addCommentDTO.UserId);
+
+                if (user is null)
+                {
+                    throw new NotFoundException($"no such user with id = {addCommentDTO.UserId}");
+                }
+
+                await _userCacheRepository.SetAsync(user.Id.ToString(), user);
             }
 
             var comment = _mapper.Map<Comment>(addCommentDTO);
@@ -104,41 +149,81 @@ namespace PostService.Application.Services
             await _commentRepository.SaveChangesAsync();
             var getCommentDTO = _mapper.Map<GetCommentDTO>(comment);
 
+            await _commentCacheRepository.SetAsync(comment.Id.ToString(), comment);
+
             post.CommentCount++;
             await _postRepository.SaveChangesAsync();
+
+            await _postCacheRepository.SetAsync(post.Id.ToString(), post);
 
             return getCommentDTO;
         }
 
-        public async Task<GetCommentDTO> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO)
+        public async Task<GetCommentDTO> UpdateCommentAsync(UpdateCommentDTO updateCommentDTO, Guid authenticatedUserId)
         {
-            var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == updateCommentDTO.Id);
+            var comment = await _commentCacheRepository.GetAsync(updateCommentDTO.Id.ToString());
 
             if (comment is null)
             {
-                throw new NotFoundException($"no such comment with id = {updateCommentDTO.Id}");
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == updateCommentDTO.Id);
+
+                if (comment is null)
+                {
+                    throw new NotFoundException($"no such comment with id = {updateCommentDTO.Id}");
+                }
+            }
+            else
+            {
+                _commentRepository.Update(comment);
+            }
+
+            if (comment.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
             }
 
             comment.Text = updateCommentDTO.Text;
             await _commentRepository.SaveChangesAsync();
             var getCommentDTO = _mapper.Map<GetCommentDTO>(comment);
 
+            await _commentCacheRepository.SetAsync(comment.Id.ToString(), comment);
+
             return getCommentDTO;
         }
 
-        public async Task RemoveCommentByIdAsync(Guid id)
+        public async Task RemoveCommentByIdAsync(Guid id, Guid authenticatedUserId)
         {
-            var comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
+            var comment = await _commentCacheRepository.GetAsync(id.ToString());
 
             if (comment is null)
             {
-                throw new NotFoundException($"no such comment with id = {id}");
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
+
+                if (comment is null)
+                {
+                    throw new NotFoundException($"no such comment with id = {id}");
+                }
+            }
+
+            if (comment.UserId != authenticatedUserId)
+            {
+                throw new ForbiddenException();
             }
 
             _commentRepository.Remove(comment);
             await _commentRepository.SaveChangesAsync();
 
-            var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == comment.PostId);
+            var post = await _postCacheRepository.GetAsync(comment.PostId.ToString());
+
+            if (post is null)
+            {
+                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == comment.PostId);
+            }
+            else
+            {
+                _postRepository.Update(post);
+            }
+
             post!.CommentCount--;
             await _postRepository.SaveChangesAsync();
         }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PostService.API.Extensions;
 using PostService.Application.DTOs.PostDTOs;
 using PostService.Application.Interfaces.PostInterfaces;
 
@@ -52,26 +54,29 @@ namespace PostService.API.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddPostAsync([FromBody] AddPostDTO addPostDTO)
         {
-            var post = await _postService.AddPostAsync(addPostDTO);
+            var post = await _postService.AddPostAsync(addPostDTO, User.AuthenticatedUserId());
 
             return Ok(post);
         }
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> UpdatePostAsync([FromBody] UpdatePostDTO updatePostDTO)
         {
-            var post = await _postService.UpdatePostAsync(updatePostDTO);
+            var post = await _postService.UpdatePostAsync(updatePostDTO, User.AuthenticatedUserId());
 
             return Ok(post);
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("{id}")]
         public async Task<IActionResult> RemovePostByIdAsync(Guid id)
         {
-            await _postService.RemovePostByIdAsync(id);
+            await _postService.RemovePostByIdAsync(id, User.AuthenticatedUserId());
 
             return NoContent();
         }

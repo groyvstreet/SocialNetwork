@@ -10,13 +10,31 @@ networks:
   chat-service-network:
     driver: bridge
 
+  kafka-network:
+    driver: bridge
+
+  zookeeper-network:
+    driver: bridge
+
+  post-redis-network:
+    driver: bridge
+
+  identity-redis-network:
+    driver: bridge
+
+  chat-redis-network:
+    driver: bridge
+
 services:
   post-service-app: 
     container_name: post-service
     ports:
       - "80:80"
+      - "8080:8080"
     networks:
       - post-service-network
+      - kafka-network
+      - post-redis-network
 
   postgresql-db:
     container_name: postgresql
@@ -35,6 +53,8 @@ services:
       - "81:80"
     networks:
       - identity-service-network
+      - kafka-network
+      - identity-redis-network
 
   mssqlserver-db:
     container_name: mssqlserver
@@ -52,6 +72,8 @@ services:
       - "82:80"
     networks:
       - chat-service-network
+      - kafka-network
+      - chat-redis-network
 
   mongo-db:
     container_name: mongo
@@ -62,3 +84,39 @@ services:
       - "27017:27017"
     networks:
       - chat-service-network
+
+  zookeeper:
+    ports:
+      - "2181:2181"
+    networks:
+      - zookeeper-network
+
+  kafka:
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CREATE_TOPICS: "users:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: 9092
+    networks:
+      - kafka-network
+      - zookeeper-network
+
+  post-redis:
+    ports:
+      - "6379:6379"
+    networks:
+      - post-redis-network
+  
+  identity-redis:
+    ports:
+      - "6380:6379"
+    networks:
+      - identity-redis-network
+
+  chat-redis:
+    ports:
+      - "6381:6379"
+    networks:
+      - chat-redis-network

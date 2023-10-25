@@ -90,6 +90,9 @@ namespace PostService.Infrastructure.Migrations
                     b.Property<decimal>("LikeCount")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<decimal>("RepostCount")
+                        .HasColumnType("numeric(20,0)");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("text");
@@ -155,13 +158,13 @@ namespace PostService.Infrastructure.Migrations
             modelBuilder.Entity("PostService.Domain.Entities.Comment", b =>
                 {
                     b.HasOne("PostService.Domain.Entities.Post", "Post")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PostService.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -174,13 +177,13 @@ namespace PostService.Infrastructure.Migrations
             modelBuilder.Entity("PostService.Domain.Entities.CommentLike", b =>
                 {
                     b.HasOne("PostService.Domain.Entities.Comment", "Comment")
-                        .WithMany()
+                        .WithMany("Likes")
                         .HasForeignKey("CommentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PostService.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("CommentLikes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -193,7 +196,7 @@ namespace PostService.Infrastructure.Migrations
             modelBuilder.Entity("PostService.Domain.Entities.Post", b =>
                 {
                     b.HasOne("PostService.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Posts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -204,13 +207,13 @@ namespace PostService.Infrastructure.Migrations
             modelBuilder.Entity("PostService.Domain.Entities.PostLike", b =>
                 {
                     b.HasOne("PostService.Domain.Entities.Post", "Post")
-                        .WithMany()
+                        .WithMany("Likes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PostService.Domain.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("PostLikes")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -218,6 +221,29 @@ namespace PostService.Infrastructure.Migrations
                     b.Navigation("Post");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PostService.Domain.Entities.Comment", b =>
+                {
+                    b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("PostService.Domain.Entities.Post", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("PostService.Domain.Entities.User", b =>
+                {
+                    b.Navigation("CommentLikes");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("PostLikes");
+
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

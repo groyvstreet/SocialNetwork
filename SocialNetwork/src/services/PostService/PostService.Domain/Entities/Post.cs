@@ -1,4 +1,6 @@
-﻿namespace PostService.Domain.Entities
+using System.Text.Json.Serialization;
+
+namespace PostService.Domain.Entities
 {
     public class Post
     {
@@ -12,12 +14,17 @@
 
         public ulong LikeCount { get; set; }
 
+        public ulong RepostCount { get; set; }
+
+        [JsonIgnore]
         public User User { get; set; }
 
         public Guid UserId { get; set; }
 
+        [JsonIgnore]
         public List<Comment> Comments { get; set; }
 
+        [JsonIgnore]
         public List<PostLike> Likes { get; set; }
     }
 }

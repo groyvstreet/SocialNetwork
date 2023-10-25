@@ -1,6 +1,7 @@
 ﻿using ChatService.Application.Interfaces.Repositories;
 using ChatService.Domain.Entities;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace ChatService.Infrastructure.Repositories
 {
@@ -86,6 +87,21 @@ namespace ChatService.Infrastructure.Repositories
             var messageIndex = chat.Messages.FindIndex(m => m.Id == messageId);
             var update = _updateDefinitionBuilder.Set(d => d.Messages[messageIndex].Text, text);
             await _collection.UpdateOneAsync(c => c.Id == chatId, update);
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            var update = _updateDefinitionBuilder.Set(c => c.Users.FirstMatchingElement().FirstName, user.FirstName)
+                .Set(c => c.Users.FirstMatchingElement().LastName, user.LastName)
+                .Set(c => c.Users.FirstMatchingElement().Image, user.Image);
+            await _collection.UpdateManyAsync(c => c.Users.Any(u => u.Id == user.Id), update);
+        }
+
+        public async Task RemoveUserAsync(User user)
+        {
+            var filter = _filterDefinitionBuilder.Empty;
+            var update = _updateDefinitionBuilder.PullFilter(c => c.Users, u => u.Id == user.Id);
+            await _collection.UpdateManyAsync(filter, update);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ChatService.Application.DTOs.MessageDTOs
+namespace ChatService.Application.DTOs.MessageDTOs
 {
     public class AddDialogMessageDTO
     {
@@ -9,5 +9,7 @@
         public Guid ReceiverId { get; set; }
 
         public DateTimeOffset? DateTime { get; set; }
+      
+        public Guid? PostId { get; set; }
     }
 }

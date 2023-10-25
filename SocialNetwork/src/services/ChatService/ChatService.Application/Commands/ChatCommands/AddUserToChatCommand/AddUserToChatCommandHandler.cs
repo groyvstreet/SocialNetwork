@@ -13,16 +13,19 @@ namespace ChatService.Application.Commands.ChatCommands.AddUserToChatCommand
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
         private readonly IChatNotificationService _chatNotificationService;
+        private readonly ICacheRepository<User> _userCacheRepository;
 
         public AddUserToChatCommandHandler(IMapper mapper,
                                            IChatRepository chatRepository,
                                            IUserRepository userRepository,
-                                           IChatNotificationService chatNotificationService)
+                                           IChatNotificationService chatNotificationService,
+                                           ICacheRepository<User> userCacheRepository)
         {
             _mapper = mapper;
             _chatRepository = chatRepository;
             _userRepository = userRepository;
             _chatNotificationService = chatNotificationService;
+            _userCacheRepository = userCacheRepository;
         }
 
         public async Task<Unit> Handle(AddUserToChatCommand request, CancellationToken cancellationToken)
@@ -41,11 +44,18 @@ namespace ChatService.Application.Commands.ChatCommands.AddUserToChatCommand
                 throw new NotFoundException($"no such chat with id = {DTO.ChatId}");
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+            var user = await _userCacheRepository.GetAsync(DTO.UserId.ToString());
 
             if (user is null)
             {
-                throw new NotFoundException($"no such user with id = {DTO.UserId}");
+                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+
+                if (user is null)
+                {
+                    throw new NotFoundException($"no such user with id = {DTO.UserId}");
+                }
+
+                await _userCacheRepository.SetAsync(user.Id.ToString(), user);
             }
 
             if (!chat.Users.Any(u => u.Id == DTO.UserId))
@@ -53,11 +63,18 @@ namespace ChatService.Application.Commands.ChatCommands.AddUserToChatCommand
                 throw new ForbiddenException($"no such user with id = {DTO.UserId} in chat with id = {DTO.ChatId}");
             }
 
-            var invitedUser = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.InvitedUserId);
+            var invitedUser = await _userCacheRepository.GetAsync(DTO.InvitedUserId.ToString());
 
             if (invitedUser is null)
             {
-                throw new NotFoundException($"no such user with id = {DTO.InvitedUserId}");
+                invitedUser = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.InvitedUserId);
+
+                if (invitedUser is null)
+                {
+                    throw new NotFoundException($"no such user with id = {DTO.InvitedUserId}");
+                }
+
+                await _userCacheRepository.SetAsync(invitedUser.Id.ToString(), invitedUser);
             }
 
             var chatUser = _mapper.Map<ChatUser>(invitedUser);

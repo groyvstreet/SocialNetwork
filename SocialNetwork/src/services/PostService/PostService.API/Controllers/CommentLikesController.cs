@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PostService.API.Extensions;
 using PostService.Application.DTOs.CommentLikeDTOs;
 using PostService.Application.Interfaces.CommentLikeInterfaces;
 
 namespace PostService.API.Controllers
 {
     [Route("api/comment-likes")]
+    [Authorize]
     [ApiController]
     public class CommentLikesController : ControllerBase
     {
@@ -18,7 +21,7 @@ namespace PostService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCommentLikeAsync([FromBody] AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
-            var commentLike = await _commentLikeService.AddCommentLikeAsync(addRemoveCommentLikeDTO);
+            var commentLike = await _commentLikeService.AddCommentLikeAsync(addRemoveCommentLikeDTO, User.AuthenticatedUserId());
 
             return Ok(commentLike);
         }
@@ -26,7 +29,7 @@ namespace PostService.API.Controllers
         [HttpDelete]
         public async Task<IActionResult> RemoveCommentLikeAsync([FromBody] AddRemoveCommentLikeDTO addRemoveCommentLikeDTO)
         {
-            await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO);
+            await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO, User.AuthenticatedUserId());
 
             return NoContent();
         }
