@@ -49,7 +49,7 @@ namespace PostService.Application.Services
 
             if (comment is null)
             {
-                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == commentId);
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == commentId);
 
                 if (comment is null)
                 {
@@ -74,7 +74,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == postId);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == postId);
 
                 if (post is null)
                 {
