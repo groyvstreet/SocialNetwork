@@ -54,7 +54,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == id);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == id);
 
                 if (post is null)
                 {
@@ -93,7 +93,7 @@ namespace PostService.Application.Services
 
             if (user is null)
             {
-                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == userId);
+                user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == userId);
 
                 if (user is null)
                 {
@@ -123,7 +123,7 @@ namespace PostService.Application.Services
 
             if (user is null)
             {
-                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addPostDTO.UserId);
+                user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == addPostDTO.UserId);
 
                 if (user is null)
                 {
@@ -152,7 +152,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == updatePostDTO.Id);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == updatePostDTO.Id);
 
                 if (post is null)
                 {
@@ -188,7 +188,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == id);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == id);
 
                 if (post is null)
                 {
