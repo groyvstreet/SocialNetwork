@@ -48,6 +48,15 @@ services:
     depends_on:
       - zookeeper
 
+  nginx:
+    build:
+      context: .
+      dockerfile: /nginx/Dockerfile
+    depends_on:
+      - identity-service-app
+      - post-service-app
+      - chat-service-app
+
   elk:
     image: sebp/elk
 
