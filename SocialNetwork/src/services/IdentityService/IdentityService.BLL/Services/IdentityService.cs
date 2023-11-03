@@ -6,7 +6,9 @@ using IdentityService.BLL.Interfaces;
 using IdentityService.DAL.Data;
 using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace IdentityService.BLL.Services
 {
@@ -16,16 +18,19 @@ namespace IdentityService.BLL.Services
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
         private readonly IKafkaProducerService<RequestOperation, GetUserDTO> _kafkaProducerService;
+        private readonly ILogger<IdentityService> _logger;
 
         public IdentityService(IMapper mapper,
                                IUserRepository userRepository,
                                ITokenService tokenService,
-                               IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService)
+                               IKafkaProducerService<RequestOperation, GetUserDTO> kafkaProducerService,
+                               ILogger<IdentityService> logger)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _tokenService = tokenService;
             _kafkaProducerService = kafkaProducerService;
+            _logger = logger;
         }
 
         public async Task<GetUserDTO> SignUpAsync(AddUserDTO addUserDTO)
@@ -43,6 +48,8 @@ namespace IdentityService.BLL.Services
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
             
             await _kafkaProducerService.SendUserRequestAsync(RequestOperation.Create, getUserDTO);
+
+            _logger.LogInformation("user - {user} added", JsonSerializer.Serialize(getUserDTO));
 
             return getUserDTO;
         }

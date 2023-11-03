@@ -13,10 +13,5 @@ namespace PostService.Infrastructure.Repositories
         {
             return await _context.Users.AsNoTracking().Include(u => u.Posts).FirstOrDefaultAsync(u => u.Id == id);
         }
-
-        public void Update(User user)
-        {
-            _context.Users.Update(user);
-        }
     }
 }

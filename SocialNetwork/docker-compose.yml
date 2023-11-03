@@ -8,6 +8,8 @@ services:
     depends_on:
       - postgresql-db
       - kafka
+      - elk
+      - post-redis
 
   postgresql-db:
     image: postgres:latest
@@ -19,6 +21,8 @@ services:
     depends_on:
       - mssqlserver-db
       - kafka
+      - elk
+      - identity-redis
 
   mssqlserver-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -30,6 +34,8 @@ services:
     depends_on:
       - mongo-db
       - kafka
+      - elk
+      - chat-redis
 
   mongo-db:
     image: mongo
@@ -50,3 +56,15 @@ services:
       - identity-service-app
       - post-service-app
       - chat-service-app
+
+  elk:
+    image: sebp/elk
+
+  post-redis:
+    image: redis:latest
+
+  identity-redis:
+    image: redis:latest
+
+  chat-redis:
+    image: redis:latest

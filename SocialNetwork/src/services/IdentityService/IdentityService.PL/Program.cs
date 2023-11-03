@@ -1,6 +1,10 @@
 using IdentityService.PL.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.ConfigureLogging();
+builder.Host.UseSerilog();
 
 builder.Services.AddDatabaseConnection(builder.Configuration);
 builder.Services.AddCorsPolicy();
@@ -8,6 +12,7 @@ builder.Services.AddIdentity();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddFluentValidation();
 builder.Services.AddAutoMapper();
+builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddControllers();
