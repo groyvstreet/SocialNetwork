@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\services\PostService\PostService.Application\PostService.Application.csproj" />
+    <ProjectReference Include="..\..\src\services\PostService\PostService.Infrastructure\PostService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

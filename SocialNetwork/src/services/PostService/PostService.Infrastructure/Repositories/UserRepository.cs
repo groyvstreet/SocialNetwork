@@ -11,7 +11,7 @@ namespace PostService.Infrastructure.Repositories
 
         public async Task<User?> GetUserWithPostsByIdAsync(Guid id)
         {
-            return await _context.Users.AsNoTracking().Include(u => u.Posts).FirstOrDefaultAsync(u => u.Id == id);
+            return await _context.Users.AsNoTracking().Include(user => user.Posts).FirstOrDefaultAsync(user => user.Id == id);
         }
     }
 }

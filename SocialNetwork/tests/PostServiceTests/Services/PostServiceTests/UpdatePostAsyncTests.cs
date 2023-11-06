@@ -139,7 +139,8 @@ namespace PostServiceTests.Services.PostServiceTests
                 UserId = Guid.NewGuid()
             };
 
-            _postRepository.Setup(postRepository => postRepository.GetFirstOrDefaultByAsync(post => post.Id == updatePostDTO.Id).Result)
+            _postRepository.Setup(postRepository =>
+                postRepository.GetFirstOrDefaultByAsync(post => post.Id == updatePostDTO.Id).Result)
                 .Returns(post);
 
             await Assert.ThrowsAsync<ForbiddenException>(() => _postService.UpdatePostAsync(updatePostDTO, authenticatedUserId));

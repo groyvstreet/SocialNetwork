@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
-using IdentityService.DAL.CacheRepositories;
-using IdentityService.DAL.Entities;
 using Microsoft.Extensions.Caching.Distributed;
 using Moq;
+using PostService.Domain.Entities;
+using PostService.Infrastructure.CacheRepositories;
 using System.Text;
 
-namespace IdentityServiceTests.CacheRepositories.CacheRepositoryTests
+namespace PostServiceTests.CacheRepositories.CacheRepositoryTests
 {
     public class GetAsyncTests
     {
@@ -20,14 +20,20 @@ namespace IdentityServiceTests.CacheRepositories.CacheRepositoryTests
         public async Task GetAsyncTestReturnsNull()
         {
             await GetAsyncTestHelherReturnsNull<User>();
-            await GetAsyncTestHelherReturnsNull<RefreshToken>();
+            await GetAsyncTestHelherReturnsNull<Post>();
+            await GetAsyncTestHelherReturnsNull<Comment>();
+            await GetAsyncTestHelherReturnsNull<PostLike>();
+            await GetAsyncTestHelherReturnsNull<CommentLike>();
         }
 
         [Fact]
         public async Task GetAsyncTestReturnsNotNull()
         {
             await GetAsyncTestHelperReturnsNotNull<User>();
-            await GetAsyncTestHelperReturnsNotNull<RefreshToken>();
+            await GetAsyncTestHelperReturnsNotNull<Post>();
+            await GetAsyncTestHelperReturnsNotNull<Comment>();
+            await GetAsyncTestHelperReturnsNotNull<PostLike>();
+            await GetAsyncTestHelperReturnsNotNull<CommentLike>();
         }
 
         private async Task GetAsyncTestHelherReturnsNull<T>() where T : class

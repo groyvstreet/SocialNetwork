@@ -1,4 +1,6 @@
-﻿using IdentityService.DAL.Entities;
+﻿using FluentAssertions;
+using FluentAssertions.Execution;
+using IdentityService.DAL.Entities;
 using IdentityService.DAL.Interfaces;
 using IdentityService.DAL.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +32,7 @@ namespace IdentityServiceTests.Repositories.UserRepositoryTests
 
             var user = await _userRepository.GetUserByEmailAndPasswordAsync(email, password);
 
-            Assert.Null(user);
+            user.Should().BeNull();
         }
 
         [Fact]
@@ -47,7 +49,7 @@ namespace IdentityServiceTests.Repositories.UserRepositoryTests
 
             var user = await _userRepository.GetUserByEmailAndPasswordAsync(email, password);
 
-            Assert.Null(user);
+            user.Should().BeNull();
         }
 
         [Fact]
@@ -65,8 +67,11 @@ namespace IdentityServiceTests.Repositories.UserRepositoryTests
 
             var resultUser = await _userRepository.GetUserByEmailAndPasswordAsync(email, password);
 
-            Assert.NotNull(resultUser);
-            Assert.Equal(email, resultUser.Email);
+            using (new AssertionScope())
+            {
+                resultUser.Should().NotBeNull();
+                resultUser?.Email.Should().Be(email);
+            }
         }
     }
 }

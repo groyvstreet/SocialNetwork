@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using IdentityService.BLL;
 using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Exceptions;
@@ -67,11 +69,14 @@ namespace IdentityServiceTests.Services.IdentitySeviceTests
 
             var resultUser = await _identityService.SignUpAsync(addUserDTO);
 
-            Assert.Equal(addUserDTO.Email, resultUser.Email);
-            Assert.Equal(addUserDTO.FirstName, resultUser.FirstName);
-            Assert.Equal(addUserDTO.LastName, resultUser.LastName);
-            Assert.Equal(addUserDTO.BirthDate, resultUser.BirthDate);
-            Assert.Equal(string.Empty, resultUser.Image);
+            using (new AssertionScope())
+            {
+                resultUser.Email.Should().Be(addUserDTO.Email);
+                resultUser.FirstName.Should().Be(addUserDTO.FirstName);
+                resultUser.LastName.Should().Be(addUserDTO.LastName);
+                resultUser.BirthDate.Should().Be(addUserDTO.BirthDate);
+                resultUser.Image.Should().BeEmpty();
+            }
         }
 
         private static User MapToUser(AddUserDTO addUserDTO)

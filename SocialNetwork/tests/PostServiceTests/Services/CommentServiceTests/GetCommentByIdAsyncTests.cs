@@ -84,7 +84,8 @@ namespace PostServiceTests.Services.CommentServiceTests
             var id = Guid.NewGuid();
             var comment = new Comment { Id = id };
 
-            _commentRepository.Setup(commentRepository => commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == id).Result)
+            _commentRepository.Setup(commentRepository =>
+                commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == id).Result)
                 .Returns(comment);
 
             _mapper.Setup(mapper => mapper.Map<GetCommentDTO>(It.IsAny<Comment>()))

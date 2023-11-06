@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using IdentityService.BLL;
 using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Exceptions;
@@ -65,7 +67,9 @@ namespace IdentityServiceTests.Services.UserServiceTests
         [InlineData("1", "1", Roles.Admin)]
         [InlineData("1", "2", Roles.Admin)]
         [InlineData("1", "1", Roles.User)]
-        public async Task UpdateUserAsyncTestWithGettingUserFromCache(string id, string authenticatedUserId, string authenticatedUserRole)
+        public async Task UpdateUserAsyncTestWithGettingUserFromCache(string id,
+            string authenticatedUserId,
+            string authenticatedUserRole)
         {
             var user = new User { Id = id };
 
@@ -86,11 +90,14 @@ namespace IdentityServiceTests.Services.UserServiceTests
 
             var resultUser = await _userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
 
-            Assert.Equal(updateUserDTO.Id, resultUser.Id);
-            Assert.Equal(updateUserDTO.FirstName, resultUser.FirstName);
-            Assert.Equal(updateUserDTO.LastName, resultUser.LastName);
-            Assert.Equal(updateUserDTO.BirthDate, resultUser.BirthDate);
-            Assert.Equal(updateUserDTO.Image, resultUser.Image);
+            using (new AssertionScope())
+            {
+                resultUser.Id.Should().Be(updateUserDTO.Id);
+                resultUser.FirstName.Should().Be(updateUserDTO.FirstName);
+                resultUser.LastName.Should().Be(updateUserDTO.LastName);
+                resultUser.BirthDate.Should().Be(updateUserDTO.BirthDate);
+                resultUser.Image.Should().Be(updateUserDTO.Image);
+            }
         }
 
         [Theory]
@@ -120,11 +127,14 @@ namespace IdentityServiceTests.Services.UserServiceTests
 
             var resultUser = await _userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
 
-            Assert.Equal(updateUserDTO.Id, resultUser.Id);
-            Assert.Equal(updateUserDTO.FirstName, resultUser.FirstName);
-            Assert.Equal(updateUserDTO.LastName, resultUser.LastName);
-            Assert.Equal(updateUserDTO.BirthDate, resultUser.BirthDate);
-            Assert.Equal(updateUserDTO.Image, resultUser.Image);
+            using (new AssertionScope())
+            {
+                resultUser.Id.Should().Be(updateUserDTO.Id);
+                resultUser.FirstName.Should().Be(updateUserDTO.FirstName);
+                resultUser.LastName.Should().Be(updateUserDTO.LastName);
+                resultUser.BirthDate.Should().Be(updateUserDTO.BirthDate);
+                resultUser.Image.Should().Be(updateUserDTO.Image);
+            }
         }
 
         private static GetUserDTO Map(User user)

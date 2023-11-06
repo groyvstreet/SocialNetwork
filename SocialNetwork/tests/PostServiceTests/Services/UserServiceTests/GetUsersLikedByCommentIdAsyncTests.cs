@@ -61,7 +61,8 @@ namespace PostServiceTests.Services.UserServiceTests
 
             await _userService.GetUsersLikedByCommentIdAsync(id);
 
-            _commentRepository.Verify(commentRepository => commentRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Comment, bool>>>()), Times.Never);
+            _commentRepository.Verify(commentRepository =>
+                commentRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Comment, bool>>>()), Times.Never);
         }
 
         [Fact]

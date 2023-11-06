@@ -1,4 +1,5 @@
-﻿using IdentityService.BLL;
+﻿using FluentAssertions;
+using IdentityService.BLL;
 using IdentityService.BLL.Interfaces;
 using IdentityService.BLL.Services;
 using IdentityService.DAL.Entities;
@@ -40,7 +41,7 @@ namespace IdentityServiceTests.Services.TokenServiceTests
             _refreshTokenRepository.Verify(refreshTokenRepository => refreshTokenRepository.Remove(It.IsAny<RefreshToken>()),
                 Times.Never);
 
-            Assert.NotEmpty(refreshToken);
+            refreshToken.Should().NotBeEmpty();
         }
 
         [Fact]
@@ -62,7 +63,7 @@ namespace IdentityServiceTests.Services.TokenServiceTests
             _refreshTokenRepository.Verify(refreshTokenRepository => refreshTokenRepository.Remove(It.IsAny<RefreshToken>()),
                 Times.Once);
 
-            Assert.NotEmpty(refreshToken);
+            refreshToken.Should().NotBeEmpty();
         }
     }
 }

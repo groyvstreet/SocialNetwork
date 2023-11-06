@@ -61,7 +61,8 @@ namespace PostServiceTests.Services.UserServiceTests
 
             await _userService.GetUsersLikedByPostIdAsync(id);
 
-            _postRepository.Verify(postRepository => postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
+            _postRepository.Verify(postRepository =>
+                postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
         }
 
         [Fact]

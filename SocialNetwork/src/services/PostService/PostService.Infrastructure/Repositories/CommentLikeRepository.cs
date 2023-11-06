@@ -11,12 +11,18 @@ namespace PostService.Infrastructure.Repositories
 
         public async Task<List<CommentLike>> GetCommentLikesWithCommentByUserIdAsync(Guid userId)
         {
-            return await _context.CommentLikes.AsNoTracking().Include(cl => cl.Comment).Where(cl => cl.UserId == userId).ToListAsync();
+            return await _context.CommentLikes.AsNoTracking()
+                .Include(commentLike => commentLike.Comment)
+                .Where(commentLike => commentLike.UserId == userId)
+                .ToListAsync();
         }
 
         public async Task<List<CommentLike>> GetCommentLikesWithUserByCommentIdAsync(Guid commentId)
         {
-            return await _context.CommentLikes.AsNoTracking().Include(cl => cl.User).Where(cl => cl.CommentId == commentId).ToListAsync();
+            return await _context.CommentLikes.AsNoTracking()
+                .Include(commentLike => commentLike.User)
+                .Where(commentLike => commentLike.CommentId == commentId)
+                .ToListAsync();
         }
     }
 }

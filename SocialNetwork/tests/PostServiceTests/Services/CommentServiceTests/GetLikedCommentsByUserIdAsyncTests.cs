@@ -9,8 +9,6 @@ using PostService.Application.Services;
 using PostService.Domain.Entities;
 using PostService.Application.Interfaces.UserInterfaces;
 using PostService.Application.Exceptions;
-using FluentAssertions;
-using PostService.Application.DTOs.CommentDTOs;
 
 namespace PostServiceTests.Services.CommentServiceTests
 {

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using IdentityService.BLL;
 using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Interfaces;
@@ -66,9 +68,12 @@ namespace IdentityServiceTests.Services.IdentitySeviceTests
 
             var response = await _identityService.SignInAsync(email, password);
 
-            Assert.NotEmpty(response.AccessToken);
-            Assert.NotEmpty(response.RefreshToken);
-            Assert.NotSame(response.AccessToken, response.RefreshToken);
+            using (new AssertionScope())
+            {
+                response.AccessToken.Should().NotBeNullOrEmpty();
+                response.RefreshToken.Should().NotBeNullOrEmpty();
+                response.RefreshToken.Should().NotBeEquivalentTo(response.AccessToken);
+            }
         }
     }
 }

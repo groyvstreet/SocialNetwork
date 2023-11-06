@@ -52,7 +52,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == addPostLikeDTO.PostId);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == addPostLikeDTO.PostId);
 
                 if (post is null)
                 {
@@ -68,7 +68,7 @@ namespace PostService.Application.Services
 
             if (user is null)
             {
-                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addPostLikeDTO.UserId);
+                user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == addPostLikeDTO.UserId);
 
                 if (user is null)
                 {
@@ -123,8 +123,8 @@ namespace PostService.Application.Services
 
             if (postLike is null)
             {
-                postLike = await _postLikeRepository.GetFirstOrDefaultByAsync(pl =>
-                    pl.PostId == addRemovePostLikeDTO.PostId && pl.UserId == addRemovePostLikeDTO.UserId);
+                postLike = await _postLikeRepository.GetFirstOrDefaultByAsync(postLike =>
+                    postLike.PostId == addRemovePostLikeDTO.PostId && postLike.UserId == addRemovePostLikeDTO.UserId);
 
                 if (postLike is null)
                 {
@@ -141,7 +141,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == postLike.PostId);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == postLike.PostId);
             }
             else
             {

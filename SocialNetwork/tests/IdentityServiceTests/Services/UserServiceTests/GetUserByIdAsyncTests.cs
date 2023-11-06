@@ -1,4 +1,5 @@
 using AutoMapper;
+using FluentAssertions;
 using IdentityService.BLL;
 using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Exceptions;
@@ -51,7 +52,7 @@ namespace IdentityServiceTests.Services.UserServiceTests
 
             var resultUser = await _userService.GetUserByIdAsync(id);
 
-            Assert.Equal(id, resultUser.Id);
+            resultUser.Id.Should().Be(id);
         }
 
         [Fact]
@@ -70,7 +71,7 @@ namespace IdentityServiceTests.Services.UserServiceTests
 
             var resultUser = await _userService.GetUserByIdAsync(id);
 
-            Assert.Equal(id, resultUser.Id);
+            resultUser.Id.Should().Be(id);
         }
 
         [Fact]

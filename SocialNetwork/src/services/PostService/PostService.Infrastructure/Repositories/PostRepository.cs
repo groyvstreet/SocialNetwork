@@ -11,7 +11,7 @@ namespace PostService.Infrastructure.Repositories
 
         public async Task<Post?> GetPostWithCommentsByIdAsync(Guid id)
         {
-            return await _context.Posts.AsNoTracking().Include(p => p.Comments).FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Posts.AsNoTracking().Include(post => post.Comments).FirstOrDefaultAsync(post => post.Id == id);
         }
     }
 }
