@@ -28,7 +28,7 @@ namespace ChatService.Application.Queries.ChatQueries.GetChatsQuery
                 throw new ForbiddenException("forbidden");
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == request.UserId);
+            var user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == request.UserId);
 
             if (user is null)
             {

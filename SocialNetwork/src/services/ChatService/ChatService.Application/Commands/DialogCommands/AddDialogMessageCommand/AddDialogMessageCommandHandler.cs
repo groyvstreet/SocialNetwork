@@ -50,7 +50,7 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
 
             if (sender is null)
             {
-                sender = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.SenderId);
+                sender = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.SenderId);
 
                 if (sender is null)
                 {
@@ -64,7 +64,7 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
 
             if (receiver is null)
             {
-                receiver = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.ReceiverId);
+                receiver = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.ReceiverId);
 
                 if (receiver is null)
                 {
@@ -88,7 +88,7 @@ namespace ChatService.Application.Commands.DialogCommands.AddDialogMessageComman
         
         public async Task AddDialogMessageAsync(AddDialogMessageDTO DTO)
         {
-            var sender = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.SenderId);
+            var sender = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.SenderId);
 
             if (sender is null)
             {

@@ -57,7 +57,7 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
 
             if (user is null)
             {
-                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+                user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.UserId);
 
                 if (user is null)
                 {
@@ -86,14 +86,14 @@ namespace ChatService.Application.Commands.ChatCommands.AddChatMessageCommand
 
         public async Task AddChatMessageAsync(AddChatMessageDTO DTO)
         {
-            var chat = await _chatRepository.GetFirstOrDefaultByAsync(c => c.Id == DTO.ChatId);
+            var chat = await _chatRepository.GetFirstOrDefaultByAsync(chat => chat.Id == DTO.ChatId);
 
             if (chat is null)
             {
                 return;
             }
 
-            var user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == DTO.UserId);
+            var user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == DTO.UserId);
 
             if (user is null)
             {
