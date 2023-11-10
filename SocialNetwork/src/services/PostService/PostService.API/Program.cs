@@ -3,7 +3,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel();
+builder.WebHost.ConfigureKestrel(builder.Configuration);
 
 builder.Configuration.ConfigureLogging();
 builder.Host.UseSerilog();

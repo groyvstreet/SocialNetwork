@@ -32,5 +32,9 @@
     <ProjectReference Include="..\IdentityService.BLL\IdentityService.BLL.csproj" />
     <ProjectReference Include="..\IdentityService.DAL\IdentityService.DAL.csproj" />
   </ItemGroup>
+	
+  <ItemGroup>
+	  <InternalsVisibleTo Include="IdentityServiceIntegrationTests"/>
+  </ItemGroup>
 
 </Project>
