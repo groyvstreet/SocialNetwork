@@ -1,22 +1,20 @@
 ﻿using DotNet.Testcontainers.Builders;
 using FluentAssertions;
-using FluentAssertions.Execution;
-using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.DAL.Entities;
 using IdentityServiceIntegrationTests.FakeDataGenerators;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
-using System.Text.Json;
 using Testcontainers.Redis;
 
-namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
+namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
 {
-    public class GetUserByIdAsyncTests
+    public class SignInAsyncTests
     {
         private readonly HttpClient _httpClient;
+        private readonly FakeUsersGenerator _fakeUsersGenerator;
 
-        public GetUserByIdAsyncTests()
+        public SignInAsyncTests()
         {
             var msSqlServerContainer = new ContainerBuilder()
                 .WithName(Guid.NewGuid().ToString("N"))
@@ -40,40 +38,31 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
             var scope = factory.Services.CreateScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-            var fakeUsersGenerator = new FakeUsersGenerator();
-            fakeUsersGenerator.InitializeData();
-            fakeUsersGenerator.Users.ForEach(user => userManager.CreateAsync(user, "string").Wait());
+            _fakeUsersGenerator = new FakeUsersGenerator();
+            _fakeUsersGenerator.InitializeData();
+            _fakeUsersGenerator.Users.ForEach(user => userManager.CreateAsync(user, "string").Wait());
 
             _httpClient = factory.CreateClient();
         }
 
         [Fact]
-        public async Task GetUserByIdAsyncTestReturnsHttpOK()
+        public async Task SignInAsyncTestReturnsOK()
         {
-            var userId = "5";
+            var user = _fakeUsersGenerator.Users.First();
 
-            var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/users/{userId}");
+            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
             var response = await _httpClient.SendAsync(request);
-
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                var userJson = await response.Content.ReadAsStringAsync();
-                var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var user = JsonSerializer.Deserialize<GetUserDTO>(userJson, jsonSerializerOptions)!;
-                user.Id.Should().Be(userId);
-            }
+            
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
-        public async Task GetUserByIdAsyncTestReturnsHttpNotFound()
+        public async Task SignInAsyncTestReturnsUnauthorized()
         {
-            var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/users/{Guid.NewGuid()}");
-
+            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={Guid.NewGuid()}&password=string");
             var response = await _httpClient.SendAsync(request);
 
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
     }
 }
