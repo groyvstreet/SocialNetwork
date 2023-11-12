@@ -56,7 +56,7 @@ namespace IdentityService.PL.Controllers
 
             await _userService.RemoveUserByIdAsync(id, authenticatedUserId, authenticatedUserRole);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

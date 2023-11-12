@@ -5,6 +5,7 @@ using IdentityServiceIntegrationTests.FakeDataGenerators;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
+using Testcontainers.Kafka;
 using Testcontainers.Redis;
 
 namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
@@ -32,8 +33,13 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var redisContainerTask = redisContainer.StartAsync();
             redisContainerTask.Wait();
 
+            var kafkaContainer = new KafkaBuilder().Build();
+            var kafkaContainerTask = kafkaContainer.StartAsync();
+            kafkaContainerTask.Wait();
+
             var factory = new CustomWebApplicationFactory<Program>(msSqlServerContainer.GetMappedPublicPort(1433),
-                redisContainer.GetConnectionString());
+                redisContainer.GetConnectionString(),
+                kafkaContainer.GetBootstrapAddress());
 
             var scope = factory.Services.CreateScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -59,7 +65,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
         [Fact]
         public async Task SignInAsyncTestReturnsUnauthorized()
         {
-            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={Guid.NewGuid()}&password=string");
+            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email=string&password=string");
             var response = await _httpClient.SendAsync(request);
 
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

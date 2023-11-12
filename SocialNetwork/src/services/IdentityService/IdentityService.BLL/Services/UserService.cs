@@ -85,6 +85,7 @@ namespace IdentityService.BLL.Services
 
             user.FirstName = updateUserDTO.FirstName;
             user.LastName = updateUserDTO.LastName;
+            user.Image = updateUserDTO.Image;
             user.BirthDate = updateUserDTO.BirthDate.ToDateTime(TimeOnly.MinValue);
             await _userRepository.UpdateUserAsync(user);
             var getUserDTO = _mapper.Map<GetUserDTO>(user);

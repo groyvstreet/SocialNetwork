@@ -1,4 +1,6 @@
-﻿using IdentityService.DAL.Data;
+﻿using IdentityService.BLL;
+using IdentityService.BLL.DTOs.UserDTOs;
+using IdentityService.DAL.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -11,11 +13,13 @@ namespace IdentityServiceIntegrationTests
     {
         private readonly ushort _msSqlServerPort;
         private readonly string _redis;
+        private readonly string _bootstrapAddress;
 
-        public CustomWebApplicationFactory(ushort msSqlServerPort, string redis)
+        public CustomWebApplicationFactory(ushort msSqlServerPort, string redis, string bootstrapAddress)
         {
             _msSqlServerPort = msSqlServerPort;
             _redis = redis;
+            _bootstrapAddress = bootstrapAddress;
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -37,6 +41,12 @@ namespace IdentityServiceIntegrationTests
                 services.AddStackExchangeRedisCache(redisCacheOptions =>
                 {
                     redisCacheOptions.Configuration = _redis;
+                });
+
+                services.Configure<KafkaProducerConfig<RequestOperation, GetUserDTO>>(kafkaOptions =>
+                {
+                    kafkaOptions.BootstrapServers = _bootstrapAddress;
+                    kafkaOptions.Topic = "users";
                 });
             });
         }

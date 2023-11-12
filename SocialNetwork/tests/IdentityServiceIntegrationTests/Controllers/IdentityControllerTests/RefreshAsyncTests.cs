@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Text.Json;
+using Testcontainers.Kafka;
 using Testcontainers.Redis;
 
 namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
@@ -33,8 +34,13 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var redisContainerTask = redisContainer.StartAsync();
             redisContainerTask.Wait();
 
+            var kafkaContainer = new KafkaBuilder().Build();
+            var kafkaContainerTask = kafkaContainer.StartAsync();
+            kafkaContainerTask.Wait();
+
             var factory = new CustomWebApplicationFactory<Program>(msSqlServerContainer.GetMappedPublicPort(1433),
-                redisContainer.GetConnectionString());
+                redisContainer.GetConnectionString(),
+                kafkaContainer.GetBootstrapAddress());
 
             var scope = factory.Services.CreateScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -63,7 +69,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
         }
 
         [Fact]
-        public async Task RefreshAsyncTestReturnsAccessTokenNotFound()
+        public async Task RefreshAsyncTestReturnsInternalServerErrorWithInvalidAccessToken()
         {
             var user = _fakeUsersGenerator.Users.First();
 
@@ -71,15 +77,16 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var response = await _httpClient.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
             var token = JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
+            token["accessToken"] = "invalid token";
 
-            request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/refresh?accessToken={token["accessToken"]}&refreshToken={Guid.NewGuid()}");
+            request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/refresh?accessToken={token["accessToken"]}&refreshToken={token["refreshToken"]}");
             response = await _httpClient.SendAsync(request);
 
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
 
         [Fact]
-        public async Task RefreshAsyncTestReturnsRefreshTokenNotFound()
+        public async Task RefreshAsyncTestReturnsUnauthorizedWithInvalidRefreshToken()
         {
             var user = _fakeUsersGenerator.Users.First();
 
@@ -87,11 +94,12 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var response = await _httpClient.SendAsync(request);
             var json = await response.Content.ReadAsStringAsync();
             var token = JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
+            token["refreshToken"] = "invalid token";
 
-            request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/refresh?accessToken={Guid.NewGuid()}&refreshToken={Guid.NewGuid()}");
+            request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/refresh?accessToken={token["accessToken"]}&refreshToken={token["refreshToken"]}");
             response = await _httpClient.SendAsync(request);
 
-            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
     }
 }

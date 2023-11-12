@@ -27,6 +27,7 @@ namespace IdentityService.PL.Middlewares
                     ForbiddenException => 403,
                     SecurityTokenExpiredException => 401,
                     SecurityTokenException => 401,
+                    UnauthorizedAccessException => 401,
                     _ => 500,
                 };
                 context.Response.Headers.ContentType = "text/json; charset=utf-8";

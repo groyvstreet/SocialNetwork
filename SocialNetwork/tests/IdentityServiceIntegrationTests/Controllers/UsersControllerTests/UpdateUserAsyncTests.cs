@@ -10,6 +10,7 @@ using System.Text.Json;
 using Testcontainers.Redis;
 using System.Text;
 using IdentityService.BLL.DTOs.UserDTOs;
+using Testcontainers.Kafka;
 
 namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
 {
@@ -36,8 +37,13 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
             var redisContainerTask = redisContainer.StartAsync();
             redisContainerTask.Wait();
 
+            var kafkaContainer = new KafkaBuilder().Build();
+            var kafkaContainerTask = kafkaContainer.StartAsync();
+            kafkaContainerTask.Wait();
+
             var factory = new CustomWebApplicationFactory<Program>(msSqlServerContainer.GetMappedPublicPort(1433),
-                redisContainer.GetConnectionString());
+                redisContainer.GetConnectionString(),
+                kafkaContainer.GetBootstrapAddress());
 
             var scope = factory.Services.CreateScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();

@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Text;
 using Testcontainers.Redis;
 using FluentAssertions;
+using Testcontainers.Kafka;
 
 namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
 {
@@ -37,8 +38,13 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var redisContainerTask = redisContainer.StartAsync();
             redisContainerTask.Wait();
 
+            var kafkaContainer = new KafkaBuilder().Build();
+            var kafkaContainerTask = kafkaContainer.StartAsync();
+            kafkaContainerTask.Wait();
+
             var factory = new CustomWebApplicationFactory<Program>(msSqlServerContainer.GetMappedPublicPort(1433),
-                redisContainer.GetConnectionString());
+                redisContainer.GetConnectionString(),
+                kafkaContainer.GetBootstrapAddress());
 
             var scope = factory.Services.CreateScope();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
@@ -62,7 +68,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
                 BirthDate = DateOnly.FromDateTime(DateTime.Now)
             };
 
-            var request = new HttpRequestMessage(new HttpMethod("PUT"), $"/api/identity/signup");
+            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signup");
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addUserDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
@@ -74,7 +80,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
 
                 var userJson = await response.Content.ReadAsStringAsync();
                 var user = JsonSerializer.Deserialize<GetUserDTO>(userJson, jsonSerializerOptions)!;
-                user.Id.Should().Be(addUserDTO.Email);
+                user.Email.Should().Be(addUserDTO.Email);
                 user.FirstName.Should().Be(addUserDTO.FirstName);
                 user.LastName.Should().Be(addUserDTO.LastName);
                 user.Image.Should().BeEmpty();
@@ -96,7 +102,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
                 BirthDate = DateOnly.FromDateTime(DateTime.Now)
             };
 
-            var request = new HttpRequestMessage(new HttpMethod("PUT"), $"/api/identity/signup");
+            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signup");
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addUserDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
