@@ -16,7 +16,7 @@ namespace PostService.API.Controllers
 
         [HttpGet]
         [Route("/api/comments/{id}/likes/users")]
-        public async Task<IActionResult> GetUsersLikedByCommentIdIdAsync(Guid id)
+        public async Task<IActionResult> GetUsersLikedByCommentIdAsync(Guid id)
         {
             var users = await _userService.GetUsersLikedByCommentIdAsync(id);
 

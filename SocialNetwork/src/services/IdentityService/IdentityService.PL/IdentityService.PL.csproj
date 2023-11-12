@@ -34,7 +34,7 @@
   </ItemGroup>
 	
   <ItemGroup>
-	  <InternalsVisibleTo Include="IdentityServiceIntegrationTests"/>
+	<InternalsVisibleTo Include="IdentityServiceIntegrationTests"/>
   </ItemGroup>
 
 </Project>

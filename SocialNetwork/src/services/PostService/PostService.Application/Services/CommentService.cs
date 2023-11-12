@@ -157,7 +157,7 @@ namespace PostService.Application.Services
             }
 
             var comment = _mapper.Map<Comment>(addCommentDTO);
-            comment.DateTime = DateTimeOffset.Now;
+            comment.DateTime = DateTimeOffset.UtcNow;
             await _commentRepository.AddAsync(comment);
             await _commentRepository.SaveChangesAsync();
             var getCommentDTO = _mapper.Map<GetCommentDTO>(comment);

@@ -32,4 +32,8 @@
     <ProjectReference Include="..\PostService.Infrastructure\PostService.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+	<InternalsVisibleTo Include="PostServiceIntegrationTests"/>
+  </ItemGroup>
+
 </Project>

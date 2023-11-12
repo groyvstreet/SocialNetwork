@@ -134,7 +134,7 @@ namespace PostService.Application.Services
             }
 
             var post = _mapper.Map<Post>(addPostDTO);
-            post.DateTime = DateTimeOffset.Now;
+            post.DateTime = DateTimeOffset.UtcNow;
             await _postRepository.AddAsync(post);
             await _postRepository.SaveChangesAsync();
             var getPostDTO = _mapper.Map<GetPostDTO>(post);
