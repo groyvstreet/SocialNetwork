@@ -1,15 +1,12 @@
 ﻿using FluentAssertions.Execution;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using PostService.Application.DTOs.PostDTOs;
 using PostService.Infrastructure.Data;
 using PostServiceIntegrationTests.FakeDataGenerators;
 using System.Net;
-using System.Text.Json;
 using Testcontainers.Kafka;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
-using PostService.Application.DTOs.UserDTOs;
 
 namespace PostServiceIntegrationTests.Controllers.UsersControllerTests
 {

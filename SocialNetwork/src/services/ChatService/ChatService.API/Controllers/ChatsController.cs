@@ -22,7 +22,7 @@ namespace ChatService.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetChatsByUserId(Guid userId)
+        public async Task<IActionResult> GetChatsByUserIdAsync(Guid userId)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var query = new GetChatsQuery(userId, Guid.Parse(authenticatedUserId));
