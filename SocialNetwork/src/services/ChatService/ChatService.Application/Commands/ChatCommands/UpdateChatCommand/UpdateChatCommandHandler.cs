@@ -39,8 +39,7 @@ namespace ChatService.Application.Commands.ChatCommands.UpdateChatCommand
                 throw new ForbiddenException("forbidden");
             }
 
-            await _chatRepository.UpdateFieldAsync(chat, chata => chat.Name, DTO.Name);
-            await _chatRepository.UpdateFieldAsync(chat, chat => chat.Image, DTO.Image);
+            await _chatRepository.UpdateChatAsync(chat);
 
             await _chatNotificationService.UpdateChatAsync(chat, DTO);
 

@@ -1,27 +1,27 @@
-﻿using ChatService.Domain.Entities;
+﻿using ChatService.Application.DTOs.ChatDTOs;
+using ChatService.Domain.Entities;
 using ChatServiceIntegrationTests.FakeDataGenerators;
-using FluentAssertions.Execution;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text;
 using Testcontainers.Kafka;
 using Testcontainers.MongoDb;
 using Testcontainers.Redis;
-using ChatService.Application.DTOs.ChatDTOs;
 
-namespace ChatServiceIntegrationTests.Controllers.ChatsControllerTests
+namespace ChatServiceIntegrationTests.Controllers.UsersControllerTests
 {
-    public class GetChatsByUserIdAsyncTests
+    public class SetUserAsDefaultAsyncTests
     {
         private readonly HttpClient _httpClient;
         private readonly FakeUsersGenerator _fakeUsersGenerator;
         private readonly FakeMessagesGenerator _fakeMessagesGenerator;
         private readonly FakeChatsGenerator _fakeChatsGenerator;
 
-        public GetChatsByUserIdAsyncTests()
+        public SetUserAsDefaultAsyncTests()
         {
             var mongoDbContainer = new MongoDbBuilder().Build();
             var mongoDbContainerTask = mongoDbContainer.StartAsync();
@@ -72,39 +72,53 @@ namespace ChatServiceIntegrationTests.Controllers.ChatsControllerTests
         }
 
         [Fact]
-        public async Task GetChatsByUserIdAsyncTestReturnsForbidden()
+        public async Task SetUserAsDefaultAsyncTestReturnsForbidden()
         {
+            var chatId = _fakeChatsGenerator.Chats.First().Id;
             var userId = _fakeUsersGenerator.Users.First().Id;
-            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
+            var authenticatedUserId = _fakeUsersGenerator.Users.Last().Id;
+            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, authenticatedUserId.ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
 
-            var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/chats?userId={userId}");
+            var setUserAsDefaultDTO = new SetUserAsDefaultDTO
+            {
+                ChatId = chatId,
+                UserId = userId
+            };
+
+            var request = new HttpRequestMessage(new HttpMethod("DELETE"), $"/api/chats/admins/");
             request.Headers.Add("Authorization", $"Bearer {token}");
+            var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var body = JsonSerializer.Serialize(setUserAsDefaultDTO, jsonSerializerOptions);
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(request);
 
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
-        public async Task GetChatsByUserIdAsyncTestReturnsOK()
+        public async Task SetUserAsDefaultAsyncTestReturnsNoContent()
         {
+            var chatId = _fakeChatsGenerator.Chats.First().Id;
             var userId = _fakeUsersGenerator.Users.First().Id;
-            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
+            var authenticatedUserId = _fakeUsersGenerator.Users.First().Id;
+            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, authenticatedUserId.ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
 
-            var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/chats?userId={userId}");
+            var setUserAsDefaultDTO = new SetUserAsDefaultDTO
+            {
+                ChatId = chatId,
+                UserId = userId
+            };
+
+            var request = new HttpRequestMessage(new HttpMethod("DELETE"), $"/api/chats/admins/");
             request.Headers.Add("Authorization", $"Bearer {token}");
+            var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var body = JsonSerializer.Serialize(setUserAsDefaultDTO, jsonSerializerOptions);
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                var chatsJson = await response.Content.ReadAsStringAsync();
-                var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var chats = JsonSerializer.Deserialize<List<GetChatDTO>>(chatsJson, jsonSerializerOptions)!;
-                chats.Should().Contain(chat => chat.Users.Any(user => user.Id == userId));
-            }
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }

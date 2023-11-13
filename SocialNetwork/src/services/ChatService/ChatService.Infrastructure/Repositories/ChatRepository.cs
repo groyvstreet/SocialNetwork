@@ -103,5 +103,12 @@ namespace ChatService.Infrastructure.Repositories
             var update = _updateDefinitionBuilder.PullFilter(c => c.Users, u => u.Id == user.Id);
             await _collection.UpdateManyAsync(filter, update);
         }
+
+        public async Task UpdateChatAsync(Chat chat)
+        {
+            var update = _updateDefinitionBuilder.Set(currentChat => currentChat.Name, chat.Name)
+                .Set(currentChat => currentChat.Image, chat.Image);
+            await _collection.UpdateOneAsync(currentChat => currentChat.Id == chat.Id, update);
+        }
     }
 }

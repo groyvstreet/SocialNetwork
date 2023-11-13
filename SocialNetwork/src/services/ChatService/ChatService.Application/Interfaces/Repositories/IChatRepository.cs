@@ -25,5 +25,7 @@ namespace ChatService.Application.Interfaces.Repositories
         Task UpdateUserAsync(User user);
 
         Task RemoveUserAsync(User user);
+
+        Task UpdateChatAsync(Chat chat);
     }
 }

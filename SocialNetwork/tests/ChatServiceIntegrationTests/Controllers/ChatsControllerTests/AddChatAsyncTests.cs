@@ -1,6 +1,6 @@
-﻿using ChatService.Domain.Entities;
+﻿using ChatService.Application.DTOs.ChatDTOs;
+using ChatService.Domain.Entities;
 using ChatServiceIntegrationTests.FakeDataGenerators;
-using FluentAssertions.Execution;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -10,18 +10,18 @@ using System.Text.Json;
 using Testcontainers.Kafka;
 using Testcontainers.MongoDb;
 using Testcontainers.Redis;
-using ChatService.Application.DTOs.ChatDTOs;
+using System.Text;
 
 namespace ChatServiceIntegrationTests.Controllers.ChatsControllerTests
 {
-    public class GetChatsByUserIdAsyncTests
+    public class AddChatAsyncTests
     {
         private readonly HttpClient _httpClient;
         private readonly FakeUsersGenerator _fakeUsersGenerator;
         private readonly FakeMessagesGenerator _fakeMessagesGenerator;
         private readonly FakeChatsGenerator _fakeChatsGenerator;
 
-        public GetChatsByUserIdAsyncTests()
+        public AddChatAsyncTests()
         {
             var mongoDbContainer = new MongoDbBuilder().Build();
             var mongoDbContainerTask = mongoDbContainer.StartAsync();
@@ -72,39 +72,48 @@ namespace ChatServiceIntegrationTests.Controllers.ChatsControllerTests
         }
 
         [Fact]
-        public async Task GetChatsByUserIdAsyncTestReturnsForbidden()
+        public async Task AddChatAsyncTestReturnsForbidden()
         {
             var userId = _fakeUsersGenerator.Users.First().Id;
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
+            var addChatDTO = new AddChatDTO
+            {
+                Name = "name",
+                UserId = userId
+            };
 
-            var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/chats?userId={userId}");
+            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/chats/");
             request.Headers.Add("Authorization", $"Bearer {token}");
+            var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var body = JsonSerializer.Serialize(addChatDTO, jsonSerializerOptions);
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(request);
 
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
-        public async Task GetChatsByUserIdAsyncTestReturnsOK()
+        public async Task AddChatAsyncTestReturnsNoContent()
         {
             var userId = _fakeUsersGenerator.Users.First().Id;
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
 
-            var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/chats?userId={userId}");
+            var addChatDTO = new AddChatDTO
+            {
+                Name = "name",
+                UserId = userId
+            };
+
+            var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/chats/");
             request.Headers.Add("Authorization", $"Bearer {token}");
+            var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var body = JsonSerializer.Serialize(addChatDTO, jsonSerializerOptions);
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                var chatsJson = await response.Content.ReadAsStringAsync();
-                var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var chats = JsonSerializer.Deserialize<List<GetChatDTO>>(chatsJson, jsonSerializerOptions)!;
-                chats.Should().Contain(chat => chat.Users.Any(user => user.Id == userId));
-            }
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }
