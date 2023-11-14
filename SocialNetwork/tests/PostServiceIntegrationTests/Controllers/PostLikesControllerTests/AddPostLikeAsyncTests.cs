@@ -1,66 +1,15 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
-using Microsoft.Extensions.DependencyInjection;
-using PostService.Application.DTOs.PostDTOs;
 using PostService.Application.DTOs.PostLikeDTOs;
-using PostService.Infrastructure.Data;
-using PostServiceIntegrationTests.FakeDataGenerators;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using Testcontainers.Kafka;
-using Testcontainers.PostgreSql;
-using Testcontainers.Redis;
 
 namespace PostServiceIntegrationTests.Controllers.PostLikesControllerTests
 {
-    public class AddPostLikeAsyncTests
+    public class AddPostLikeAsyncTests : PostLikesControllerTests
     {
-        private readonly HttpClient _httpClient;
-        private readonly FakeUsersGenerator _fakeUsersGenerator;
-        private readonly FakePostsGenerator _fakePostsGenerator;
-        private readonly FakePostLikesGenerator _fakePostLikesGenerator;
-
-        public AddPostLikeAsyncTests()
-        {
-            var postgreSqlContainer = new PostgreSqlBuilder().Build();
-            var postgreSqlContainerTask = postgreSqlContainer.StartAsync();
-
-            var redisContainer = new RedisBuilder().Build();
-            var redisContainerTask = redisContainer.StartAsync();
-
-            var kafkaContainer = new KafkaBuilder().Build();
-            var kafkaContainerTask = kafkaContainer.StartAsync();
-
-            postgreSqlContainerTask.Wait();
-            redisContainerTask.Wait();
-            kafkaContainerTask.Wait();
-
-            var factory = new CustomWebApplicationFactory<Program>(postgreSqlContainer.GetConnectionString(),
-                redisContainer.GetConnectionString(),
-                kafkaContainer.GetBootstrapAddress());
-
-            var scope = factory.Services.CreateScope();
-            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-            _fakeUsersGenerator = new FakeUsersGenerator();
-            _fakeUsersGenerator.InitializeData();
-            dataContext.AddRange(_fakeUsersGenerator.Users);
-
-            _fakePostsGenerator = new FakePostsGenerator();
-            _fakePostsGenerator.InitializeData(_fakeUsersGenerator.Users);
-            dataContext.AddRange(_fakePostsGenerator.Posts);
-
-            _fakePostLikesGenerator = new FakePostLikesGenerator();
-            _fakePostLikesGenerator.InitializeData(_fakeUsersGenerator.Users.TakeLast(1).ToList(), _fakePostsGenerator.Posts);
-            dataContext.AddRange(_fakePostLikesGenerator.PostLikes);
-
-            dataContext.SaveChanges();
-
-            _httpClient = factory.CreateClient();
-        }
-
         [Fact]
         public async Task AddPostLikeAsyncTestReturnsUnauthorized()
         {

@@ -1,57 +1,11 @@
-﻿using FluentAssertions.Execution;
-using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using PostServiceIntegrationTests.FakeDataGenerators;
+﻿using FluentAssertions;
 using System.Net;
 using System.Security.Claims;
-using Testcontainers.Kafka;
-using Testcontainers.PostgreSql;
-using Testcontainers.Redis;
-using PostService.Infrastructure.Data;
 
 namespace PostServiceIntegrationTests.Controllers.PostsControllerTests
 {
-    public class RemovePostByIdAsyncTests
+    public class RemovePostByIdAsyncTests : PostsControllerTests
     {
-        private readonly HttpClient _httpClient;
-        private readonly FakeUsersGenerator _fakeUsersGenerator;
-        private readonly FakePostsGenerator _fakePostsGenerator;
-
-        public RemovePostByIdAsyncTests()
-        {
-            var postgreSqlContainer = new PostgreSqlBuilder().Build();
-            var postgreSqlContainerTask = postgreSqlContainer.StartAsync();
-
-            var redisContainer = new RedisBuilder().Build();
-            var redisContainerTask = redisContainer.StartAsync();
-
-            var kafkaContainer = new KafkaBuilder().Build();
-            var kafkaContainerTask = kafkaContainer.StartAsync();
-
-            postgreSqlContainerTask.Wait();
-            redisContainerTask.Wait();
-            kafkaContainerTask.Wait();
-
-            var factory = new CustomWebApplicationFactory<Program>(postgreSqlContainer.GetConnectionString(),
-                redisContainer.GetConnectionString(),
-                kafkaContainer.GetBootstrapAddress());
-
-            var scope = factory.Services.CreateScope();
-            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-            _fakeUsersGenerator = new FakeUsersGenerator();
-            _fakeUsersGenerator.InitializeData();
-            dataContext.AddRange(_fakeUsersGenerator.Users);
-
-            _fakePostsGenerator = new FakePostsGenerator();
-            _fakePostsGenerator.InitializeData(_fakeUsersGenerator.Users);
-            dataContext.AddRange(_fakePostsGenerator.Posts);
-
-            dataContext.SaveChanges();
-
-            _httpClient = factory.CreateClient();
-        }
-
         [Fact]
         public async Task RemovePostByIdAsyncTestReturnsUnauthorized()
         {

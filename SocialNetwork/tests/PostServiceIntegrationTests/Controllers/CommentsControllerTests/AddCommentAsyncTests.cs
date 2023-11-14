@@ -1,60 +1,15 @@
 ﻿using FluentAssertions.Execution;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using PostService.Infrastructure.Data;
-using PostServiceIntegrationTests.FakeDataGenerators;
 using System.Net;
 using System.Text.Json;
 using System.Text;
-using Testcontainers.Kafka;
-using Testcontainers.PostgreSql;
-using Testcontainers.Redis;
 using System.Security.Claims;
 using PostService.Application.DTOs.CommentDTOs;
 
 namespace PostServiceIntegrationTests.Controllers.CommentsControllerTests
 {
-    public class AddCommentAsyncTests
+    public class AddCommentAsyncTests : CommentsControllerTests
     {
-        private readonly HttpClient _httpClient;
-        private readonly FakeUsersGenerator _fakeUsersGenerator;
-        private readonly FakePostsGenerator _fakePostsGenerator;
-
-        public AddCommentAsyncTests()
-        {
-            var postgreSqlContainer = new PostgreSqlBuilder().Build();
-            var postgreSqlContainerTask = postgreSqlContainer.StartAsync();
-
-            var redisContainer = new RedisBuilder().Build();
-            var redisContainerTask = redisContainer.StartAsync();
-
-            var kafkaContainer = new KafkaBuilder().Build();
-            var kafkaContainerTask = kafkaContainer.StartAsync();
-
-            postgreSqlContainerTask.Wait();
-            redisContainerTask.Wait();
-            kafkaContainerTask.Wait();
-
-            var factory = new CustomWebApplicationFactory<Program>(postgreSqlContainer.GetConnectionString(),
-                redisContainer.GetConnectionString(),
-                kafkaContainer.GetBootstrapAddress());
-
-            var scope = factory.Services.CreateScope();
-            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-            _fakeUsersGenerator = new FakeUsersGenerator();
-            _fakeUsersGenerator.InitializeData();
-            dataContext.AddRange(_fakeUsersGenerator.Users);
-
-            _fakePostsGenerator = new FakePostsGenerator();
-            _fakePostsGenerator.InitializeData(_fakeUsersGenerator.Users);
-            dataContext.AddRange(_fakePostsGenerator.Posts);
-
-            dataContext.SaveChanges();
-
-            _httpClient = factory.CreateClient();
-        }
-
         [Fact]
         public async Task AddCommentAsyncTestReturnsUnauthorized()
         {
