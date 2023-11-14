@@ -28,6 +28,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
         [Fact]
         public async Task HandleTestThrowsForbidden()
         {
+            // Arrange
             var removeDialogMessageFromUserDTO = new RemoveDialogMessageFromUserDTO
             {
                 DialogId = Guid.NewGuid(),
@@ -38,6 +39,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
             var authenticatedUserId = Guid.NewGuid();
             var request = new RemoveDialogMessageFromUserCommand(removeDialogMessageFromUserDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _removeDialogMessageFromUserCommandHandler.Handle(request, CancellationToken.None));
         }
@@ -45,6 +47,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
         [Fact]
         public async Task HandleTestThrowsDialogNotFound()
         {
+            // Arrange
             var removeDialogMessageFromUserDTO = new RemoveDialogMessageFromUserDTO
             {
                 DialogId = Guid.NewGuid(),
@@ -55,6 +58,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
             var authenticatedUserId = removeDialogMessageFromUserDTO.UserId;
             var request = new RemoveDialogMessageFromUserCommand(removeDialogMessageFromUserDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _removeDialogMessageFromUserCommandHandler.Handle(request, CancellationToken.None));
         }
@@ -62,6 +66,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
         [Fact]
         public async Task HandleTestThrowsMessageNotFound()
         {
+            // Arrange
             _dialogRepository.Setup(dialogRepository =>
                 dialogRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Dialog, bool>>>()).Result)
                 .Returns(new Dialog());
@@ -76,6 +81,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
             var authenticatedUserId = removeDialogMessageFromUserDTO.UserId;
             var request = new RemoveDialogMessageFromUserCommand(removeDialogMessageFromUserDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _removeDialogMessageFromUserCommandHandler.Handle(request, CancellationToken.None));
         }
@@ -83,6 +89,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
         [Fact]
         public async Task HandleTestThrowsAlreadyExists()
         {
+            // Arrange
             var messageId = Guid.NewGuid();
             var message = new Message { Id = messageId };
 
@@ -106,6 +113,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageFromUserCo
             var authenticatedUserId = userId;
             var request = new RemoveDialogMessageFromUserCommand(removeDialogMessageFromUserDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<AlreadyExistsException>(() =>
                 _removeDialogMessageFromUserCommandHandler.Handle(request, CancellationToken.None));
         }

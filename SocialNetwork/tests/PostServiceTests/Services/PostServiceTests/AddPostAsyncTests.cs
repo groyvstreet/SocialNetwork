@@ -46,26 +46,31 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task AddPostAsyncTestThrowsForbidden()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var addPostDTO = new AddPostDTO { UserId = id };
             var authenticatedUserId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _postService.AddPostAsync(addPostDTO, authenticatedUserId));
         }
 
         [Fact]
         public async Task AddPostAsyncTestThrowsNotFound()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var addPostDTO = new AddPostDTO { UserId = id };
             var authenticatedUserId = id;
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _postService.AddPostAsync(addPostDTO, authenticatedUserId));
         }
 
         [Fact]
         public async Task AddPostAsyncTestWithUserFromCache()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var addPostDTO = new AddPostDTO { UserId = id };
 
@@ -76,8 +81,10 @@ namespace PostServiceTests.Services.PostServiceTests
 
             _mapper.Setup(mapper => mapper.Map<GetPostDTO>(It.IsAny<Post>())).Returns((Func<Post, GetPostDTO>)Map);
 
+            // Act
             var resultPost = await _postService.AddPostAsync(addPostDTO, id);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultPost.Text.Should().Be(addPostDTO.Text);
@@ -88,6 +95,7 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task AddPostAsyncTestWithUserFromRepository()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var addPostDTO = new AddPostDTO { UserId = id };
 
@@ -99,8 +107,10 @@ namespace PostServiceTests.Services.PostServiceTests
 
             _mapper.Setup(mapper => mapper.Map<GetPostDTO>(It.IsAny<Post>())).Returns((Func<Post, GetPostDTO>)Map);
 
+            // Act
             var resultPost = await _postService.AddPostAsync(addPostDTO, id);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultPost.Text.Should().Be(addPostDTO.Text);

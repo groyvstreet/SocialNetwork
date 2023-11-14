@@ -50,6 +50,7 @@ namespace PostServiceTests.Services.UserServiceTests
         [Fact]
         public async Task GetUsersLikedByCommentIdAsyncTestReturnsCommentFromCache()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
             _commentCacheRepository.Setup(commentCacheRepository => commentCacheRepository.GetAsync(It.IsAny<string>()).Result)
@@ -59,8 +60,10 @@ namespace PostServiceTests.Services.UserServiceTests
                 commentLikeRepository.GetCommentLikesWithUserByCommentIdAsync(id).Result)
                 .Returns(new List<CommentLike>());
 
+            // Act
             await _userService.GetUsersLikedByCommentIdAsync(id);
 
+            // Assert
             _commentRepository.Verify(commentRepository =>
                 commentRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Comment, bool>>>()), Times.Never);
         }
@@ -68,6 +71,7 @@ namespace PostServiceTests.Services.UserServiceTests
         [Fact]
         public async Task GetUsersLikedByCommentIdAsyncTestReturnsCommentFromRepository()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
             _commentRepository.Setup(commentRepository =>
@@ -78,8 +82,10 @@ namespace PostServiceTests.Services.UserServiceTests
                 commentLikeRepository.GetCommentLikesWithUserByCommentIdAsync(id).Result)
                 .Returns(new List<CommentLike>());
 
+            // Act
             await _userService.GetUsersLikedByCommentIdAsync(id);
 
+            // Assert
             _commentRepository.Verify(commentRepository =>
                 commentRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Comment, bool>>>()), Times.Once);
         }
@@ -87,8 +93,10 @@ namespace PostServiceTests.Services.UserServiceTests
         [Fact]
         public async Task GetUsersLikedByCommentIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _userService.GetUsersLikedByCommentIdAsync(id));
         }
     }

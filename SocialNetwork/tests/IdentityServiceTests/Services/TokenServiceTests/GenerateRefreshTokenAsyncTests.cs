@@ -25,6 +25,7 @@ namespace IdentityServiceTests.Services.TokenServiceTests
         [Fact]
         public async Task GenerateRefreshTokenAsyncTestsWithoutRemoving()
         {
+            // Arrange
             var userId = Guid.NewGuid().ToString();
 
             _refreshTokenRepository.Setup(refreshTokenRepository =>
@@ -36,8 +37,10 @@ namespace IdentityServiceTests.Services.TokenServiceTests
             _jwtOptions.SetupGet(jwtOptions => jwtOptions.Value)
                 .Returns(jwtOptions);
 
+            // Act
             var refreshToken = await _tokenService.GenerateRefreshTokenAsync(userId);
 
+            // Assert
             _refreshTokenRepository.Verify(refreshTokenRepository => refreshTokenRepository.Remove(It.IsAny<RefreshToken>()),
                 Times.Never);
 
@@ -47,6 +50,7 @@ namespace IdentityServiceTests.Services.TokenServiceTests
         [Fact]
         public async Task GenerateRefreshTokenAsyncTestsWithRemoving()
         {
+            // Arrange
             var userId = Guid.NewGuid().ToString();
 
             _refreshTokenRepository.Setup(refreshTokenRepository =>
@@ -58,8 +62,10 @@ namespace IdentityServiceTests.Services.TokenServiceTests
             _jwtOptions.SetupGet(jwtOptions => jwtOptions.Value)
                 .Returns(jwtOptions);
 
+            // Act
             var refreshToken = await _tokenService.GenerateRefreshTokenAsync(userId);
 
+            // Assert
             _refreshTokenRepository.Verify(refreshTokenRepository => refreshTokenRepository.Remove(It.IsAny<RefreshToken>()),
                 Times.Once);
 

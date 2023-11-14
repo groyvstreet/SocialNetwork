@@ -39,10 +39,12 @@ namespace IdentityServiceTests.Services.UserServiceTests
         [Fact]
         public async Task RemoveUserByIdAsyncTestThrowsForbidden()
         {
+            // Arrange
             var id = "1";
             var authenticatedUserId = "2";
             var authenticatedUserRole = Roles.User;
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _userService.RemoveUserByIdAsync(id,
                 authenticatedUserId,
                 authenticatedUserRole));
@@ -54,6 +56,7 @@ namespace IdentityServiceTests.Services.UserServiceTests
         [InlineData("1", "1", Roles.User)]
         public async Task RemoveUserByIdAsyncTestThrowsNotFound(string id, string authenticatedUserId, string authenticatedUserRole)
         {
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _userService.RemoveUserByIdAsync(id,
                 authenticatedUserId,
                 authenticatedUserRole));
@@ -67,11 +70,14 @@ namespace IdentityServiceTests.Services.UserServiceTests
             string authenticatedUserId,
             string authenticatedUserRole)
         {
+            // Arrange
             _userCacheRepository.Setup(userCacheRepository => userCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new User());
 
+            // Act
             await _userService.RemoveUserByIdAsync(id, authenticatedUserId, authenticatedUserRole);
 
+            // Assert
             _userRepository.Verify(userRepository => userRepository.GetUserByIdAsync(It.IsAny<string>()), Times.Never);
         }
 
@@ -83,11 +89,14 @@ namespace IdentityServiceTests.Services.UserServiceTests
             string authenticatedUserId,
             string authenticatedUserRole)
         {
+            // Arrange
             _userRepository.Setup(userCacheRepository => userCacheRepository.GetUserByIdAsync(It.IsAny<string>()).Result)
                 .Returns(new User());
 
+            // Act
             await _userService.RemoveUserByIdAsync(id, authenticatedUserId, authenticatedUserRole);
 
+            // Assert
             _userCacheRepository.Verify(userCacheRepository => userCacheRepository.GetAsync(It.IsAny<string>()), Times.Once);
         }
     }

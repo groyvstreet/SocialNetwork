@@ -24,6 +24,7 @@ namespace PostServiceTests.Grpc.PostServiceTests
         [Fact]
         public async Task UpdatePostAsyncTestPostFound()
         {
+            // Arrange
             _postRepository.Setup(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()).Result)
                 .Returns(new Post());
@@ -31,19 +32,24 @@ namespace PostServiceTests.Grpc.PostServiceTests
             var postId = Guid.NewGuid();
             var request = new PostService.Application.Grpc.Protos.Request { PostId = postId.ToString() };
 
+            // Act
             await _postService.UpdatePost(request, _serverCallContext);
 
+            // Assert
             _postRepository.Verify(postRepository => postRepository.SaveChangesAsync(), Times.Once);
         }
 
         [Fact]
         public async Task UpdatePostAsyncTestPostNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var request = new PostService.Application.Grpc.Protos.Request { PostId = postId.ToString() };
 
+            // Act
             await _postService.UpdatePost(request, _serverCallContext);
 
+            // Assert
             _postRepository.Verify(postRepository => postRepository.SaveChangesAsync(), Times.Never);
         }
     }

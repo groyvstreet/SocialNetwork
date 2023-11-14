@@ -51,8 +51,10 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task GetCommentsByPostIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _commentService.GetCommentsByPostIdAsync(postId));
         }
     }

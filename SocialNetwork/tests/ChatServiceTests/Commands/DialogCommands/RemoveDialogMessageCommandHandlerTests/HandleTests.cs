@@ -32,6 +32,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageCommandHan
         [Fact]
         public async Task HandleTestThrowsDialogNotFound()
         {
+            // Arrange
             var removeDialogMessageDTO = new RemoveDialogMessageDTO
             {
                 DialogId = Guid.NewGuid(),
@@ -41,6 +42,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageCommandHan
             var authenticatedUserId = Guid.NewGuid();
             var request = new RemoveDialogMessageCommand(removeDialogMessageDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _removeDialogMessageCommandHandler.Handle(request, CancellationToken.None));
         }
@@ -48,6 +50,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageCommandHan
         [Fact]
         public async Task HandleTestThrowsMessageNotFound()
         {
+            // Arrange
             _dialogRepository.Setup(dialogRepository =>
                 dialogRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Dialog, bool>>>()).Result)
                 .Returns(new Dialog());
@@ -61,6 +64,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageCommandHan
             var authenticatedUserId = Guid.NewGuid();
             var request = new RemoveDialogMessageCommand(removeDialogMessageDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _removeDialogMessageCommandHandler.Handle(request, CancellationToken.None));
         }
@@ -68,6 +72,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageCommandHan
         [Fact]
         public async Task HandleTestThrowsForbidden()
         {
+            // Arrange
             var message = new Message
             {
                 Id = Guid.NewGuid(),
@@ -90,6 +95,7 @@ namespace ChatServiceTests.Commands.DialogCommands.RemoveDialogMessageCommandHan
             var authenticatedUserId = Guid.NewGuid();
             var request = new RemoveDialogMessageCommand(removeDialogMessageDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _removeDialogMessageCommandHandler.Handle(request, CancellationToken.None));
         }

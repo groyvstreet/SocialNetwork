@@ -46,6 +46,7 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task GetPostByIdTestReturnsFromCache()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var post = new Post { Id = id };
 
@@ -55,8 +56,10 @@ namespace PostServiceTests.Services.PostServiceTests
             _mapper.Setup(mapper => mapper.Map<GetPostDTO>(It.IsAny<Post>()))
                 .Returns(Map);
 
+            // Act
             var resultPost = await _postService.GetPostByIdAsync(id);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
 
@@ -66,6 +69,7 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task GetPostByIdTestReturnsFromRepository()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var post = new Post { Id = id };
 
@@ -75,8 +79,10 @@ namespace PostServiceTests.Services.PostServiceTests
             _mapper.Setup(mapper => mapper.Map<GetPostDTO>(It.IsAny<Post>()))
                 .Returns(Map);
 
+            // Act
             var resultPost = await _postService.GetPostByIdAsync(id);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
 
@@ -86,8 +92,10 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task GetPostByIdTestThrowsNotFound()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _postService.GetPostByIdAsync(id));
         }
 

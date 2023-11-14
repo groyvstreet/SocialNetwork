@@ -52,15 +52,18 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task RemoveCommentByIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _commentService.RemoveCommentByIdAsync(commentId, authenticatedUserId));
         }
 
         [Fact]
         public async Task RemoveCommentByIdAsyncTestWithCommentFromCacheWithPostFromCache()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -76,8 +79,10 @@ namespace CommentServiceTests.Services.CommentServiceTests
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new Post());
 
+            // Act
             await _commentService.RemoveCommentByIdAsync(commentId, authenticatedUserId);
 
+            // Assert
             _commentRepository.Verify(commentRepository =>
                 commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == commentId), Times.Never);
 
@@ -88,6 +93,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task RemoveCommentByIdAsyncTestWithCommentFromRepositoryWithPostFromCache()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -104,8 +110,10 @@ namespace CommentServiceTests.Services.CommentServiceTests
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new Post());
 
+            // Act
             await _commentService.RemoveCommentByIdAsync(commentId, authenticatedUserId);
 
+            // Assert
             _commentRepository.Verify(commentRepository =>
                 commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == commentId), Times.Once);
 
@@ -116,6 +124,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task RemoveCommentByIdAsyncTestWithCommentFromCacheWithPostFromRepository()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -132,8 +141,10 @@ namespace CommentServiceTests.Services.CommentServiceTests
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()).Result)
                 .Returns(new Post());
 
+            // Act
             await _commentService.RemoveCommentByIdAsync(commentId, authenticatedUserId);
 
+            // Assert
             _commentRepository.Verify(commentRepository =>
                 commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == commentId), Times.Never);
 
@@ -144,6 +155,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task RemoveCommentByIdAsyncTestWithCommentFromRepositoryWithPostFromRepository()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -161,8 +173,10 @@ namespace CommentServiceTests.Services.CommentServiceTests
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()).Result)
                 .Returns(new Post());
 
+            // Act
             await _commentService.RemoveCommentByIdAsync(commentId, authenticatedUserId);
 
+            // Assert
             _commentRepository.Verify(commentRepository =>
                 commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == commentId), Times.Once);
 
@@ -173,6 +187,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task RemoveCommentByIdAsyncTestWithCommentFromCacheThrowsFordbidden()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -185,6 +200,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
             _commentCacheRepository.Setup(commentCacheRepository => commentCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(comment);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _commentService.RemoveCommentByIdAsync(commentId, authenticatedUserId));
 
@@ -195,6 +211,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task RemoveCommentByIdAsyncTestWithCommentFromRepositoryThrowsFordbidden()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -208,6 +225,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
                 commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == commentId).Result)
                 .Returns(comment);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _commentService.RemoveCommentByIdAsync(commentId, authenticatedUserId));
 

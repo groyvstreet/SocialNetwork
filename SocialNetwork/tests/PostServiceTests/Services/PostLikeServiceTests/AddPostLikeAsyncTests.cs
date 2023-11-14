@@ -51,10 +51,12 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestThrowsForbidden()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId));
         }
@@ -62,10 +64,12 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestThrowsPostNotFound()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId));
         }
@@ -73,6 +77,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestThrowsUserNotFound()
         {
+            // Arrange
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new Post());
 
@@ -80,6 +85,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId));
         }
@@ -87,6 +93,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestWithPostLikeFromCacheThrowsAlreadyExists()
         {
+            // Arrange
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new Post());
 
@@ -100,6 +107,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<AlreadyExistsException>(() =>
                 _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId));
 
@@ -110,6 +118,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestWithPostLikeFromRepositoryThrowsAlreadyExists()
         {
+            // Arrange
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new Post());
 
@@ -124,6 +133,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<AlreadyExistsException>(() =>
                 _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId));
 
@@ -134,6 +144,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestWithPostFromCacheWithUserFromCache()
         {
+            // Arrange
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new Post());
 
@@ -157,8 +168,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
 
             var authenticatedUserId = userId;
 
+            // Act
             var resultPostLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
 
@@ -175,6 +188,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestWithPostFromRepositoryWithUserFromCache()
         {
+            // Arrange
             _postRepository.Setup(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()).Result)
                 .Returns(new Post());
@@ -199,8 +213,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
 
             var authenticatedUserId = userId;
 
+            // Act
             var resultPostLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
 
@@ -217,6 +233,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestWithPostFromCacheWithUserFromRepository()
         {
+            // Arrange
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new Post());
 
@@ -241,8 +258,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
 
             var authenticatedUserId = userId;
 
+            // Act
             var resultPostLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
 
@@ -259,6 +278,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task AddPostLikeAsyncTestWithPostFromRepositoryWithUserFromRepository()
         {
+            // Arrange
             _postRepository.Setup(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()).Result)
                 .Returns(new Post());
@@ -284,8 +304,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
 
             var authenticatedUserId = userId;
 
+            // Act
             var resultPostLike = await _postLikeService.AddPostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
 

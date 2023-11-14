@@ -26,19 +26,24 @@ namespace PostServiceTests.MessageBrokerConsumerHandlers.UserKafkaConsumerHandle
         [Fact]
         public async Task HandleAsyncTestCreateRequestOperation()
         {
+            // Act
             await _userKafkaConsumerHandler.HandleAsync(RequestOperation.Create, new User());
 
+            // Assert
             _userRepository.Verify(userRepository => userRepository.AddAsync(It.IsAny<User>()), Times.Once);
         }
 
         [Fact]
         public async Task HandleAsyncTestUpdateRequestOperationWithUserFromCache()
         {
+            // Arrange
             _userCacheRepository.Setup(userCacheRepository => userCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new User());
 
+            // Act
             await _userKafkaConsumerHandler.HandleAsync(RequestOperation.Update, new User());
 
+            // Assert
             _userRepository.Verify(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()), Times.Never);
 
@@ -48,12 +53,15 @@ namespace PostServiceTests.MessageBrokerConsumerHandlers.UserKafkaConsumerHandle
         [Fact]
         public async Task HandleAsyncTestUpdateRequestOperationWithUserFromRepository()
         {
+            // Arrange
             _userRepository.Setup(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()).Result)
                 .Returns(new User());
 
+            // Act
             await _userKafkaConsumerHandler.HandleAsync(RequestOperation.Update, new User());
 
+            // Assert
             _userRepository.Verify(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()), Times.Once);
 
@@ -63,8 +71,10 @@ namespace PostServiceTests.MessageBrokerConsumerHandlers.UserKafkaConsumerHandle
         [Fact]
         public async Task HandleAsyncTestUpdateRequestOperationWhenUserNotFound()
         {
+            // Act
             await _userKafkaConsumerHandler.HandleAsync(RequestOperation.Update, new User());
 
+            // Assert
             _userRepository.Verify(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()), Times.Once);
 
@@ -74,11 +84,14 @@ namespace PostServiceTests.MessageBrokerConsumerHandlers.UserKafkaConsumerHandle
         [Fact]
         public async Task HandleAsyncTestRemoveRequestOperationWithUserFromCache()
         {
+            // Arrange
             _userCacheRepository.Setup(userCacheRepository => userCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new User());
 
+            // Act
             await _userKafkaConsumerHandler.HandleAsync(RequestOperation.Remove, new User());
 
+            // Assert
             _userRepository.Verify(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()), Times.Never);
 
@@ -88,12 +101,15 @@ namespace PostServiceTests.MessageBrokerConsumerHandlers.UserKafkaConsumerHandle
         [Fact]
         public async Task HandleAsyncTestRemoveRequestOperationWithUserFromRepository()
         {
+            // Arrange
             _userRepository.Setup(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()).Result)
                 .Returns(new User());
 
+            // Act
             await _userKafkaConsumerHandler.HandleAsync(RequestOperation.Remove, new User());
 
+            // Assert
             _userRepository.Verify(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()), Times.Once);
 
@@ -103,8 +119,10 @@ namespace PostServiceTests.MessageBrokerConsumerHandlers.UserKafkaConsumerHandle
         [Fact]
         public async Task HandleAsyncTestRemoveRequestOperationWhenUserNotFound()
         {
+            // Act
             await _userKafkaConsumerHandler.HandleAsync(RequestOperation.Remove, new User());
 
+            // Assert
             _userRepository.Verify(userRepository =>
                 userRepository.GetFirstOrDefaultAsNoTrackingByAsync(It.IsAny<Expression<Func<User, bool>>>()), Times.Once);
 

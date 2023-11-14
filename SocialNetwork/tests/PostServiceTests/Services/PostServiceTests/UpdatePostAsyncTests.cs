@@ -46,16 +46,19 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task UpdatePostAsyncTestThrowsNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var updatePostDTO = new UpdatePostDTO { Id = postId };
             var authenticatedUserId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _postService.UpdatePostAsync(updatePostDTO, authenticatedUserId));
         }
 
         [Fact]
         public async Task UpdatePostAsyncTestWithPostFromCache()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var updatePostDTO = new UpdatePostDTO { Id = postId };
             var authenticatedUserId = Guid.NewGuid();
@@ -71,8 +74,10 @@ namespace PostServiceTests.Services.PostServiceTests
 
             _mapper.Setup(mapper => mapper.Map<GetPostDTO>(It.IsAny<Post>())).Returns(Map);
 
+            // Act
             var resultPost = await _postService.UpdatePostAsync(updatePostDTO, authenticatedUserId);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultPost.Id.Should().Be(updatePostDTO.Id);
@@ -83,6 +88,7 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task UpdatePostAsyncTestWithPostFromRepository()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var updatePostDTO = new UpdatePostDTO { Id = postId };
             var authenticatedUserId = Guid.NewGuid();
@@ -98,8 +104,10 @@ namespace PostServiceTests.Services.PostServiceTests
 
             _mapper.Setup(mapper => mapper.Map<GetPostDTO>(It.IsAny<Post>())).Returns(Map);
 
+            // Act
             var resultPost = await _postService.UpdatePostAsync(updatePostDTO, authenticatedUserId);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultPost.Id.Should().Be(updatePostDTO.Id);
@@ -110,6 +118,7 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task UpdatePostAsyncTestWithPostFromCacheThrowsFordbidden()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var updatePostDTO = new UpdatePostDTO { Id = postId };
             var authenticatedUserId = Guid.NewGuid();
@@ -123,12 +132,14 @@ namespace PostServiceTests.Services.PostServiceTests
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(post);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _postService.UpdatePostAsync(updatePostDTO, authenticatedUserId));
         }
 
         [Fact]
         public async Task UpdatePostAsyncTestWithPostFromRepositoryThrowsFordbidden()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var updatePostDTO = new UpdatePostDTO { Id = postId };
             var authenticatedUserId = Guid.NewGuid();
@@ -143,6 +154,7 @@ namespace PostServiceTests.Services.PostServiceTests
                 postRepository.GetFirstOrDefaultByAsync(post => post.Id == updatePostDTO.Id).Result)
                 .Returns(post);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _postService.UpdatePostAsync(updatePostDTO, authenticatedUserId));
         }
 

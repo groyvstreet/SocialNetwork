@@ -49,10 +49,12 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task RemovePostLikeAsyncTestThrowsForbidden()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, authenticatedUserId));
         }
@@ -60,10 +62,12 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task RemovePostLikeAsyncTestThrowsNotFound()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, authenticatedUserId));
         }
@@ -71,6 +75,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task RemovePostLikeAsyncTestWithPostLikeFromCacheWithPostFromCache()
         {
+            // Arrange
             _postLikeCacheRepository.Setup(postLikeCacheRepository => postLikeCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new PostLike());
 
@@ -81,8 +86,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Act
             await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postLikeRepository.Verify(postLikeRepository =>
                 postLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<PostLike, bool>>>()), Times.Never);
 
@@ -93,6 +100,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task RemovePostLikeAsyncTestWithPostLikeFromRepositoryWithPostFromCache()
         {
+            // Arrange
             _postLikeRepository.Setup(postLikeRepository =>
                 postLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<PostLike, bool>>>()).Result)
                 .Returns(new PostLike());
@@ -104,8 +112,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Act
             await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postLikeRepository.Verify(postLikeRepository =>
                 postLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<PostLike, bool>>>()), Times.Once);
 
@@ -116,6 +126,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task RemovePostLikeAsyncTestWithPostLikeFromCacheWithPostFromRepostiry()
         {
+            // Arrange
             _postLikeCacheRepository.Setup(postLikeCacheRepository => postLikeCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new PostLike());
 
@@ -127,8 +138,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Act
             await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postLikeRepository.Verify(postLikeRepository =>
                 postLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<PostLike, bool>>>()), Times.Never);
 
@@ -139,6 +152,7 @@ namespace PostServiceTests.Services.PostLikeServiceTests
         [Fact]
         public async Task RemovePostLikeAsyncTestWithPostLikeFromRepositoryWithPostFromRepostiry()
         {
+            // Arrange
             _postLikeRepository.Setup(postLikeRepository =>
                 postLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<PostLike, bool>>>()).Result)
                 .Returns(new PostLike());
@@ -151,8 +165,10 @@ namespace PostServiceTests.Services.PostLikeServiceTests
             var authenticatedUserId = userId;
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO { UserId = userId };
 
+            // Act
             await _postLikeService.RemovePostLikeAsync(addRemovePostLikeDTO, authenticatedUserId);
 
+            // Assert
             _postLikeRepository.Verify(postLikeRepository =>
                 postLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<PostLike, bool>>>()), Times.Once);
 

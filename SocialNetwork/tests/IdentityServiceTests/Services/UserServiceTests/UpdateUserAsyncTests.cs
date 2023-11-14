@@ -41,10 +41,12 @@ namespace IdentityServiceTests.Services.UserServiceTests
         [Fact]
         public async Task UpdateUserAsyncTestThrowsForbidden()
         {
+            // Arrange
             var updateUserDTO = new UpdateUserDTO { Id = "1" };
             var authenticatedUserId = "2";
             var authenticatedUserRole = Roles.User;
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _userService.UpdateUserAsync(updateUserDTO,
                 authenticatedUserId,
                 authenticatedUserRole));
@@ -56,8 +58,10 @@ namespace IdentityServiceTests.Services.UserServiceTests
         [InlineData("1", "1", Roles.User)]
         public async Task UpdateUserAsyncTestThrowsNotFound(string id, string authenticatedUserId, string authenticatedUserRole)
         {
+            // Arrange
             var updateUserDTO = new UpdateUserDTO { Id = id };
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _userService.UpdateUserAsync(updateUserDTO,
                 authenticatedUserId,
                 authenticatedUserRole));
@@ -71,6 +75,7 @@ namespace IdentityServiceTests.Services.UserServiceTests
             string authenticatedUserId,
             string authenticatedUserRole)
         {
+            // Arrange
             var user = new User { Id = id };
 
             _userCacheRepository.Setup(userCacheRepository => userCacheRepository.GetAsync(id).Result)
@@ -88,8 +93,10 @@ namespace IdentityServiceTests.Services.UserServiceTests
                 Image = "Image"
             };
 
+            // Act
             var resultUser = await _userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultUser.Id.Should().Be(updateUserDTO.Id);
@@ -108,6 +115,7 @@ namespace IdentityServiceTests.Services.UserServiceTests
             string authenticatedUserId,
             string authenticatedUserRole)
         {
+            // Arrange
             var user = new User { Id = id };
 
             _userRepository.Setup(userCacheRepository => userCacheRepository.GetUserByIdAsync(id).Result)
@@ -125,8 +133,10 @@ namespace IdentityServiceTests.Services.UserServiceTests
                 Image = "Image"
             };
 
+            // Act
             var resultUser = await _userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultUser.Id.Should().Be(updateUserDTO.Id);

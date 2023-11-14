@@ -55,16 +55,19 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task AddCommentAsyncTestThrowsForbidden()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var addCommentDTO = new AddCommentDTO { UserId = userId };
             var authenticatedUserId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId));
         }
 
         [Fact]
         public async Task AddCommentAsyncTestThrowsPostNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var authenticatedUserId = userId;
@@ -76,12 +79,14 @@ namespace PostServiceTests.Services.CommentServiceTests
                 UserId = userId
             };
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId));
         }
 
         [Fact]
         public async Task AddCommentAsyncTestThrowsUserNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var post = new Post { Id = postId };
 
@@ -98,12 +103,14 @@ namespace PostServiceTests.Services.CommentServiceTests
                 UserId = userId
             };
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId));
         }
 
         [Fact]
         public async Task AddCommentAsyncTestWithPostFromCacheWithUserFromCache()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var post = new Post { Id = postId };
 
@@ -131,8 +138,10 @@ namespace PostServiceTests.Services.CommentServiceTests
                 UserId = userId
             };
 
+            // Act
             var resultComment = await _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
 
@@ -150,6 +159,7 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task AddCommentAsyncTestWithPostFromRepositoryWithUserFromCache()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var post = new Post { Id = postId };
 
@@ -178,8 +188,10 @@ namespace PostServiceTests.Services.CommentServiceTests
                 UserId = userId
             };
 
+            // Act
             var resultComment = await _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
 
@@ -197,6 +209,7 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task AddCommentAsyncTestWithPostFromCacheWithUserFromRepository()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var post = new Post { Id = postId };
 
@@ -225,8 +238,10 @@ namespace PostServiceTests.Services.CommentServiceTests
                 UserId = userId
             };
 
+            // Act
             var resultComment = await _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
 
@@ -244,6 +259,7 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task AddCommentAsyncTestWithPostFromRepositoryWithUserFromRepository()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var post = new Post { Id = postId };
 
@@ -273,8 +289,10 @@ namespace PostServiceTests.Services.CommentServiceTests
                 UserId = userId
             };
 
+            // Act
             var resultComment = await _commentService.AddCommentAsync(addCommentDTO, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
 

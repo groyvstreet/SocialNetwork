@@ -32,10 +32,12 @@ namespace ChatServiceTests.Commands.DialogCommands.UpdateDialogMessageCommandHan
         [Fact]
         public async Task HandleTestThrowsDialogNotFound()
         {
+            // Arrange
             var updateDialogMessageDTO = new UpdateDialogMessageDTO();
             var authenticatedUserId = Guid.NewGuid();
             var request = new UpdateDialogMessageCommand(updateDialogMessageDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _updateDialogMessageCommandHandler.Handle(request,
                 CancellationToken.None));
         }
@@ -43,6 +45,7 @@ namespace ChatServiceTests.Commands.DialogCommands.UpdateDialogMessageCommandHan
         [Fact]
         public async Task HandleTestThrowsMessageNotFound()
         {
+            // Arrange
             _dialogRepository.Setup(dialogRepository =>
                 dialogRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Dialog, bool>>>()).Result)
                 .Returns(new Dialog());
@@ -51,6 +54,7 @@ namespace ChatServiceTests.Commands.DialogCommands.UpdateDialogMessageCommandHan
             var authenticatedUserId = Guid.NewGuid();
             var request = new UpdateDialogMessageCommand(updateDialogMessageDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _updateDialogMessageCommandHandler.Handle(request,
                 CancellationToken.None));
         }
@@ -58,6 +62,7 @@ namespace ChatServiceTests.Commands.DialogCommands.UpdateDialogMessageCommandHan
         [Fact]
         public async Task HandleTestThrowsForbidden()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var message = new Message { User = new User { Id = userId } };
 
@@ -76,6 +81,7 @@ namespace ChatServiceTests.Commands.DialogCommands.UpdateDialogMessageCommandHan
             var authenticatedUserId = Guid.NewGuid();
             var request = new UpdateDialogMessageCommand(updateDialogMessageDTO, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _updateDialogMessageCommandHandler.Handle(request,
                 CancellationToken.None));
         }

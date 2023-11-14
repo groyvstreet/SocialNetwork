@@ -54,10 +54,12 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task UpdateCommentAsyncTestThrowsNotFound()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var updateCommentDTO = new UpdateCommentDTO { Id = commentId };
             var authenticatedUserId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _commentService.UpdateCommentAsync(updateCommentDTO, authenticatedUserId));
         }
@@ -65,6 +67,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task UpdateCommentAsyncTestWithCommentFromCache()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var updateCommentDTO = new UpdateCommentDTO { Id = commentId };
             var authenticatedUserId = Guid.NewGuid();
@@ -80,8 +83,10 @@ namespace CommentServiceTests.Services.CommentServiceTests
 
             _mapper.Setup(mapper => mapper.Map<GetCommentDTO>(It.IsAny<Comment>())).Returns(Map);
 
+            // Act
             var resultComment = await _commentService.UpdateCommentAsync(updateCommentDTO, authenticatedUserId);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultComment.Id.Should().Be(updateCommentDTO.Id);
@@ -92,6 +97,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task UpdateCommentAsyncTestWithCommentFromRepository()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var updateCommentDTO = new UpdateCommentDTO { Id = commentId };
             var authenticatedUserId = Guid.NewGuid();
@@ -108,8 +114,10 @@ namespace CommentServiceTests.Services.CommentServiceTests
 
             _mapper.Setup(mapper => mapper.Map<GetCommentDTO>(It.IsAny<Comment>())).Returns(Map);
 
+            // Act
             var resultComment = await _commentService.UpdateCommentAsync(updateCommentDTO, authenticatedUserId);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultComment.Id.Should().Be(updateCommentDTO.Id);
@@ -120,6 +128,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task UpdateCommentAsyncTestWithCommentFromCacheThrowsFordbidden()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var updateCommentDTO = new UpdateCommentDTO { Id = commentId };
             var authenticatedUserId = Guid.NewGuid();
@@ -133,6 +142,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
             _commentCacheRepository.Setup(commentCacheRepository => commentCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(comment);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _commentService.UpdateCommentAsync(updateCommentDTO, authenticatedUserId));
         }
@@ -140,6 +150,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task UpdateCommentAsyncTestWithCommentFromRepositoryThrowsFordbidden()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var updateCommentDTO = new UpdateCommentDTO { Id = commentId };
             var authenticatedUserId = Guid.NewGuid();
@@ -154,6 +165,7 @@ namespace CommentServiceTests.Services.CommentServiceTests
                 commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == updateCommentDTO.Id).Result)
                 .Returns(comment);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _commentService.UpdateCommentAsync(updateCommentDTO, authenticatedUserId));
         }

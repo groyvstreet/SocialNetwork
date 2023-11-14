@@ -25,6 +25,7 @@ namespace PostServiceTests.Grpc.PostServiceTests
         [Fact]
         public async Task IsPostExistsAsyncTestReturnsTrue()
         {
+            // Arrange
             _postRepository.Setup(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()).Result)
                 .Returns(new Post());
@@ -32,19 +33,24 @@ namespace PostServiceTests.Grpc.PostServiceTests
             var postId = Guid.NewGuid();
             var request = new PostService.Application.Grpc.Protos.Request { PostId = postId.ToString() };
 
+            // Act
             var reply = await _postService.IsPostExists(request, _serverCallContext);
 
+            // Assert
             reply.IsPostExists.Should().Be(true);
         }
 
         [Fact]
         public async Task IsPostExistsAsyncTestReturnsFalse()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var request = new PostService.Application.Grpc.Protos.Request { PostId = postId.ToString() };
 
+            // Act
             var reply = await _postService.IsPostExists(request, _serverCallContext);
 
+            // Assert
             reply.IsPostExists.Should().Be(false);
         }
     }

@@ -39,6 +39,7 @@ namespace IdentityServiceTests.Services.UserServiceTests
         [Fact]
         public async Task GetUserByIdAsyncTestReturnsUserFromCache()
         {
+            // Arrange
             var id = Guid.NewGuid().ToString();
             var user = new User { Id = id };
 
@@ -50,14 +51,17 @@ namespace IdentityServiceTests.Services.UserServiceTests
             _mapper.Setup(mapper => mapper.Map<GetUserDTO>(user))
                 .Returns(getUserDTO);
 
+            // Act
             var resultUser = await _userService.GetUserByIdAsync(id);
 
+            // Assert
             resultUser.Id.Should().Be(id);
         }
 
         [Fact]
         public async Task GetUserByIdAsyncTestReturnsUserFromRepository()
         {
+            // Arrange
             var id = Guid.NewGuid().ToString();
             var user = new User { Id = id };
 
@@ -69,14 +73,17 @@ namespace IdentityServiceTests.Services.UserServiceTests
             _mapper.Setup(mapper => mapper.Map<GetUserDTO>(user))
                 .Returns(getUserDTO);
 
+            // Act
             var resultUser = await _userService.GetUserByIdAsync(id);
 
+            // Assert
             resultUser.Id.Should().Be(id);
         }
 
         [Fact]
         public async Task GetUserByIdAsyncTestThrowsNotFound()
         {
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _userService.GetUserByIdAsync(It.IsAny<string>()));
         }
     }

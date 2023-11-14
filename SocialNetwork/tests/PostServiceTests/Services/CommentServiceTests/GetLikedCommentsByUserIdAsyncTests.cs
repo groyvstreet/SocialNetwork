@@ -51,14 +51,17 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task GetLikedCommentsByUserIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var userId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _commentService.GetLikedCommentsByUserIdAsync(userId));
         }
 
         [Fact]
         public async Task GetLikedCommentsByUserIdAsyncTestWithUserFromCache()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var user = new User { Id = userId };
 
@@ -69,8 +72,10 @@ namespace PostServiceTests.Services.CommentServiceTests
                 commentLikeRepository.GetCommentLikesWithCommentByUserIdAsync(userId).Result)
                 .Returns(new List<CommentLike>());
 
+            // Act
             await _commentService.GetLikedCommentsByUserIdAsync(userId);
 
+            // Assert
             _userRepository.Verify(userRepository => userRepository.GetFirstOrDefaultByAsync(user => user.Id == userId),
                 Times.Never);
         }
@@ -78,6 +83,7 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task GetLikedCommentsByUserIdAsyncTestWithUserFromRepository()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var user = new User { Id = userId };
 
@@ -88,8 +94,10 @@ namespace PostServiceTests.Services.CommentServiceTests
                 commentLikeRepository.GetCommentLikesWithCommentByUserIdAsync(userId).Result)
                 .Returns(new List<CommentLike>());
 
+            // Act
             await _commentService.GetLikedCommentsByUserIdAsync(userId);
 
+            // Assert
             _userRepository.Verify(userRepository => userRepository.GetFirstOrDefaultByAsync(user => user.Id == userId),
                 Times.Once);
         }

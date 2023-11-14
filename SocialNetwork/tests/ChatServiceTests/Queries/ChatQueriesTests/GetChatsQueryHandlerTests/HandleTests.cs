@@ -29,20 +29,24 @@ namespace ChatServiceTests.Queries.ChatQueriesTests.GetChatsQueryHandlerTests
         [Fact]
         public async Task HandleTestThrowsForbidden()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
             var request = new GetChatsQuery(userId, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _getChatsQueryHandler.Handle(request, CancellationToken.None));
         }
 
         [Fact]
         public async Task HandleTestThrowsNotFound()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = userId;
             var request = new GetChatsQuery(userId, authenticatedUserId);
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _getChatsQueryHandler.Handle(request, CancellationToken.None));
         }
     }

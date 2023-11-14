@@ -43,8 +43,10 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task GetPostsByUserIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _postService.GetPostsByUserIdAsync(id));
         }
     }

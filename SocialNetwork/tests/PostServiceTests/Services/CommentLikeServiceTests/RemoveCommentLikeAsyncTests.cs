@@ -49,10 +49,12 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
         [Fact]
         public async Task RemoveCommentLikeAsyncTestThrowsForbidden()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
             var addRemoveCommentLikeDTO = new AddRemoveCommentLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() =>
                 _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO, authenticatedUserId));
         }
@@ -60,10 +62,12 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
         [Fact]
         public async Task RemoveCommentLikeAsyncTestThrowsNotFound()
         {
+            // Arrange
             var userId = Guid.NewGuid();
             var authenticatedUserId = userId;
             var addRemoveCommentLikeDTO = new AddRemoveCommentLikeDTO { UserId = userId };
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() =>
                 _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO, authenticatedUserId));
         }
@@ -71,6 +75,7 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
         [Fact]
         public async Task RemoveCommentLikeAsyncTestWithCommentLikeFromCacheWithCommentFromCache()
         {
+            // Arrange
             _commentLikeCacheRepository.Setup(commentLikeCacheRepository =>
                 commentLikeCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new CommentLike());
@@ -82,8 +87,10 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
             var authenticatedUserId = userId;
             var addRemoveCommentLikeDTO = new AddRemoveCommentLikeDTO { UserId = userId };
 
+            // Act
             await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO, authenticatedUserId);
 
+            // Assert
             _commentLikeRepository.Verify(commentLikeRepository =>
                 commentLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<CommentLike, bool>>>()), Times.Never);
 
@@ -94,6 +101,7 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
         [Fact]
         public async Task RemoveCommentLikeAsyncTestWithCommentLikeFromRepositoryWithCommentFromCache()
         {
+            // Arrange
             _commentLikeRepository.Setup(commentLikeRepository =>
                 commentLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<CommentLike, bool>>>()).Result)
                 .Returns(new CommentLike());
@@ -105,8 +113,10 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
             var authenticatedUserId = userId;
             var addRemoveCommentLikeDTO = new AddRemoveCommentLikeDTO { UserId = userId };
 
+            // Act
             await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO, authenticatedUserId);
 
+            // Assert
             _commentLikeRepository.Verify(commentLikeRepository =>
                 commentLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<CommentLike, bool>>>()), Times.Once);
 
@@ -117,6 +127,7 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
         [Fact]
         public async Task RemoveCommentLikeAsyncTestWithCommentLikeFromCacheWithCommentFromRecommentiry()
         {
+            // Arrange
             _commentLikeCacheRepository.Setup(commentLikeCacheRepository =>
                 commentLikeCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(new CommentLike());
@@ -129,8 +140,10 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
             var authenticatedUserId = userId;
             var addRemoveCommentLikeDTO = new AddRemoveCommentLikeDTO { UserId = userId };
 
+            // Act
             await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO, authenticatedUserId);
 
+            // Assert
             _commentLikeRepository.Verify(commentLikeRepository =>
                 commentLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<CommentLike, bool>>>()), Times.Never);
 
@@ -141,6 +154,7 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
         [Fact]
         public async Task RemoveCommentLikeAsyncTestWithCommentLikeFromRepositoryWithCommentFromRecommentiry()
         {
+            // Arrange
             _commentLikeRepository.Setup(commentLikeRepository =>
                 commentLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<CommentLike, bool>>>()).Result)
                 .Returns(new CommentLike());
@@ -153,8 +167,10 @@ namespace CommentServiceTests.Services.CommentLikeServiceTests
             var authenticatedUserId = userId;
             var addRemoveCommentLikeDTO = new AddRemoveCommentLikeDTO { UserId = userId };
 
+            // Act
             await _commentLikeService.RemoveCommentLikeAsync(addRemoveCommentLikeDTO, authenticatedUserId);
 
+            // Assert
             _commentLikeRepository.Verify(commentLikeRepository =>
                 commentLikeRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<CommentLike, bool>>>()), Times.Once);
 

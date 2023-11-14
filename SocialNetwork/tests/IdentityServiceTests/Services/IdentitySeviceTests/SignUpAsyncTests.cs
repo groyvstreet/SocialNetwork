@@ -39,17 +39,20 @@ namespace IdentityServiceTests.Services.IdentitySeviceTests
         [Fact]
         public async Task SignUpAsyncTestThrowsAlreadyExists()
         {
+            // Arrange
             _userRepository.Setup(userRepository => userRepository.GetUserByEmailAsync(It.IsAny<string>()).Result)
                 .Returns(new User());
 
             var addUserDTO = new AddUserDTO { Email = "email" };
 
+            // Assert
             await Assert.ThrowsAsync<AlreadyExistsException>(() => _identityService.SignUpAsync(addUserDTO));
         }
 
         [Fact]
         public async Task SignUpAsyncTestReturnsUser()
         {
+            // Arrange
             _userRepository.Setup(userRepository => userRepository.GetUserByEmailAsync(It.IsAny<string>()).Result)
                 .Returns((User?)null);
 
@@ -67,8 +70,10 @@ namespace IdentityServiceTests.Services.IdentitySeviceTests
                 BirthDate = DateOnly.FromDateTime(DateTime.Now)
             };
 
+            // Act
             var resultUser = await _identityService.SignUpAsync(addUserDTO);
 
+            // Assert
             using (new AssertionScope())
             {
                 resultUser.Email.Should().Be(addUserDTO.Email);

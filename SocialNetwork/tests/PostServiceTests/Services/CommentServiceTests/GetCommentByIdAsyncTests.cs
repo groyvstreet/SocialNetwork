@@ -53,14 +53,17 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task GetCommentByIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _commentService.GetCommentByIdAsync(id));
         }
 
         [Fact]
         public async Task GetCommentByIdAsyncTestReturnsFromCache()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var comment = new Comment { Id = id };
 
@@ -70,8 +73,10 @@ namespace PostServiceTests.Services.CommentServiceTests
             _mapper.Setup(mapper => mapper.Map<GetCommentDTO>(It.IsAny<Comment>()))
                 .Returns(Map);
 
+            // Act
             var resultComment = await _commentService.GetCommentByIdAsync(id);
 
+            // Assert
             _commentRepository.Verify(commentRepository => commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == id),
                 Times.Never);
 
@@ -81,6 +86,7 @@ namespace PostServiceTests.Services.CommentServiceTests
         [Fact]
         public async Task GetCommentByIdAsyncTestReturnsFromRepository()
         {
+            // Arrange
             var id = Guid.NewGuid();
             var comment = new Comment { Id = id };
 
@@ -91,8 +97,10 @@ namespace PostServiceTests.Services.CommentServiceTests
             _mapper.Setup(mapper => mapper.Map<GetCommentDTO>(It.IsAny<Comment>()))
                 .Returns(Map);
 
+            // Act
             var resultComment = await _commentService.GetCommentByIdAsync(id);
 
+            // Assert
             _commentRepository.Verify(commentRepository => commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == id),
                 Times.Once);
 

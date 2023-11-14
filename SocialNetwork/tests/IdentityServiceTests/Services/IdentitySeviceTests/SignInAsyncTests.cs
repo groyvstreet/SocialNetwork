@@ -39,18 +39,21 @@ namespace IdentityServiceTests.Services.IdentitySeviceTests
         [Fact]
         public async Task SignInAsyncThrowsUnauthorizedAccess()
         {
+            // Arrange
             var email = "email";
             var password = "password";
 
             _userRepository.Setup(userRepository => userRepository.GetUserByEmailAndPasswordAsync(email, password).Result)
                 .Returns((User?)null);
 
+            // Assert
             await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _identityService.SignInAsync(email, password));
         }
 
         [Fact]
         public async Task SignInAsyncReturnsTokens()
         {
+            // Arrange
             var email = "email";
             var password = "password";
 
@@ -66,8 +69,10 @@ namespace IdentityServiceTests.Services.IdentitySeviceTests
             _tokenService.Setup(tokenService => tokenService.GenerateRefreshTokenAsync(It.IsAny<string>()).Result)
                 .Returns("refresh token");
 
+            // Act
             var response = await _identityService.SignInAsync(email, password);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.AccessToken.Should().NotBeNullOrEmpty();

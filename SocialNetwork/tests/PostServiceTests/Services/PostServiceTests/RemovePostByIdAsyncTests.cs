@@ -43,15 +43,18 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task RemovePostByIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _postService.RemovePostByIdAsync(postId, authenticatedUserId));
         }
 
         [Fact]
         public async Task RemovePostByIdAsyncTestWithPostFromCache()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -64,14 +67,17 @@ namespace PostServiceTests.Services.PostServiceTests
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(post);
 
+            // Act
             await _postService.RemovePostByIdAsync(postId, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository => postRepository.GetFirstOrDefaultByAsync(post => post.Id == postId), Times.Never);
         }
 
         [Fact]
         public async Task RemovePostByIdAsyncTestWithPostFromRepository()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -84,14 +90,17 @@ namespace PostServiceTests.Services.PostServiceTests
             _postRepository.Setup(postRepository => postRepository.GetFirstOrDefaultByAsync(post => post.Id == postId).Result)
                 .Returns(post);
 
+            // Act
             await _postService.RemovePostByIdAsync(postId, authenticatedUserId);
 
+            // Assert
             _postRepository.Verify(postRepository => postRepository.GetFirstOrDefaultByAsync(post => post.Id == postId), Times.Once);
         }
 
         [Fact]
         public async Task RemovePostByIdAsyncTestWithPostFromCacheThrowsFordbidden()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -104,6 +113,7 @@ namespace PostServiceTests.Services.PostServiceTests
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
                 .Returns(post);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _postService.RemovePostByIdAsync(postId, authenticatedUserId));
 
             _postRepository.Verify(postRepository => postRepository.GetFirstOrDefaultByAsync(post => post.Id == postId), Times.Never);
@@ -112,6 +122,7 @@ namespace PostServiceTests.Services.PostServiceTests
         [Fact]
         public async Task RemovePostByIdAsyncTestWithPostFromRepositoryThrowsFordbidden()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var authenticatedUserId = Guid.NewGuid();
 
@@ -124,6 +135,7 @@ namespace PostServiceTests.Services.PostServiceTests
             _postRepository.Setup(postRepository => postRepository.GetFirstOrDefaultByAsync(post => post.Id == postId).Result)
                 .Returns(post);
 
+            // Assert
             await Assert.ThrowsAsync<ForbiddenException>(() => _postService.RemovePostByIdAsync(postId, authenticatedUserId));
 
             _postRepository.Verify(postRepository => postRepository.GetFirstOrDefaultByAsync(post => post.Id == postId), Times.Once);

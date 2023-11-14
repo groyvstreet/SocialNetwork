@@ -50,6 +50,7 @@ namespace PostServiceTests.Services.UserServiceTests
         [Fact]
         public async Task GetUsersLikedByPostIdAsyncTestReturnsCommentFromCache()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
             _postCacheRepository.Setup(postCacheRepository => postCacheRepository.GetAsync(It.IsAny<string>()).Result)
@@ -59,8 +60,10 @@ namespace PostServiceTests.Services.UserServiceTests
                 postLikeRepository.GetPostLikesWithUserByPostIdAsync(id).Result)
                 .Returns(new List<PostLike>());
 
+            // Act
             await _userService.GetUsersLikedByPostIdAsync(id);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Never);
         }
@@ -68,6 +71,7 @@ namespace PostServiceTests.Services.UserServiceTests
         [Fact]
         public async Task GetUsersLikedByPostIdAsyncTestReturnsCommentFromRepository()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
             _postRepository.Setup(postRepository =>
@@ -78,8 +82,10 @@ namespace PostServiceTests.Services.UserServiceTests
                 postLikeRepository.GetPostLikesWithUserByPostIdAsync(id).Result)
                 .Returns(new List<PostLike>());
 
+            // Act
             await _userService.GetUsersLikedByPostIdAsync(id);
 
+            // Assert
             _postRepository.Verify(postRepository =>
                 postRepository.GetFirstOrDefaultByAsync(It.IsAny<Expression<Func<Post, bool>>>()), Times.Once);
         }
@@ -87,8 +93,10 @@ namespace PostServiceTests.Services.UserServiceTests
         [Fact]
         public async Task GetUsersLikedByPostIdAsyncTestThrowsNotFound()
         {
+            // Arrange
             var id = Guid.NewGuid();
 
+            // Assert
             await Assert.ThrowsAsync<NotFoundException>(() => _userService.GetUsersLikedByPostIdAsync(id));
         }
     }
