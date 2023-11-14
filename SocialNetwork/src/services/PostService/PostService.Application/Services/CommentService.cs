@@ -61,7 +61,7 @@ namespace PostService.Application.Services
 
             if (comment is null)
             {
-                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == id);
 
                 if (comment is null)
                 {
@@ -100,7 +100,7 @@ namespace PostService.Application.Services
 
             if (user is null)
             {
-                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == userId);
+                user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == userId);
 
                 if (user is null)
                 {
@@ -130,7 +130,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == addCommentDTO.PostId);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == addCommentDTO.PostId);
 
                 if (post is null)
                 {
@@ -146,7 +146,7 @@ namespace PostService.Application.Services
 
             if (user is null)
             {
-                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addCommentDTO.UserId);
+                user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == addCommentDTO.UserId);
 
                 if (user is null)
                 {
@@ -180,7 +180,7 @@ namespace PostService.Application.Services
 
             if (comment is null)
             {
-                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == updateCommentDTO.Id);
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == updateCommentDTO.Id);
 
                 if (comment is null)
                 {
@@ -214,7 +214,7 @@ namespace PostService.Application.Services
 
             if (comment is null)
             {
-                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == id);
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == id);
 
                 if (comment is null)
                 {
@@ -234,7 +234,7 @@ namespace PostService.Application.Services
 
             if (post is null)
             {
-                post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == comment.PostId);
+                post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == comment.PostId);
             }
             else
             {

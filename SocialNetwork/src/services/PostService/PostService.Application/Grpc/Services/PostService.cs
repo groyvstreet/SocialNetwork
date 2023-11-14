@@ -16,7 +16,7 @@ namespace PostService.Application.Grpc.Services
 
         public override async Task<Reply> IsPostExists(Request request, ServerCallContext context)
         {
-            var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == Guid.Parse(request.PostId));
+            var post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == Guid.Parse(request.PostId));
             var isPostExists = post is not null;
             var reply = new Reply { IsPostExists = isPostExists };
 
@@ -25,7 +25,7 @@ namespace PostService.Application.Grpc.Services
 
         public override async Task<Empty> UpdatePost(Request request, ServerCallContext context)
         {
-            var post = await _postRepository.GetFirstOrDefaultByAsync(p => p.Id == Guid.Parse(request.PostId));
+            var post = await _postRepository.GetFirstOrDefaultByAsync(post => post.Id == Guid.Parse(request.PostId));
             
             if (post is not null)
             {

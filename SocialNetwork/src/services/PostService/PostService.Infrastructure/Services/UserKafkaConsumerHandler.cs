@@ -32,7 +32,8 @@ namespace PostService.Infrastructure.Services
 
                     if (userForUpdate is null)
                     {
-                        userForUpdate = await _userRepository.GetFirstOrDefaultAsNoTrackingByAsync(u => u.Id == user.Id);
+                        userForUpdate = await _userRepository.GetFirstOrDefaultAsNoTrackingByAsync(userToFind =>
+                            userToFind.Id == user.Id);
 
                         if (userForUpdate is null)
                         {
@@ -55,7 +56,8 @@ namespace PostService.Infrastructure.Services
 
                     if (userForRemove is null)
                     {
-                        userForRemove = await _userRepository.GetFirstOrDefaultAsNoTrackingByAsync(u => u.Id == user.Id);
+                        userForRemove = await _userRepository.GetFirstOrDefaultAsNoTrackingByAsync(userToFind =>
+                            userToFind.Id == user.Id);
 
                         if (userForRemove is not null)
                         {

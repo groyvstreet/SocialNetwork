@@ -40,7 +40,7 @@ namespace IdentityService.BLL.Services
             using var randomNumberGenerator = RandomNumberGenerator.Create();
             randomNumberGenerator.GetBytes(randomBytes);
 
-            var refreshToken = await _refreshTokenRepository.GetRefreshTokenByUserId(userId);
+            var refreshToken = await _refreshTokenRepository.GetRefreshTokenByUserIdAsync(userId);
 
             if (refreshToken is not null)
             {
@@ -77,7 +77,8 @@ namespace IdentityService.BLL.Services
             var principal = jwtSecurityTokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
 
-            if (jwtSecurityToken is null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            if (jwtSecurityToken is null ||
+                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new SecurityTokenException("invalid access token");
             }
@@ -95,7 +96,7 @@ namespace IdentityService.BLL.Services
                 throw new SecurityTokenException("invalid access token");
             }
 
-            var refreshTokenObj = await _refreshTokenRepository.GetRefreshTokenByUserId(userId);
+            var refreshTokenObj = await _refreshTokenRepository.GetRefreshTokenByUserIdAsync(userId);
 
             if (refreshTokenObj is null)
             {

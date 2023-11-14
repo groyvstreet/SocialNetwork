@@ -14,9 +14,9 @@ namespace IdentityService.DAL.Repositories
             _context = context;
         }
 
-        public async Task<RefreshToken?> GetRefreshTokenByUserId(string userId)
+        public async Task<RefreshToken?> GetRefreshTokenByUserIdAsync(string userId)
         {
-            return await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
+            return await _context.RefreshTokens.FirstOrDefaultAsync(refreshToken => refreshToken.UserId == userId);
         }
     }
 }

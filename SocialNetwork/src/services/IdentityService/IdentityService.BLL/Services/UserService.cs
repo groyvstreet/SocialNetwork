@@ -64,7 +64,9 @@ namespace IdentityService.BLL.Services
             return getUserDTO;
         }
 
-        public async Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO updateUserDTO, string authenticatedUserId, string authenticatedUserRole)
+        public async Task<GetUserDTO> UpdateUserAsync(UpdateUserDTO updateUserDTO,
+            string authenticatedUserId,
+            string authenticatedUserRole)
         {
             if (authenticatedUserRole != Roles.Admin && authenticatedUserId != updateUserDTO.Id)
             {
@@ -86,6 +88,7 @@ namespace IdentityService.BLL.Services
             user.FirstName = updateUserDTO.FirstName;
             user.LastName = updateUserDTO.LastName;
             user.BirthDate = updateUserDTO.BirthDate.ToDateTime(TimeOnly.MinValue);
+            user.Image = updateUserDTO.Image;
             await _userRepository.UpdateUserAsync(user);
             var getUserDTO = _mapper.Map<GetUserDTO>(user);
 

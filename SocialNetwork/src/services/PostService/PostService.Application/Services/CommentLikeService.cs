@@ -52,7 +52,7 @@ namespace PostService.Application.Services
 
             if (comment is null)
             {
-                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == addCommentLikeDTO.CommentId);
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == addCommentLikeDTO.CommentId);
 
                 if (comment is null)
                 {
@@ -68,7 +68,7 @@ namespace PostService.Application.Services
 
             if (user is null)
             {
-                user = await _userRepository.GetFirstOrDefaultByAsync(u => u.Id == addCommentLikeDTO.UserId);
+                user = await _userRepository.GetFirstOrDefaultByAsync(user => user.Id == addCommentLikeDTO.UserId);
 
                 if (user is null)
                 {
@@ -82,12 +82,13 @@ namespace PostService.Application.Services
 
             if (commentLike is null)
             {
-                commentLike = await _commentLikeRepository.GetFirstOrDefaultByAsync(cl =>
-                    cl.CommentId == addCommentLikeDTO.CommentId && cl.UserId == addCommentLikeDTO.UserId);
+                commentLike = await _commentLikeRepository.GetFirstOrDefaultByAsync(commentLike =>
+                    commentLike.CommentId == addCommentLikeDTO.CommentId && commentLike.UserId == addCommentLikeDTO.UserId);
 
                 if (commentLike is not null)
                 {
-                    await _commentLikeCacheRepository.SetAsync($"{addCommentLikeDTO.CommentId}&{addCommentLikeDTO.UserId}", commentLike);
+                    await _commentLikeCacheRepository.SetAsync($"{addCommentLikeDTO.CommentId}&{addCommentLikeDTO.UserId}",
+                        commentLike);
 
                     throw new AlreadyExistsException($"comment like with commentId = {addCommentLikeDTO.CommentId} and userId = {addCommentLikeDTO.UserId} already exists");
                 }
@@ -119,12 +120,14 @@ namespace PostService.Application.Services
                 throw new ForbiddenException();
             }
 
-            var commentLike = await _commentLikeCacheRepository.GetAsync($"{addRemoveCommentLikeDTO.CommentId}&{addRemoveCommentLikeDTO.UserId}");
+            var commentLike = await _commentLikeCacheRepository
+                .GetAsync($"{addRemoveCommentLikeDTO.CommentId}&{addRemoveCommentLikeDTO.UserId}");
 
             if (commentLike is null)
             {
-                commentLike = await _commentLikeRepository.GetFirstOrDefaultByAsync(cl =>
-                    cl.CommentId == addRemoveCommentLikeDTO.CommentId && cl.UserId == addRemoveCommentLikeDTO.UserId);
+                commentLike = await _commentLikeRepository.GetFirstOrDefaultByAsync(commentLike =>
+                    commentLike.CommentId == addRemoveCommentLikeDTO.CommentId &&
+                    commentLike.UserId == addRemoveCommentLikeDTO.UserId);
 
                 if (commentLike is null)
                 {
@@ -141,7 +144,7 @@ namespace PostService.Application.Services
 
             if (comment is null)
             {
-                comment = await _commentRepository.GetFirstOrDefaultByAsync(c => c.Id == commentLike.CommentId);
+                comment = await _commentRepository.GetFirstOrDefaultByAsync(comment => comment.Id == commentLike.CommentId);
             }
             else
             {

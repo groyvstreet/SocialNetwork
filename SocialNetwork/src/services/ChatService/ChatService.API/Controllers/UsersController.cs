@@ -1,4 +1,5 @@
-﻿using ChatService.Application.Commands.ChatCommands.AddUserToChatCommand;
+﻿using ChatService.API.Extensions;
+using ChatService.Application.Commands.ChatCommands.AddUserToChatCommand;
 using ChatService.Application.Commands.ChatCommands.RemoveUserFromChatCommand;
 using ChatService.Application.Commands.ChatCommands.SetUserAsChatAdminCommand;
 using ChatService.Application.Commands.ChatCommands.SetUserAsDefaultCommand;
@@ -6,7 +7,6 @@ using ChatService.Application.DTOs.ChatDTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ChatService.API.Controllers
 {
@@ -26,8 +26,7 @@ namespace ChatService.API.Controllers
         [Route("/api/chats/users")]
         public async Task<IActionResult> AddUserToChatAsync([FromBody] AddUserToChatDTO addUserToChatDTO)
         {
-            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var command = new AddUserToChatCommand(addUserToChatDTO, Guid.Parse(authenticatedUserId));
+            var command = new AddUserToChatCommand(addUserToChatDTO, User.AuthenticatedUserId());
             await _mediator.Send(command);
 
             return NoContent();
@@ -37,8 +36,7 @@ namespace ChatService.API.Controllers
         [Route("/api/chats/users")]
         public async Task<IActionResult> RemoveUserFromChatAsync([FromBody] RemoveUserFromChatDTO removeUserFromChatDTO)
         {
-            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var command = new RemoveUserFromChatCommand(removeUserFromChatDTO, Guid.Parse(authenticatedUserId));
+            var command = new RemoveUserFromChatCommand(removeUserFromChatDTO, User.AuthenticatedUserId());
             await _mediator.Send(command);
 
             return NoContent();
@@ -48,8 +46,7 @@ namespace ChatService.API.Controllers
         [Route("/api/chats/admins")]
         public async Task<IActionResult> SetUserAsChatAdminAsync([FromBody] SetUserAsChatAdminDTO setUserAsChatAdminDTO)
         {
-            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var command = new SetUserAsChatAdminCommand(setUserAsChatAdminDTO, Guid.Parse(authenticatedUserId));
+            var command = new SetUserAsChatAdminCommand(setUserAsChatAdminDTO, User.AuthenticatedUserId());
             await _mediator.Send(command);
 
             return NoContent();
@@ -59,8 +56,7 @@ namespace ChatService.API.Controllers
         [Route("/api/chats/admins")]
         public async Task<IActionResult> SetUserAsDefaultAsync([FromBody] SetUserAsDefaultDTO setUserAsDefaultDTO)
         {
-            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var command = new SetUserAsDefaultCommand(setUserAsDefaultDTO, Guid.Parse(authenticatedUserId));
+            var command = new SetUserAsDefaultCommand(setUserAsDefaultDTO, User.AuthenticatedUserId());
             await _mediator.Send(command);
 
             return NoContent();

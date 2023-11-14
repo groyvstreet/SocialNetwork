@@ -1,8 +1,8 @@
-﻿using IdentityService.BLL.DTOs.UserDTOs;
+﻿using IdentityService.API.Extensions;
+using IdentityService.BLL.DTOs.UserDTOs;
 using IdentityService.BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace IdentityService.PL.Controllers
 {
@@ -38,10 +38,7 @@ namespace IdentityService.PL.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserDTO updateUserDTO)
         {
-            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var authenticatedUserRole = User.FindFirstValue(ClaimTypes.Role)!;
-
-            var user = await _userService.UpdateUserAsync(updateUserDTO, authenticatedUserId, authenticatedUserRole);
+            var user = await _userService.UpdateUserAsync(updateUserDTO, User.AuthenticatedUserId(), User.AuthenticatedUserRole());
 
             return Ok(user);
         }
@@ -51,10 +48,7 @@ namespace IdentityService.PL.Controllers
         [Authorize]
         public async Task<IActionResult> RemoveUserByIdAsync(string id)
         {
-            var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var authenticatedUserRole = User.FindFirstValue(ClaimTypes.Role)!;
-
-            await _userService.RemoveUserByIdAsync(id, authenticatedUserId, authenticatedUserRole);
+            await _userService.RemoveUserByIdAsync(id, User.AuthenticatedUserId(), User.AuthenticatedUserRole());
 
             return Ok();
         }

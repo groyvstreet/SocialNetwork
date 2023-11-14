@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using PostService.Application.Interfaces;
+using System.Text;
 using System.Text.Json;
 
 namespace PostService.Infrastructure.CacheRepositories
@@ -15,13 +16,14 @@ namespace PostService.Infrastructure.CacheRepositories
 
         public async Task<T?> GetAsync(string key)
         {
-            var json = await _distributedCache.GetStringAsync($"{nameof(T)}-{key}");
+            var bytes = await _distributedCache.GetAsync($"{nameof(T)}-{key}");
 
-            if (json is null)
+            if (bytes is null)
             {
                 return null;
             }
 
+            var json = Encoding.UTF8.GetString(bytes);
             var entity = JsonSerializer.Deserialize<T>(json);
 
             return entity;
@@ -30,10 +32,14 @@ namespace PostService.Infrastructure.CacheRepositories
         public async Task SetAsync(string key, T post)
         {
             var json = JsonSerializer.Serialize(post);
-            await _distributedCache.SetStringAsync($"{nameof(T)}-{key}", json, new DistributedCacheEntryOptions
+            var bytes = Encoding.UTF8.GetBytes(json);
+
+            var distributedCacheEntryOptions = new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
-            });
+            };
+
+            await _distributedCache.SetAsync($"{nameof(T)}-{key}", bytes, distributedCacheEntryOptions);
         }
 
         public async Task RemoveAsync(string key)
