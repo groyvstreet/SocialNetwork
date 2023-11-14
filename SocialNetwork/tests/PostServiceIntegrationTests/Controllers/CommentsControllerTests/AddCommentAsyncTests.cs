@@ -58,19 +58,24 @@ namespace PostServiceIntegrationTests.Controllers.CommentsControllerTests
         [Fact]
         public async Task AddCommentAsyncTestReturnsUnauthorized()
         {
+            // Arrange
             var addCommentDTO = new AddCommentDTO();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/comments/");
             var body = JsonSerializer.Serialize(addCommentDTO);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
         public async Task AddCommentAsyncTestReturnsForbidden()
         {
+            // Arrange
             var userId = _fakeUsersGenerator.Users.First().Id;
             var postId = _fakePostsGenerator.Posts.First().Id;
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
@@ -88,19 +93,18 @@ namespace PostServiceIntegrationTests.Controllers.CommentsControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addCommentDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task AddCommentAsyncTestReturnsBadRequest()
         {
-            var userId = _fakeUsersGenerator.Users.First().Id;
-            var postId = _fakePostsGenerator.Posts.First().Id;
+            // Arrange
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
 
@@ -111,17 +115,18 @@ namespace PostServiceIntegrationTests.Controllers.CommentsControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addCommentDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
         public async Task AddCommentAsyncTestReturnsOK()
         {
+            // Arrange
             var userId = _fakeUsersGenerator.Users.First().Id;
             var postId = _fakePostsGenerator.Posts.First().Id;
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
@@ -139,8 +144,11 @@ namespace PostServiceIntegrationTests.Controllers.CommentsControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addCommentDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);

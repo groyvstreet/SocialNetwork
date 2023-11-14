@@ -56,11 +56,15 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
         [Fact]
         public async Task GetUserByIdAsyncTestReturnsHttpOK()
         {
+            // Arrange
             var userId = "5";
 
             var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/users/{userId}");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -75,10 +79,13 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
         [Fact]
         public async Task GetUserByIdAsyncTestReturnsHttpNotFound()
         {
+            // Arrange
             var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/users/{Guid.NewGuid()}");
 
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
     }

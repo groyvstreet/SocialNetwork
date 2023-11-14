@@ -1,5 +1,4 @@
-﻿using FluentAssertions.Execution;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using PostService.Infrastructure.Data;
 using PostServiceIntegrationTests.FakeDataGenerators;
@@ -68,19 +67,24 @@ namespace PostServiceIntegrationTests.Controllers.CommentLikesControllerTests
         [Fact]
         public async Task RemoveCommentLikeAsyncTestReturnsUnauthorized()
         {
+            // Arrange
             var addRemoveCommentLikeDTO = new AddRemoveCommentLikeDTO();
 
             var request = new HttpRequestMessage(new HttpMethod("DELETE"), $"/api/comment-likes/");
             var body = JsonSerializer.Serialize(addRemoveCommentLikeDTO);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
         public async Task RemoveCommentLikeAsyncTestReturnsForbidden()
         {
+            // Arrange
             var commentId = _fakeCommentsGenerator.Comments.First().Id;
             var userId = _fakeUsersGenerator.Users.First().Id;
 
@@ -98,14 +102,18 @@ namespace PostServiceIntegrationTests.Controllers.CommentLikesControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addRemoveCommentLikeDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task RemoveCommentLikeAsyncTestReturnsNotFound()
         {
+            // Arrange
             var commentId = Guid.NewGuid();
             var userId = _fakeUsersGenerator.Users.First().Id;
 
@@ -123,14 +131,18 @@ namespace PostServiceIntegrationTests.Controllers.CommentLikesControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addRemoveCommentLikeDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
         public async Task RemoveCommentLikeAsyncTestReturnsNoContent()
         {
+            // Arrange
             var commentId = _fakeCommentsGenerator.Comments.First().Id;
             var userId = _fakeUsersGenerator.Users.Last().Id;
 
@@ -148,12 +160,12 @@ namespace PostServiceIntegrationTests.Controllers.CommentLikesControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addRemoveCommentLikeDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }

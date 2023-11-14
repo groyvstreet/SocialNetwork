@@ -56,9 +56,13 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
         [Fact]
         public async Task RemoveUserByIdAsyncTestReturnsUnauthorized()
         {
+            // Arrange
             var request = new HttpRequestMessage(new HttpMethod("DELETE"), $"/api/users/{Guid.NewGuid()}");
+            
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -68,6 +72,7 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
         [Fact]
         public async Task RemoveUserByIdAsyncTestReturnsForbidden()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -77,17 +82,18 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
 
             request = new HttpRequestMessage(new HttpMethod("DELETE"), $"/api/users/{Guid.NewGuid()}");
             request.Headers.Add("Authorization", $"Bearer {token["accessToken"]}");
+
+            // Act
             response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task RemoveUserByIdAsyncTestReturnsNoContent()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -97,12 +103,12 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
 
             request = new HttpRequestMessage(new HttpMethod("DELETE"), $"/api/users/{user.Id}");
             request.Headers.Add("Authorization", $"Bearer {token["accessToken"]}");
+
+            // Act
             response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }

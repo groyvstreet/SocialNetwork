@@ -63,19 +63,24 @@ namespace PostServiceIntegrationTests.Controllers.PostLikesControllerTests
         [Fact]
         public async Task RemovePostLikeAsyncTestReturnsUnauthorized()
         {
+            // Arrange
             var addRemovePostLikeDTO = new AddRemovePostLikeDTO();
 
             var request = new HttpRequestMessage(new HttpMethod("DELETE"), $"/api/post-likes/");
             var body = JsonSerializer.Serialize(addRemovePostLikeDTO);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
         public async Task RemovePostLikeAsyncTestReturnsForbidden()
         {
+            // Arrange
             var postId = _fakePostsGenerator.Posts.First().Id;
             var userId = _fakeUsersGenerator.Users.First().Id;
 
@@ -93,14 +98,18 @@ namespace PostServiceIntegrationTests.Controllers.PostLikesControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addRemovePostLikeDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task RemovePostLikeAsyncTestReturnsNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
             var userId = _fakeUsersGenerator.Users.First().Id;
 
@@ -118,14 +127,18 @@ namespace PostServiceIntegrationTests.Controllers.PostLikesControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addRemovePostLikeDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
         public async Task RemovePostLikeAsyncTestReturnsNoContent()
         {
+            // Arrange
             var postId = _fakePostsGenerator.Posts.First().Id;
             var userId = _fakeUsersGenerator.Users.Last().Id;
 
@@ -143,12 +156,12 @@ namespace PostServiceIntegrationTests.Controllers.PostLikesControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addRemovePostLikeDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }

@@ -58,22 +58,24 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
         [Fact]
         public async Task UpdateUserAsyncTestReturnsUnauthorized()
         {
+            // Arrange
             var updateUserDTO = new UpdateUserDTO();
 
             var request = new HttpRequestMessage(new HttpMethod("PUT"), $"/api/users/");
             var body = JsonSerializer.Serialize(updateUserDTO);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
         public async Task UpdateUserAsyncTestReturnsForbidden()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -94,17 +96,18 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(updateUserDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task UpdateUserAsyncTestReturnsBadRequest()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -119,17 +122,18 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(updateUserDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
         public async Task UpdateUserAsyncTestReturnsOK()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -151,8 +155,11 @@ namespace IdentityServiceIntegrationTests.Controllers.UsersControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(updateUserDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);

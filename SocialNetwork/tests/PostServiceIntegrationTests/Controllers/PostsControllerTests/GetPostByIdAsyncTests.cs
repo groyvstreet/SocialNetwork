@@ -60,22 +60,30 @@ namespace PostServiceIntegrationTests.Controllers.PostsControllerTests
         [Fact]
         public async Task GetPostByIdAsyncTestReturnsNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
 
             var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/posts/{postId}");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
         public async Task GetPostByIdAsyncTestReturnsOK()
         {
+            // Arrange
             var postId = _fakePostsGenerator.Posts.First().Id;
 
             var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/posts/{postId}");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -58,19 +58,24 @@ namespace PostServiceIntegrationTests.Controllers.PostsControllerTests
         [Fact]
         public async Task UpdatePostAsyncTestReturnsUnauthorized()
         {
+            // Arrange
             var updatePostDTO = new UpdatePostDTO();
 
             var request = new HttpRequestMessage(new HttpMethod("PUT"), $"/api/posts/");
             var body = JsonSerializer.Serialize(updatePostDTO);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
         public async Task UpdatePostAsyncTestReturnsForbidden()
         {
+            // Arrange
             var postId = _fakePostsGenerator.Posts.First().Id;
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
@@ -86,17 +91,18 @@ namespace PostServiceIntegrationTests.Controllers.PostsControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(updatePostDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task UpdatePostAsyncTestReturnsBadRequest()
         {
+            // Arrange
             var postId = _fakePostsGenerator.Posts.First().Id;
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
@@ -108,18 +114,18 @@ namespace PostServiceIntegrationTests.Controllers.PostsControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(updatePostDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
-            using (new AssertionScope())
-            {
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            }
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         [Fact]
         public async Task UpdatePostAsyncTestReturnsNotFound()
         {
-            var postId = _fakePostsGenerator.Posts.First().Id;
+            // Arrange
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()) };
             var token = JwtGenerator.GenerateToken(claims);
 
@@ -134,14 +140,18 @@ namespace PostServiceIntegrationTests.Controllers.PostsControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(updatePostDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
         public async Task UpdatePostAsyncTestReturnsOK()
         {
+            // Arrange
             var postId = _fakePostsGenerator.Posts.First().Id;
             var userId = _fakeUsersGenerator.Users.First().Id;
             var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, userId.ToString()) };
@@ -158,8 +168,11 @@ namespace PostServiceIntegrationTests.Controllers.PostsControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(updatePostDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);

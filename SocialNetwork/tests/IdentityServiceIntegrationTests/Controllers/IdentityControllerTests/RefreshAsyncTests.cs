@@ -55,6 +55,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
         [Fact]
         public async Task RefreshAsyncTestReturnsOK()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -63,14 +64,18 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var token = JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
 
             request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/refresh?accessToken={token["accessToken"]}&refreshToken={token["refreshToken"]}");
+            
+            // Act
             response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
         public async Task RefreshAsyncTestReturnsInternalServerErrorWithInvalidAccessToken()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -80,14 +85,18 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             token["accessToken"] = "invalid token";
 
             request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/refresh?accessToken={token["accessToken"]}&refreshToken={token["refreshToken"]}");
+            
+            // Act
             response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
 
         [Fact]
         public async Task RefreshAsyncTestReturnsUnauthorizedWithInvalidRefreshToken()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/signin?email={user.Email}&password=string");
@@ -97,8 +106,11 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             token["refreshToken"] = "invalid token";
 
             request = new HttpRequestMessage(new HttpMethod("POST"), $"/api/identity/refresh?accessToken={token["accessToken"]}&refreshToken={token["refreshToken"]}");
+            
+            // Act
             response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
     }

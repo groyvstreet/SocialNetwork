@@ -61,22 +61,30 @@ namespace PostServiceIntegrationTests.Controllers.CommentsControllerTests
         [Fact]
         public async Task GetCommentsByPostIdAsyncTestReturnsNotFound()
         {
+            // Arrange
             var postId = Guid.NewGuid();
 
             var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/posts/{postId}/comments");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Fact]
         public async Task GetCommentsByPostIdAsyncTestReturnsOK()
         {
+            // Arrange
             var postId = _fakePostsGenerator.Posts.First().Id;
 
             var request = new HttpRequestMessage(new HttpMethod("GET"), $"/api/posts/{postId}/comments");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);

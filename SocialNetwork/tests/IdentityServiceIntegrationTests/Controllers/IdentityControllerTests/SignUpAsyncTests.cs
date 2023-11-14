@@ -59,6 +59,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
         [Fact]
         public async Task SignUpAsyncTestReturnsOK()
         {
+            // Arrange
             var addUserDTO = new AddUserDTO
             {
                 Email = "email",
@@ -72,8 +73,11 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addUserDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+            
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -91,6 +95,7 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
         [Fact]
         public async Task SignUpAsyncTestReturnsConflict()
         {
+            // Arrange
             var user = _fakeUsersGenerator.Users.First();
 
             var addUserDTO = new AddUserDTO
@@ -106,8 +111,11 @@ namespace IdentityServiceIntegrationTests.Controllers.IdentityControllerTests
             var jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             var body = JsonSerializer.Serialize(addUserDTO, jsonSerializerOptions);
             request.Content = new StringContent(body, Encoding.UTF8, "application/json");
+
+            // Act
             var response = await _httpClient.SendAsync(request);
 
+            // Assert
             using (new AssertionScope())
             {
                 response.StatusCode.Should().Be(HttpStatusCode.Conflict);
