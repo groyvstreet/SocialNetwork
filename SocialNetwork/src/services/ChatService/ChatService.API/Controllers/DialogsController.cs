@@ -19,7 +19,7 @@ namespace ChatService.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDialogsByUserId(Guid userId)
+        public async Task<IActionResult> GetDialogsByUserIdAsync(Guid userId)
         {
             var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var query = new GetDialogsQuery(userId, Guid.Parse(authenticatedUserId));

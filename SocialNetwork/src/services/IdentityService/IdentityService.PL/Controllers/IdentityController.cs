@@ -38,9 +38,9 @@ namespace IdentityService.PL.Controllers
 
         [HttpPost]
         [Route("refresh")]
-        public async Task<IActionResult> RefreshAsync([FromQuery] string accsessToken, [FromQuery] string refreshToken)
+        public async Task<IActionResult> RefreshAsync([FromQuery] string accessToken, [FromQuery] string refreshToken)
         {
-            var tokens = await _tokenService.RefreshTokenAsync(accsessToken, refreshToken);
+            var tokens = await _tokenService.RefreshTokenAsync(accessToken, refreshToken);
 
             return Ok(tokens);
         }
